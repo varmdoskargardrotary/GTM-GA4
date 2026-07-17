@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trafikanalys och rapportering — handledning för rotarydistrikt</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+  :root {
+    --gold: #C8963E;
+    --gold-light: #E8B96A;
+    --navy: #1A2744;
+    --navy-mid: #2A3D5E;
+    --cream: #FAF7F2;
+    --warm-gray: #8B8070;
+    --text: #2C2416;
+    --border: #DDD5C8;
+    --code-bg: #F0ECE4;
+    --success: #2D6A4F;
+    --warning: #7B4F00;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    background: var(--cream);
+    color: var(--text);
+    line-height: 1.7;
+  }
+
+  .header {
+    background: var(--navy);
+    color: white;
+    padding: 3rem 2rem 2.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 300px; height: 300px;
+    border: 2px solid rgba(200,150,62,0.2);
+    border-radius: 50%;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    top: 20px; right: 20px;
+    width: 180px; height: 180px;
+    border: 1px solid rgba(200,150,62,0.15);
+    border-radius: 50%;
+  }
+  .header-inner {
+    max-width: 900px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+  .badge {
+    display: inline-block;
+    background: var(--gold);
+    color: white;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 0.25rem 0.7rem;
+    border-radius: 2px;
+    margin-bottom: 1rem;
+  }
+  h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    font-weight: 400;
+    line-height: 1.2;
+    color: white;
+    margin-bottom: 0.75rem;
+  }
+  h1 em { color: var(--gold-light); font-style: italic; }
+  .header p {
+    color: rgba(255,255,255,0.65);
+    font-size: 0.95rem;
+    max-width: 640px;
+  }
+
+  .content {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2.5rem 2rem 4rem;
+  }
+
+  /* TOC */
+  .toc {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 2.5rem;
+  }
+  .toc-title {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--warm-gray);
+    margin-bottom: 0.75rem;
+  }
+  .toc ol {
+    list-style: none;
+    counter-reset: toc;
+  }
+  .toc li {
+    counter-increment: toc;
+    font-size: 0.85rem;
+    padding: 0.2rem 0;
+    color: var(--navy-mid);
+  }
+  .toc li::before {
+    content: counter(toc) ". ";
+    color: var(--gold);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+  }
+  .toc a { color: inherit; text-decoration: none; }
+  .toc a:hover { color: var(--gold); }
+
+  /* Context box */
+  .context-box {
+    background: white;
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--gold);
+    border-radius: 4px;
+    padding: 1.5rem;
+    margin-bottom: 2.5rem;
+  }
+  .context-box h3 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1rem;
+    font-weight: 400;
+    color: var(--navy);
+    margin-bottom: 0.75rem;
+  }
+
+  /* Sections */
+  .section { margin-bottom: 2.5rem; }
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid var(--navy);
+  }
+  .section-num {
+    background: var(--navy);
+    color: var(--gold);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    font-weight: 500;
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.4rem;
+    font-weight: 400;
+    color: var(--navy);
+  }
+
+  /* Subsection */
+  .subsection {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1.5rem;
+    margin-bottom: 1.25rem;
+  }
+  .subsection-header {
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.6rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .subsection-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: var(--gold);
+    background: rgba(200,150,62,0.08);
+    padding: 0.15rem 0.5rem;
+    border-radius: 2px;
+    white-space: nowrap;
+  }
+  h3 {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--navy);
+    line-height: 1.3;
+  }
+
+  h4 {
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--navy-mid);
+    margin: 1rem 0 0.5rem;
+  }
+
+  p {
+    font-size: 0.88rem;
+    color: #4A3F30;
+    margin-bottom: 0.65rem;
+    line-height: 1.65;
+  }
+  p:last-child { margin-bottom: 0; }
+
+  /* Navigation path */
+  .nav-path {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.25rem;
+    background: var(--navy);
+    color: rgba(255,255,255,0.85);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.73rem;
+    padding: 0.5rem 0.85rem;
+    border-radius: 4px;
+    margin: 0.6rem 0;
+  }
+  .nav-path .sep { color: var(--gold); margin: 0 0.1rem; }
+  .nav-path .nav-end { color: var(--gold-light); font-weight: 500; }
+
+  /* Config table */
+  .config-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.82rem;
+    margin: 0.65rem 0;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .config-table th {
+    background: var(--navy);
+    color: rgba(255,255,255,0.85);
+    font-weight: 500;
+    font-size: 0.71rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.55rem 0.85rem;
+    text-align: left;
+  }
+  .config-table td {
+    padding: 0.5rem 0.85rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    color: var(--text);
+    line-height: 1.5;
+  }
+  .config-table tr:last-child td { border-bottom: none; }
+  .config-table tr:nth-child(even) td { background: var(--cream); }
+
+  code {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.8em;
+    background: var(--code-bg);
+    padding: 0.1em 0.35em;
+    border-radius: 2px;
+    color: var(--navy-mid);
+  }
+
+  /* Callouts */
+  .callout {
+    border-radius: 4px;
+    padding: 0.85rem 1.1rem;
+    margin: 0.65rem 0;
+    font-size: 0.84rem;
+    border-left: 3px solid;
+    line-height: 1.55;
+  }
+  .callout-warning { background: #FFF8EC; border-color: #D4A020; color: #6B4400; }
+  .callout-tip     { background: #F0F7F4; border-color: #4A9E7A; color: #1A5C3A; }
+  .callout-info    { background: #EEF4FA; border-color: #4A80B4; color: #1A3D6A; }
+  .callout strong  { font-weight: 600; }
+
+  hr.divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 2.5rem 0;
+  }
+
+  /* Summary */
+  .summary {
+    background: var(--navy);
+    color: white;
+    border-radius: 6px;
+    padding: 1.75rem;
+    margin-top: 2.5rem;
+  }
+  .summary-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.15rem;
+    color: var(--gold-light);
+    font-weight: 400;
+    margin-bottom: 1.25rem;
+  }
+  .summary-cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+  }
+  @media (max-width: 620px) {
+    .summary-cols { grid-template-columns: 1fr; }
+  }
+  .summary-col h4 {
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 0.6rem;
+    font-family: 'DM Mono', monospace;
+  }
+  .summary-col ul { list-style: none; }
+  .summary-col li {
+    font-size: 0.83rem;
+    color: rgba(255,255,255,0.75);
+    padding: 0.22rem 0 0.22rem 1.1rem;
+    position: relative;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .summary-col li:last-child { border-bottom: none; }
+  .summary-col li::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: var(--gold);
+    font-size: 0.7rem;
+    top: 0.3rem;
+  }
+  .footer-note {
+    margin-top: 1.25rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    font-size: 0.75rem;
+    color: rgba(255,255,255,0.4);
+    font-style: italic;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <div class="badge">Rotarydistrikt · Trafikanalys &amp; rapport</div>
+    <h1>Trafikanalys <em>och rapportering</em><br>för rotarydistrikt</h1>
+    <p>Handledning för hur insamlad GA4-data omsätts till en rapport på max en sida till distriktsteamet: vad som ska laddas ner, var nyckeltalen hittas, och en föreslagen rapportstruktur.</p>
+    <p style="font-size:0.75rem; color:rgba(255,255,255,0.45); margin-top:1.25rem; margin-bottom:0;">Anders Tihkan (Värmdö Skärgård RK) &nbsp;·&nbsp; Uppdaterat 2026-07-15</p>
+  </div>
+</div>
+
+<div class="content">
+
+  <!-- Document series note -->
+  <div class="context-box" style="border-left-color: var(--gold); padding: 1rem 1.5rem;">
+    <p style="font-size:0.82rem; margin:0; color:var(--navy-mid);"><strong style="font-family:'DM Mono',monospace; font-size:0.72rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--gold);">Del 2 av 2</strong> &nbsp;·&nbsp; Det här dokumentet beskriver hur insamlad data utvärderas och sammanställs. Del 1 — <em>GTM &amp; GA4 konfiguration för ClubRunner-distrikt</em> — beskriver hur mätningen konfigureras och vilka events som samlas in.</p>
+  </div>
+
+  <!-- Context box -->
+  <div class="context-box">
+    <h3>Förutsättning</h3>
+    <p>Handledningen förutsätter att GTM och GA4 är konfigurerade enligt <em>Del 1</em>, och att mätningen samlat in data i minst en period. Det innebär att unwanted referrals är blockerade, att custom events för nedladdningar (<code>file_download</code>, <code>page_file_download</code>), utgående klick (<code>outbound_click</code>), nyhetsbrev (<code>bulletin_viewed</code>) och sökord (<code>view_search_results</code>) är aktiva, och att en fyrafliksutforskning är byggd enligt avsnitt 1d i Del 1. Utan den konfigurationen blir event-data ofullständig och flera avsnitt i den här handledningen inte tillämpliga.</p>
+  </div>
+
+  <!-- TOC -->
+  <div class="toc">
+    <div class="toc-title">Innehåll</div>
+    <ol>
+      <li><a href="#ladda-ner">Vad som ska laddas ner från GA4</a></li>
+      <li><a href="#nyckeltal">Hitta nyckeltalen — sammanställning</a></li>
+      <li><a href="#struktur">Rapportstruktur — förslag</a></li>
+      <li><a href="#checklist">Checklista</a></li>
+    </ol>
+  </div>
+
+  <!-- ======================================================= -->
+  <!-- Avsnitt 1 — Vad ska laddas ner                           -->
+  <!-- ======================================================= -->
+  <div class="section" id="ladda-ner">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <h2>Vad som ska laddas ner från GA4</h2>
+    </div>
+
+    <!-- 1a -->
+    <div class="subsection">
+      <div class="subsection-header">
+        <span class="subsection-label">1a</span>
+        <h3>Välj mätperiod</h3>
+      </div>
+      <p>Välj mätperiod i datumväljaren — det svarta fältet uppe till höger i varje rapport.</p>
+
+      <div class="nav-path">
+        [valfri rapport under Reports] <span class="sep">›</span> svarta fältet uppe till höger <span class="sep">›</span> <span class="nav-end">Custom · ange startdatum och slutdatum</span>
+      </div>
+
+      <div class="callout callout-tip">
+        <strong>Slå på jämförelse</strong> — välj "Compare: Previous period" eller ett eget datumintervall för att ge siffran kontext. Utan jämförelsetal är en enstaka siffra svår att tolka.
+      </div>
+    </div>
+
+    <!-- 1b -->
+    <div class="subsection">
+      <div class="subsection-header">
+        <span class="subsection-label">1b</span>
+        <h3>Grundmåtten — räckvidd och engagemang</h3>
+      </div>
+      <p>Startpunkten för alla rapporter. Ger den övergripande bilden innan du går vidare till källor och innehåll.</p>
+
+      <div class="nav-path">
+        Reports <span class="sep">›</span> Life cycle <span class="sep">›</span> <span class="nav-end">Engagement › Overview</span>
+      </div>
+
+      <table class="config-table">
+        <tr><th>Mått</th><th>Vad det mäter</th><th>Användning</th></tr>
+        <tr><td>Sessions</td><td>Antal besök totalt — en person kan ha flera sessioner</td><td>Bra jämförelsetal period mot period</td></tr>
+        <tr><td>Engaged sessions</td><td>Besök som varade ≥10 sek, gav ≥2 sidvisningar, eller innehöll ett konverteringsevent</td><td>Operativt mått — visar om trafiken är kvalitativ</td></tr>
+        <tr><td>Engagement rate</td><td>Engaged sessions / alla sessions</td><td>Operativt mått — förändras snabbare än Users och är mer känsligt för kommunikationsinsatser</td></tr>
+        <tr><td>Average engagement time per session</td><td>Hur länge besökare aktivt interagerar (inte bara har fliken öppen)</td><td>Indikator på innehållskvalitet</td></tr>
+        <tr><td>Users</td><td>Antal webbläsarinstanser med aktiv GA4-cookie — inte antal människor</td><td>Långsiktig trend, inte styrtal för löpande kommunikationsinsatser</td></tr>
+        <tr><td>New users</td><td>Webbläsare utan tidigare GA4-cookie — rensad cookie = "ny" besökare</td><td>Indikering, inte styrtal — alltför beroende av cookie-livslängd</td></tr>
+      </table>
+
+      <div class="callout callout-warning">
+        <strong>Users är webbläsare, inte människor.</strong> GA4 identifierar varje "user" med en förstapartscookie (<code>_ga</code>) som lagras i webbläsaren — inte kopplad till ett konto eller en person. Det ger tre viktiga begränsningar:
+        <ul style="margin: 0.5rem 0 0.5rem 1.25rem;">
+          <li>Samma person på mobil och dator räknas som <em>två</em> users.</li>
+          <li>Den som rensar cookies, byter webbläsare eller använder privat-/inkognitoläge räknas som en ny user vid nästa besök.</li>
+          <li>Den som avvisar cookies i samtyckesrutan spåras inte alls och saknas i datan.</li>
+        </ul>
+        Users tenderar därför att <em>överskatta</em> antalet verkliga besökare — men underskattar dem som nekar samtycke. Använd Sessions och Engagement rate som operativa mått; Users ger bara en grov indikation på besöksvolymen över tid.
+      </div>
+
+      <p>Ladda ner tabellen med nedladdningsikonen (↓) uppe till höger i rapporten — exporterar till CSV eller Google Sheets.</p>
+    </div>
+
+    <!-- 1c -->
+    <div class="subsection">
+      <div class="subsection-header">
+        <span class="subsection-label">1c</span>
+        <h3>Trafikkällor</h3>
+      </div>
+      <p>Visar <em>varifrån</em> besökarna kommer — avgörande för att bedöma om sajten primärt nås via sökmotorer, direktlänkar (t.ex. från klubbmejl), sociala medier eller andra sajter.</p>
+
+      <div class="nav-path">
+        Reports <span class="sep">›</span> Acquisition <span class="sep">›</span> <span class="nav-end">Traffic acquisition</span>
+      </div>
+
+      <p>Primär dimension: <strong>Session default channel group</strong> (Organic Search, Direct, Referral, Organic Social, Unassigned m.fl.). Mätvärden: Sessions, Engaged sessions, Engagement rate.</p>
+
+      <div class="callout callout-warning">
+        <strong>Kontrollera "unwanted referrals" i GA4-konfigurationen innan du läser av den här rapporten.</strong> Om ClubRunners egna domäner inte är blockerade dyker de upp som falska "Referral"-källor och skevar bilden.
+      </div>
+    </div>
+
+    <!-- 1d -->
+    <div class="subsection">
+      <div class="subsection-header">
+        <span class="subsection-label">1d</span>
+        <h3>Mest besökta sidor</h3>
+      </div>
+      <p>Vilket innehåll som faktiskt konsumeras — underlag för att bedöma om distriktets prioriterade sidor (t.ex. projektfond, evenemang) når fram.</p>
+
+      <div class="nav-path">
+        Reports <span class="sep">›</span> Engagement <span class="sep">›</span> <span class="nav-end">Pages and screens</span>
+      </div>
+
+      <p>Dimension: Page title and screen class (eller Page path). Mätvärden: Views, Active users, Average engagement time. Sortera fallande på Views och ta med topp 10–15 i underlaget — bara de 3–5 mest relevanta hamnar sedan i rapporten.</p>
+    </div>
+
+    <!-- 1e -->
+    <div class="subsection">
+      <div class="subsection-header">
+        <span class="subsection-label">1e</span>
+        <h3>Anpassade events — nedladdningar, utgående klick, nyhetsbrev, sökord</h3>
+      </div>
+      <p>Custom events fångar <em>handling</em>, inte bara visning — en starkare engagemangssignal än sidvisningar. Fem events konfigureras i Del 1; nedladdningar täcks av två separata events som redovisas ihop i utforskningen:</p>
+
+      <table class="config-table">
+        <tr><th>Event</th><th>Vad det fångar</th><th>Viktigaste parameter</th></tr>
+        <tr><td colspan="3" style="background:rgba(200,150,62,0.08); font-size:0.78rem; font-weight:600; color:var(--warm-gray); padding:0.3rem 0.75rem; letter-spacing:0.04em; text-transform:uppercase;">Nedladdningar — 2 events</td></tr>
+        <tr><td><code>file_download</code></td><td>Nedladdning av filer från Dokument</td><td><code>file_name</code> — vilken fil</td></tr>
+        <tr><td><code>page_file_download</code></td><td>Nedladdning av sidfiler (filer i widgeten Page Download Files, lagras på ClubRunners blob-domän)</td><td><code>file_name</code> — vilken sida/fil</td></tr>
+        <tr><td><code>outbound_click</code></td><td>Klick på externa länkar</td><td><code>link_url</code>, <code>link_text</code> — vart och vad</td></tr>
+        <tr><td><code>bulletin_viewed</code></td><td>Klick till nyhetsbrev (bulletin)</td><td><code>link_url</code> — vilket utskick</td></tr>
+        <tr><td><code>view_search_results</code></td><td>Sökningar i sajtens sökruta</td><td><code>search_term</code> — sökordet</td></tr>
+      </table>
+
+      <p style="margin-top:0.75rem;">Standardrapporten ger bara totalantal per eventnamn. Öppna den fyrafliksutforskning som byggdes i Del 1 (avsnitt 1e) för att se uppdelningen per dokument, länk eller sökord:</p>
+
+      <div class="nav-path">
+        Explore <span class="sep">›</span> <span class="nav-end">Custom events [distrikt] [period]</span>
+      </div>
+
+      <div class="callout callout-tip">
+        <strong>Sökorden är en direkt signal om innehållsgap.</strong> Om besökare söker efter termer som inte matchar något bra sidresultat (stavfel, synonymer, ämnen som saknas) pekar det på var sajten behöver förbättras — utan att man behöver gissa sig till det ur sidvisningsstatistik.
+      </div>
+    </div>
+
+    <!-- 1f -->
+    <div class="subsection">
+      <div class="subsection-header">
+        <span class="subsection-label">1f</span>
+        <h3>Enhet och geografi (sanity check)</h3>
+      </div>
+      <p>Inte huvudfokus för distriktsrapporten, men värt en snabb koll: en avvikande geografisk fördelning (mycket trafik utanför Sverige) eller en extremt hög andel av en enskild enhetstyp kan indikera bot-/spamtrafik snarare än riktiga besökare.</p>
+
+      <div class="nav-path">
+        Reports <span class="sep">›</span> Tech <span class="sep">›</span> Overview <span class="sep">·</span> Reports <span class="sep">›</span> Demographics <span class="sep">›</span> <span class="nav-end">Demographics detail (Country)</span>
+      </div>
+    </div>
+
+  
+    <!-- 1g -->
+    <div class="subsection">
+      <div class="subsection-header">
+        <span class="subsection-label">1g</span>
+        <h3>Söktrafik från Google — Search Console-data</h3>
+      </div>
+      <p>Search Console-data i GA4 visar den <em>inkommande</em> söktrafiken: vilka söktermer i Google som leder besökare till sajten, vilka sidor som rankar, och hur synlig sajten är i sökresultaten. Det kompletterar sökordsspårningen (1e) som visar vad besökare letar efter <em>när de väl är på sajten</em>.</p>
+
+      <div class="nav-path">
+        Reports <span class="sep">›</span> Acquisition <span class="sep">›</span> <span class="nav-end">Search Console</span>
+      </div>
+
+      <h4>Vad du hittar här</h4>
+      <table class="config-table">
+        <tr>
+          <th>Rapport</th>
+          <th>Nyckeltal</th>
+          <th>Vad det berättar</th>
+        </tr>
+        <tr>
+          <td>Queries</td>
+          <td>Clicks, Impressions, CTR, Position</td>
+          <td>Vilka sökord ger trafik — och vilka ger visningar utan klick</td>
+        </tr>
+        <tr>
+          <td>Google organic search pages</td>
+          <td>Clicks, Impressions, CTR, Position</td>
+          <td>Vilka sidor rankar i Google och för hur många sökningar</td>
+        </tr>
+      </table>
+
+      <h4>Vad du bör titta efter</h4>
+      <p><strong>Hög visningsandel, låg CTR</strong> (klickfrekvens under ~2&nbsp;%) tyder på att sidan syns i sökresultaten men att titel eller beskrivning inte lockar till klick — ett tecken på att metadatan behöver ses över.</p>
+      <p><strong>Söktermer utan sida</strong> — om besökare söker på t.ex. "Rotary [stad] medlemskap" men ingen sida rankar för det, kan det vara ett innehållsgap att fylla.</p>
+      <p><strong>Jämför med sajtsökningen:</strong> termer som ofta söks både i Google <em>och</em> i sajtsökningen (avsnitt 1e) är en stark signal om att innehållet antingen saknas eller är svårt att navigera till.</p>
+
+      <div class="callout callout-warning">
+        <strong>Distrikts- och klubbsajter syns sällan för generella sökningar.</strong> Förvänta dig söktermer knutna till distriktets namn, ortsnamn och specifika programnamn — inte bred Rotary-trafik. Det är normalt.
+      </div>
+    </div>
+
+  
+    <!-- 1h -->
+    <div class="subsection">
+      <div class="subsection-header">
+        <span class="subsection-label">1h</span>
+        <h3>Microsoft Clarity — beteendedata som kompletterar GA4</h3>
+      </div>
+      <p>GA4 svarar på <em>vad</em> som händer — hur många besök, vilka sidor, vilka events. Clarity svarar på <em>varför</em>: det spelar in besökssessioner och skapar värmekartor som visar var besökare klickar, hur långt de scrollar och var de fastnar.</p>
+
+      <div class="nav-path">
+        <a href="https://clarity.microsoft.com" style="color:inherit;">clarity.microsoft.com</a> <span class="sep">›</span> <span class="nav-end">ditt projekt</span>
+      </div>
+
+      <h4>De viktigaste verktygen</h4>
+      <table class="config-table">
+        <tr>
+          <th>Verktyg</th>
+          <th>Vad det visar</th>
+          <th>Bra fråga att ställa</th>
+        </tr>
+        <tr>
+          <td>Heatmap — Clicks</td>
+          <td>Var på sidan besökare klickar</td>
+          <td>Klickar besökare på rätt element — eller på saker som inte är klickbara?</td>
+        </tr>
+        <tr>
+          <td>Heatmap — Scroll</td>
+          <td>Hur långt ner på sidan besökare scrollar</td>
+          <td>Ser besökare det viktigaste innehållet, eller stannar de redan ovanför det?</td>
+        </tr>
+        <tr>
+          <td>Heatmap — Attention</td>
+          <td>Kombinerad bild av var besökare lägger sin uppmärksamhet (tid, scroll, position)</td>
+          <td>Läses viktig information ovanför scrollgränsen, eller missas den trots sin placering?</td>
+        </tr>
+        <tr>
+          <td>Session recordings</td>
+          <td>Inspelningar av enskilda besök med musrörelser och klick</td>
+          <td>Vad gör en besökare som lämnar sidan snabbt — hittar de inte vad de söker?</td>
+        </tr>
+        <tr>
+          <td>Dead clicks</td>
+          <td>Klick på element som inte är klickbara</td>
+          <td>Finns bilder eller rubriker som besökare tror är länkar?</td>
+        </tr>
+        <tr>
+          <td>Rage clicks</td>
+          <td>Upprepade klick på samma ställe</td>
+          <td>Finns det ett element som frustrerar besökare — t.ex. en knapp som inte svarar?</td>
+        </tr>
+        <tr>
+          <td>Quick backs</td>
+          <td>Besökare som omedelbart lämnar sidan och går tillbaka</td>
+          <td>Matchar sidans innehåll det besökaren förväntade sig?</td>
+        </tr>
+      </table>
+
+      <h4>Filtrera per enhet</h4>
+      <p>Alla värmekartor kan filtreras per enhet — Desktop, Tablet eller Mobile — direkt i heatmap-gränssnittet. Det ger mer än GA4:s enhetssiffror: det visar <em>hur</em> beteendet skiljer sig åt, inte bara hur många som besöker från varje enhet. ClubRunner-sajter är sällan fullt mobiloptimerade, och en jämförelse mellan desktop och mobil kan snabbt avslöja var layouten brister.</p>
+
+      <h4>AI Insights</h4>
+      <p>Clarity har en inbyggd AI-sammanfattning (AI Insights) som automatiskt analyserar värmekartor och inspelningar och identifierar mönster — t.ex. "de flesta användare klickar på X men ignorerar Y" eller "många lämnar sidan vid det här steget". Det är en bra ingångspunkt för en webmaster som inte vill titta igenom tiotals inspelningar manuellt.</p>
+
+      <h4>Så används Clarity bäst i kombination med GA4</h4>
+      <p>GA4 visar att en sida har hög avvisningsfrekvens — Clarity visar <em>vad</em> som händer under de besöken. Filtrera inspelningar på den specifika sidan och titta på ett tiotal sessioner. Mönster brukar framträda snabbt.</p>
+      <p>GA4 visar att en knapp klickas sällan — Claritys heatmap visar om besökare överhuvudtaget ser den, eller om den hamnar under scrollgränsen för majoriteten av besökarna.</p>
+
+      <div class="callout callout-info">
+        <strong>Volymkrav.</strong> Clarity kräver ett visst antal sessioner för att heatmaps ska vara statistiskt meningsfulla. På sajter med låg trafik ger sessionsinspelningar mer direkt nytta — titta på enskilda besök snarare än aggregerade värmekartor.
+      </div>
+    </div>
+
+    <!-- 1i -->
+    <div class="subsection">
+      <div class="subsection-header">
+        <span class="subsection-label">1i</span>
+        <h3>Videoengagemang</h3>
+      </div>
+      <p>Visar om inbäddade videor faktiskt tittas på, eller bara scrollas förbi. Nivå 3-mått. Två datakällor kompletterar varandra:</p>
+
+      <table class="config-table">
+        <tr><th>Källa</th><th>Vad det visar</th><th>Var</th></tr>
+        <tr><td>GA4 Enhanced Measurement</td><td><code>video_start</code>, <code>video_progress</code> (25/50/75 %), <code>video_complete</code> — för inbäddade YouTube-klipp på sajten</td><td>Reports › Engagement › Events (filtrera på "video_")</td></tr>
+        <tr><td>YouTube Analytics</td><td>Totalt antal visningar, genomsnittlig visningslängd, retentionskurva — för alla visningar oavsett ursprung</td><td>studio.youtube.com › Analytics</td></tr>
+      </table>
+
+      <div class="callout callout-info">
+        GA4 spårar videoevents automatiskt för inbäddade YouTube-videor om Enhanced Measurement är aktiverat (se Del 1, avsnitt 1b). Retentionskurvan i YouTube Analytics är särskilt användbar — den visar exakt vid vilken tidpunkt tittare slutar titta.
+      </div>
+    </div>
+
+    <!-- 1j -->
+    <div class="subsection">
+      <div class="subsection-header">
+        <span class="subsection-label">1j</span>
+        <h3>Kundvägsutforskning</h3>
+      </div>
+      <p>Visar vilken väg besökare tar genom webbplatsen — t.ex. om de går vidare från en artikel till en donationssida eller projektfond. Används för att bedöma om navigering och CTA fungerar som tänkt. Nivå 3-mått.</p>
+
+      <div class="nav-path">
+        Explore <span class="sep">›</span> <span class="nav-end">Path exploration</span>
+      </div>
+
+      <p>Välj startpunkt (t.ex. en specifik sida eller event) och GA4 visar besökarnas nästa steg och var de lämnar flödet. Mest användbart vid analys av en konkret besöksväg: t.ex. Startsida → Projektfond → Donationsformulär.</p>
+    </div>
+
+  </div><!-- /section 1 -->
+
+  <!-- ======================================================= -->
+  <!-- Avsnitt 2 — Hitta nyckeltalen                            -->
+  <!-- ======================================================= -->
+  <div class="section" id="nyckeltal">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <h2>Hitta nyckeltalen — sammanställning</h2>
+    </div>
+
+    <p>Samtliga mått från avsnitt 1, samlade på ett ställe. Använd tabellen som en checklista när du bygger underlaget — varje rad motsvarar en siffra som ska in i faktatabellen i den färdiga rapporten.</p>
+
+    <table class="config-table">
+      <tr><th>Nyckeltal</th><th>Var du hittar det</th><th>Vad det säger</th><th>Nivå</th></tr>
+      <tr><td>Sessions</td><td>Life cycle › Engagement › Overview</td><td>Totalt antal besök — bra jämförelsetal period mot period</td><td>Trend</td></tr>
+      <tr><td>Engagement rate</td><td>Life cycle › Engagement › Overview</td><td>Andel besök med meningsfull interaktion</td><td>Trend</td></tr>
+      <tr><td>Sessions per channel group</td><td>Acquisition › Traffic acquisition</td><td>Varifrån besökarna kommer — direkt, organisk sökning, referral, social</td><td>Operativt</td></tr>
+      <tr><td>Views per sida (topp 10–15)</td><td>Engagement › Pages and screens</td><td>Populäraste innehållet</td><td>Operativt</td></tr>
+      <tr><td>file_download / page_file_download / outbound_click / bulletin_viewed</td><td>Explore → Custom events (fyrafliksutforskning)</td><td>Konkret handling — starkare signal än sidvisning</td><td>Operativt</td></tr>
+      <tr><td>Söktrafik (Search Console)</td><td>Reports › Acquisition › Search Console</td><td>Sökord och ranking i Google — visar om organisk synlighet ökar</td><td>Operativt</td></tr>
+      <tr><td>view_search_results — intern sökning</td><td>Explore → Custom events, fliken Sökord</td><td>Vad besökare söker efter på sajten — visar innehållsgap</td><td>Löpande</td></tr>
+      <tr><td>Average engagement time</td><td>Life cycle › Engagement › Overview</td><td>Hur länge besökare stannar aktivt</td><td>Löpande</td></tr>
+      <tr><td>Scrolldjup</td><td>Microsoft Clarity › scrollheatmap</td><td>Hur långt ned besökare scrollar — avslöjar om längre innehåll läses</td><td>Löpande</td></tr>
+      <tr><td>Videoengagemang</td><td>Reports › Engagement › Events (video_*) + YouTube Analytics</td><td>Om inbäddade videor spelas upp och ses klart</td><td>Löpande</td></tr>
+      <tr><td>Kundvägsutforskning</td><td>Explore → Path exploration</td><td>Besökarens väg genom sajten — om CTA och navigering fungerar</td><td>Löpande</td></tr>
+      <tr><td>Beteendeanalys (Clarity)</td><td>clarity.microsoft.com</td><td>Värmekartor, sessionsinspelningar, AI-mönster</td><td>Löpande</td></tr>
+      <tr><td>Users</td><td>Life cycle › Engagement › Overview</td><td>Webbläsarinstanser med aktiv GA4-cookie — indikation på volym, ej styrtal (se avsnitt 1b)</td><td>Indikator</td></tr>
+    </table>
+  </div>
+
+  <!-- ======================================================= -->
+  <!-- Avsnitt 3 — Rapportstruktur                              -->
+  <!-- ======================================================= -->
+  <div class="section" id="struktur">
+    <div class="section-header">
+      <div class="section-num">3</div>
+      <h2>Rapportstruktur — förslag</h2>
+    </div>
+
+    <div class="subsection">
+      <p>Distriktsteamet är inte GA4-kunniga och vill inte bläddra i rådata. Föreslagen struktur: <strong>slutsats först, tolkande löptext under rubriker, siffror samlade i en tabell sist.</strong> Strukturen nedan gäller webbmåtten från GA4 och Clarity för rotary2405.se — Facebook-statistik och utskicksstatistik redovisas separat.</p>
+
+      <table class="config-table">
+        <tr><th>Del</th><th>Innehåll</th></tr>
+        <tr><td>Titel</td><td>Sajt/kanal + rotaryår, t.ex. "rotary2405.se — Trafikanalys Rotaryåret 2025/26"</td></tr>
+        <tr><td>Ingress (2–4 meningar)</td><td>Huvudslutsatsen rakt av: fungerar sajten som avsett? Går trenden upp eller ner mot föregående år? Ingen underrubrik behövs — det här är rapportens kärna.</td></tr>
+        <tr><td>Rubrik: Räckvidd</td><td>Sessions-trend jämfört med föregående period + engagement rate — inte Users som huvudtal; Users nämns i faktatabellen men ska inte vara kommunikationsmål</td></tr>
+        <tr><td>Rubrik: Trafikkällor</td><td>Organic Search, Direct, Referral och Social — lyft fram starkaste källan och eventuella förändringar jämfört med föregående period</td></tr>
+        <tr><td>Rubrik: Populäraste sidor</td><td>Topp 3–5 sidor med flest sidvisningar — kommentera om prioriterade distriktssidor (t.ex. projektfond, evenemang) når fram</td></tr>
+        <tr><td>Rubrik: Nedladdningar och externa klick</td><td>Vilka dokument laddas ned, vilka externa sidor klickas — konkret handling, starkare signal än sidvisning</td></tr>
+        <tr><td>Faktatabell</td><td>Samtliga nyckeltal från avsnitt 2, kompakt samlade — underlag för kommande jämförelse mot baslinjer</td></tr>
+      </table>
+    </div>
+  </div>
+
+</div><!-- /content -->
+</body>
+</html>
