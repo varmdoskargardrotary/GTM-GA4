@@ -364,10 +364,10 @@
 
 <div class="header">
   <div class="header-inner">
-    <div class="badge">Rotarydistrikt · Trafikanalys &amp; rapport</div>
-    <h1>Trafikanalys <em>och rapportering</em><br>för rotarydistrikt</h1>
-    <p>Handledning för hur insamlad GA4-data omsätts till en rapport på max en sida till distriktsteamet: vad som ska laddas ner, var nyckeltalen hittas, och en föreslagen rapportstruktur.</p>
-    <p style="font-size:0.75rem; color:rgba(255,255,255,0.45); margin-top:1.25rem; margin-bottom:0;">Anders Tihkan (Värmdö Skärgård RK) &nbsp;·&nbsp; Uppdaterat 2026-07-15</p>
+    <div class="badge">Rotarydistrikt/Rotaryklubbar · ClubRunner CMS</div>
+    <h1>DEL 2 Trafikanalys <em>och rapportering</em></h1>
+    <p>Handledning för hur insamlad GA4-data omsätts till en rapport på max en sida: vad som bör laddas ner, var nyckeltalen hittas, och en föreslagen rapportstruktur.</p>
+    <p style="font-size:0.75rem; color:rgba(255,255,255,0.45); margin-top:1.25rem; margin-bottom:0;">Anders Tihkan (Värmdö Skärgård RK) &nbsp;·&nbsp; Uppdaterat 2026-07-18</p>
   </div>
 </div>
 
@@ -375,7 +375,9 @@
 
   <!-- Document series note -->
   <div class="context-box" style="border-left-color: var(--gold); padding: 1rem 1.5rem;">
-    <p style="font-size:0.82rem; margin:0; color:var(--navy-mid);"><strong style="font-family:'DM Mono',monospace; font-size:0.72rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--gold);">Del 2 av 2</strong> &nbsp;·&nbsp; Det här dokumentet beskriver hur insamlad data utvärderas och sammanställs. Del 1 — <em>GTM &amp; GA4 konfiguration för ClubRunner-distrikt</em> — beskriver hur mätningen konfigureras och vilka events som samlas in.</p>
+    <p style="font-size:0.82rem; margin:0; color:var(--navy-mid);"><strong style="font-family:'DM Mono',monospace; font-size:0.72rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--gold);">Del 2 av 2</strong> &nbsp;·&nbsp; Det här dokumentet beskriver hur insamlad data utvärderas och sammanställs.<br/>
+      Del 1 — <em>GTM &amp; GA4 konfiguration för webbplatser med ClubRunner CMS</em> — beskriver hur mätningen konfigureras och vilka events som samlas in.<br/>
+    Supportsidan om <a href="https://rotary2405.se/page/support-trafikanalys/" target="_blank">Trafikanalys</a> beskriver varför mätningar och konfigurering behövs.</p>
   </div>
 
   <!-- Context box -->
@@ -388,7 +390,7 @@
   <div class="toc">
     <div class="toc-title">Innehåll</div>
     <ol>
-      <li><a href="#ladda-ner">Vad som ska laddas ner från GA4</a></li>
+      <li><a href="#ladda-ner">Vad som behöver laddas ner från GA4</a></li>
       <li><a href="#nyckeltal">Hitta nyckeltalen — sammanställning</a></li>
       <li><a href="#struktur">Rapportstruktur — förslag</a></li>
       <li><a href="#checklist">Checklista</a></li>
@@ -410,10 +412,10 @@
         <span class="subsection-label">1a</span>
         <h3>Välj mätperiod</h3>
       </div>
-      <p>Välj mätperiod i datumväljaren — det svarta fältet uppe till höger i varje rapport.</p>
+      <p>Välj mätperiod i datumväljaren uppe till höger i GA4-fönstret.</p>
 
       <div class="nav-path">
-        [valfri rapport under Reports] <span class="sep">›</span> svarta fältet uppe till höger <span class="sep">›</span> <span class="nav-end">Custom · ange startdatum och slutdatum</span>
+        [valfri rapport under Reports] <span class="sep">›</span> datumväljaren uppe till höger <span class="sep">›</span> <span class="nav-end">Custom · ange startdatum och slutdatum</span>
       </div>
 
       <div class="callout callout-tip">
@@ -444,7 +446,7 @@
       </table>
 
       <div class="callout callout-warning">
-        <strong>Users är webbläsare, inte människor.</strong> GA4 identifierar varje "user" med en förstapartscookie (<code>_ga</code>) som lagras i webbläsaren — inte kopplad till ett konto eller en person. Det ger tre viktiga begränsningar:
+        <strong>Users är webbläsare, inte människor.</strong> GA4 identifierar varje "user" med en förstapartscookie (<code>_ga</code>) som lagras i webbläsaren och inte är kopplad till ett konto eller en person. Detta ger tre viktiga begränsningar:
         <ul style="margin: 0.5rem 0 0.5rem 1.25rem;">
           <li>Samma person på mobil och dator räknas som <em>två</em> users.</li>
           <li>Den som rensar cookies, byter webbläsare eller använder privat-/inkognitoläge räknas som en ny user vid nästa besök.</li>
@@ -652,7 +654,7 @@
         <span class="subsection-label">1i</span>
         <h3>Videoengagemang</h3>
       </div>
-      <p>Visar om inbäddade videor faktiskt tittas på, eller bara scrollas förbi. Nivå 3-mått. Två datakällor kompletterar varandra:</p>
+      <p>Visar om inbäddade videor faktiskt tittas på, eller bara scrollas förbi. Nivå 3-mått (löpande uppföljning). Två datakällor kompletterar varandra:</p>
 
       <table class="config-table">
         <tr><th>Källa</th><th>Vad det visar</th><th>Var</th></tr>
@@ -699,7 +701,7 @@
       <tr><td>Engagement rate</td><td>Life cycle › Engagement › Overview</td><td>Andel besök med meningsfull interaktion</td><td>Trend</td></tr>
       <tr><td>Sessions per channel group</td><td>Acquisition › Traffic acquisition</td><td>Varifrån besökarna kommer — direkt, organisk sökning, referral, social</td><td>Operativt</td></tr>
       <tr><td>Views per sida (topp 10–15)</td><td>Engagement › Pages and screens</td><td>Populäraste innehållet</td><td>Operativt</td></tr>
-      <tr><td>file_download / page_file_download / outbound_click / bulletin_viewed</td><td>Explore → Custom events (fyrafliksutforskning)</td><td>Konkret handling — starkare signal än sidvisning</td><td>Operativt</td></tr>
+      <tr><td>file_download / page_file_download / outbound_click / bulletin_viewed</td><td>Explore → Custom events (fyrafliksutforskning)</td><td>Konkreta handlingar ger starkare signal än sidvisning</td><td>Operativt</td></tr>
       <tr><td>Söktrafik (Search Console)</td><td>Reports › Acquisition › Search Console</td><td>Sökord och ranking i Google — visar om organisk synlighet ökar</td><td>Operativt</td></tr>
       <tr><td>view_search_results — intern sökning</td><td>Explore → Custom events, fliken Sökord</td><td>Vad besökare söker efter på sajten — visar innehållsgap</td><td>Löpande</td></tr>
       <tr><td>Average engagement time</td><td>Life cycle › Engagement › Overview</td><td>Hur länge besökare stannar aktivt</td><td>Löpande</td></tr>
@@ -721,7 +723,9 @@
     </div>
 
     <div class="subsection">
-      <p>Distriktsteamet är inte GA4-kunniga och vill inte bläddra i rådata. Föreslagen struktur: <strong>slutsats först, tolkande löptext under rubriker, siffror samlade i en tabell sist.</strong> Strukturen nedan gäller webbmåtten från GA4 och Clarity för rotary2405.se — Facebook-statistik och utskicksstatistik redovisas separat.</p>
+      <p>Distriktsteamet är inte GA4-kunniga och vill inte bläddra i rådata. Föreslagen struktur: <strong>slutsats först, tolkande löptext under rubriker, siffror samlade i en tabell sist.</strong> Strukturen nedan gäller webbmåtten från GA4 och Clarity. Analys på andra kanaler som utskick, Facebook, etc bör tillföras för att ge en helhetsbild av kommunikationen.<br/>
+        Läs på supportsidan om <a href="https://rotary2405.se/page/support-trafikanalys/" target="_blank">Trafikanalys</a> om förslag till nyckeltal uppdelade på tre nivåer. </p>
+      <p>Låt gärna din favorit-AI göra grovjobbet: Ladda upp texten om nyckeltal från supportsidan Trafikanalys, tabellen nedan, samt csv-filerna från GA4 och be om analys och sammanställning. </p>
 
       <table class="config-table">
         <tr><th>Del</th><th>Innehåll</th></tr>
