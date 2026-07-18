@@ -126,6 +126,8 @@
     font-family: 'DM Mono', monospace;
     font-size: 0.75rem;
   }
+  .toc li.nonum { counter-increment: none; }
+  .toc li.nonum::before { content: "· "; }
   .toc a { color: inherit; text-decoration: none; }
   .toc a:hover { color: var(--gold); }
 
@@ -495,7 +497,7 @@
       <li><a href="#ga4">Google Analytics 4 — inställningar</a></li>
       <li><a href="#gtm">Google Tag Manager — taggar och triggers</a></li>
       <li><a href="#begransningar">Kända begränsningar med ClubRunner</a></li>
-      <li><a href="#checklist">Checklista</a></li>
+      <li class="nonum"><a href="#checklist">Checklista</a></li>
       <li><a href="#portal">Nationell portal — rotary.se (mäta vidareklick)</a></li>
     </ol>
   </div>
@@ -511,7 +513,7 @@
       <div class="domain-item"><span>Admin-gränssnitt</span>admin.clubrunner.ca</div>
       <div class="domain-item"><span>Medlems- och klubbdata</span>crsadmin.com</div>
     </div>
-    <p style="font-size:0.8rem; margin-top:0.75rem; margin-bottom:0; color:var(--warm-gray);">Filer som besökare laddar ned via ClubRunner hämtas dessutom från en separat blob-domän: <code>clubrunner.blob.core.windows.net</code>. Det kräver en egen trigger (se avsnitt 2e).</p>
+    <p style="font-size:0.8rem; margin-top:0.75rem; margin-bottom:0; color:var(--warm-gray);">Filer som besökare laddar ned via ClubRunner hämtas dessutom från en separat blob-domän: <code>clubrunner.blob.core.windows.net</code>. Det kräver en egen trigger (se avsnitt 2g).</p>
   </div>
 
   <!-- Language box -->
@@ -527,7 +529,7 @@
   <!-- Club note box -->
   <div class="context-box" style="border-left-color: var(--warm-gray);">
     <p style="font-size:0.85rem; margin-bottom:0.75rem;"><strong>För ett distrikt är det nödvändigt att konfigurera spårningen</strong>, se supportsidan om <a href="https://rotary2405.se/page/support-trafikanalys/" target="_blank">Trafikanalys</a>.</p>
-    
+
     <h3>Gäller det här också för klubb-sajt?</h3>
     <p style="font-size:0.85rem; margin-bottom:0.75rem;">Motsvarande konfiguration kan göras för en ClubRunner-klubb. Tekniken är identisk — domäner, triggers och taggar fungerar på samma sätt. Skillnaden är att en typisk klubb-sajt har så liten trafikvolym att statistiska mätningar sällan ger meningsfulla resultat: segmenteringar, funnel-analyser och trafikkällefördelningar kräver tillräckligt många observationer för att mönstren ska vara tillförlitliga.</p>
     <p style="font-size:0.85rem; margin-bottom:0.5rem;">Flera av de avancerade taggarna i detta dokument är däremot värdefulla <em>oavsett volym</em>, eftersom de inte bygger på statistik utan ger en direkt lista över konkreta händelser — även en handfull observationer är användbara:</p>
@@ -708,8 +710,8 @@
         </tr>
         <tr>
           <td>File downloads</td>
-          <td>⚠️ Valfritt</td>
-          <td>Kan stängas av om du hanterar det i GTM</td>
+          <td>🚫 <strong>Off</strong></td>
+          <td>Hanteras via GTM (2f/2g). Blob-filerna har filändelser och skulle annars dubbelräknas av den inbyggda spårningen</td>
         </tr>
       </table>
     </div>
@@ -744,13 +746,13 @@
           <td>Link text</td>
           <td>Event</td>
           <td><code>link_text</code></td>
-          <td>outbound_click, file_download, page_file_download</td>
+          <td>outbound_click, file_download (taggarna i 2f och 2g)</td>
         </tr>
         <tr>
           <td>File name</td>
           <td>Event</td>
           <td><code>file_name</code></td>
-          <td>file_download, page_file_download</td>
+          <td>file_download (taggarna i 2f och 2g)</td>
         </tr>
         <tr>
           <td>Search term</td>
@@ -777,7 +779,7 @@
       <h4>Kom igång</h4>
      <div> <ol>
         <li>Gå till <strong>Explore → Blank exploration</strong>.</li>
-        <li>Namnge utforskningen <strong>Custom Events</strong>.</li>
+        <li>Namnge utforskningen, t.ex. <strong>Custom events [distrikt] [period]</strong>.</li>
         <li>Öppna <strong>Variables</strong>-panelen (vänster) och klicka på <strong>+</strong> bredvid Dimensions resp. Metrics för att lägga till dessa gemensamma variabler för alla flikar:</div>
           <div class="config-block" style="margin-top:0.5rem;"><span class="k">Dimensions:</span>
   <span class="d">Event name</span>
@@ -789,7 +791,7 @@
 <span class="k">Metric:</span>
   <span class="d">Event count</span></div>
         </li>
-      <div>  
+      <div>
       <li>Skapa sedan fyra flikar i ordning nedan. Varje flik konfigureras i <strong>Tab Settings</strong>-panelen (höger). <br/>
           Tips: Efter första rapporten, tryck på nerpilen i fliknamnet och duplicera fliken, då behöver du bara göra några mindre ändringar på nya flikens Settings. Redigera fliknamn genom att klicka i namnet.</li>
       </ol></div>
@@ -1150,6 +1152,7 @@
 <span class="cm">// Villkor — triggar när ALLA är uppfyllda:</span>
 <span class="cm">// Gate: bara verkliga http(s)-länkar – stoppar filter-/JS-länkar utan href</span>
 <span class="k">Click URL</span>  <span class="v">matches RegEx</span>       <span class="rx">^https?://</span>
+<span class="cm">// Byt ut rotary[distrikt].se mot din publika domän:</span>
 <span class="k">Click URL</span>  <span class="v">does not start with</span>  <span class="d">https://rotary[distrikt].se</span>
 <span class="k">Click URL</span>  <span class="v">does not start with</span>  <span class="d">https://portal.clubrunner.ca</span>
 <span class="k">Click URL</span>  <span class="v">does not start with</span>  <span class="d">https://content.clubrunner.ca</span>
@@ -1276,6 +1279,7 @@
 
 <span class="cm">// Org-ID:t är unikt för ditt distrikt/din klubb och räcker som matchning – inget mer behövs i sökvägen.</span>
 <span class="cm">// Byt ut 00000060099 mot ditt distrikt/klubb-ClubRunner-organisations-ID.</span>
+<span class="cm">// Ditt ClubRunner-ID ser du som inloggad, i adressfältet: https://admin.clubrunner.ca/[ID]/</span>
 
 <span class="k">Trigger name:</span>  <span class="v">Page file download</span></div>
 
@@ -1303,7 +1307,7 @@
         <h3>Konsolidera sidvisningar: omdöpta sidor och skiftlägeskorrigering (canonical-sökväg)</h3>
       </div>
       <p>GA4 grupperar sidvisningar på <code>page_location</code> (den faktiska URL:en). På ClubRunner gör det att samma sida ofta splittras på flera rader av två skäl: <strong>omdöpta sidor</strong> nås via en gammal alias-URL parallellt med den rena adressen, och <strong>skiftläge</strong> i sökvägen (<code>/Events</code> vs <code>/events</code>, <code>/ClubInfo/…</code> vs <code>/clubinfo/…</code>) skapar dubbletter. Variabeln nedan åtgärdar båda.</p>
-      <p>När en sida byter namn låter ClubRunner den gamla adressen fortsätta fungera — men <em>utan</em> 301-omdirigering. Innehållet serveras på en lång alias-URL, t.ex. <code>/60089/Page/Show?ClassCode=Page&amp;Slug=…</code>, parallellt med den rena <code>/page/&lt;slug&gt;</code>. Resultatet blir två sidor i rapporten för samma innehåll.</p>
+      <p>När en sida byter namn låter ClubRunner den gamla adressen fortsätta fungera — men <em>utan</em> 301-omdirigering. Innehållet serveras på en lång alias-URL, t.ex. <code>/60099/Page/Show?ClassCode=Page&amp;Slug=…</code>, parallellt med den rena <code>/page/&lt;slug&gt;</code>. Resultatet blir två sidor i rapporten för samma innehåll.</p>
 
       <div class="callout callout-warning">
         <strong>Två fällor:</strong>
@@ -1322,7 +1326,7 @@
           <td><code>https://rotary2405.se/page/support-logga-in-hjälp</code> ✅</td>
         </tr>
         <tr>
-          <td><code>rotary2405.se/60089/Page/Show?…&amp;Slug=support-logga-in-hjälp</code></td>
+          <td><code>rotary2405.se/60099/Page/Show?…&amp;Slug=support-logga-in-hjälp</code></td>
           <td><code>https://portal.clubrunner.ca/page/support-logga-in-hjälp</code> ❌ fel värd</td>
         </tr>
       </table>
@@ -1361,7 +1365,7 @@ function() {
       </div>
 
       <div class="callout callout-info">
-        <strong>Specialfall hemsidan:</strong> ClubRunner serverar hemsidan på <em>två</em> live-adresser — den rena roten <code>/</code> och den interna routen <code>/page/showhomepage</code> (dit logotyp-/"Hem"-länkar ofta går). Båda har <em>självrefererande</em> canonical, så canonical ensam slår inte ihop dem; därför tvingar <code>if</code>-raden i variabeln <code>/page/showhomepage</code> till roten. Den bara routen <code>/60089/Page/Show</code> <em>utan</em> <code>?…&amp;Slug=</code> är däremot en felsida ("Kontot hittas inte", soft 404) — den ska <strong>inte</strong> normaliseras bort. Dyker den upp i rapporterna är det en nyttig signal om trasiga länkar (larma t.ex. på <code>page_title</code> som innehåller "General Error").
+        <strong>Specialfall hemsidan:</strong> ClubRunner serverar hemsidan på <em>två</em> live-adresser — den rena roten <code>/</code> och den interna routen <code>/page/showhomepage</code> (dit logotyp-/"Hem"-länkar ofta går). Båda har <em>självrefererande</em> canonical, så canonical ensam slår inte ihop dem; därför tvingar <code>if</code>-raden i variabeln <code>/page/showhomepage</code> till roten. Den bara routen <code>/60099/Page/Show</code> <em>utan</em> <code>?…&amp;Slug=</code> är däremot en felsida ("Kontot hittas inte", soft 404) — den ska <strong>inte</strong> normaliseras bort. Dyker den upp i rapporterna är det en nyttig signal om trasiga länkar (larma t.ex. på <code>page_title</code> som innehåller "General Error").
       </div>
 
       <h4>Steg 2 — Skriv över page_location i Google-taggen</h4>
@@ -1371,7 +1375,7 @@ function() {
       <div class="callout callout-info">
         <strong>Effekt:</strong> Den automatiska <code>page_view</code> och alla GA4-event som ärver Google-taggen rapporteras nu på den rena sökvägen, oavsett vilken alias-URL besökaren kom in på. Eftersom kampanjparametrarna behålls påverkas inte trafikkällorna.
       </div>
-  
+
     </div>
 
     <!-- 2i -->
@@ -1545,9 +1549,9 @@ function() {
         <h4>Google Analytics 4</h4>
         <ul>
           <li>List unwanted referrals: lägg till <code>clubrunner.ca</code>, <code>crsadmin.com</code>, <code>clubrunner.blob.core.windows.net</code> — plus referral-spam-listan i avsnitt 1e</li>
-          <li>Enhanced Measurement: stäng av <em>Outbound clicks</em></li>
+          <li>Enhanced Measurement: stäng av <em>Outbound clicks</em> och <em>File downloads</em></li>
           <li>Custom dimensions (Event scope): <code>link_url</code>, <code>link_text</code>, <code>file_name</code>, <code>search_term</code></li>
-          <li>Utforskning "Custom Events" med fyra flikar: UTgående klick, Sitesearch CR, Nedladdningar, Bulletin viewed (avsnitt 1d)</li>
+          <li>Utforskning "Custom events [distrikt] [period]" med fyra flikar: UTgående klick, Sitesearch CR, Nedladdningar, Bulletin viewed (avsnitt 1d)</li>
           <li>Verifiera events i DebugView efter publicering</li>
         </ul>
       </div>
@@ -1669,7 +1673,7 @@ function() {
 <span class="k">Project ID:</span> <span class="d">DITT_CLARITY_PROJEKT_ID</span>
 <span class="k">Trigger:</span>    <span class="v">Initialization – All Pages</span></div>
     </div>
-    
+
     <!-- 4d -->
     <div class="subsection">
       <div class="subsection-header">
@@ -1710,11 +1714,15 @@ function() {
 <span class="cm">// Gate: bara verkliga http(s)-länkar – stoppar filter-/JS-länkar utan href</span>
 <span class="k">Click URL</span>  <span class="v">matches RegEx</span>       <span class="rx">^https?://</span>
 <span class="k">Click URL</span>  <span class="v">does not start with</span>  <span class="d">https://rotary.se</span>
+<span class="k">Click URL</span>  <span class="v">does not start with</span>  <span class="d">https://www.rotary.se</span>
+<span class="k">Click URL</span>  <span class="v">does not contain</span>     <span class="d">clubrunner.ca</span>
+<span class="k">Click URL</span>  <span class="v">does not contain</span>     <span class="d">clubrunner.blob.core.windows.net</span>
+<span class="k">Click URL</span>  <span class="v">does not contain</span>     <span class="d">crsadmin.com</span>
 
 <span class="k">Trigger name:</span>  <span class="v">Portal outbound click</span></div>
 
       <div class="callout callout-tip">
-        <strong>Varför fungerar undantaget?</strong> <code>rotary2325.se</code> m.fl. innehåller inte strängen <code>rotary.se</code>, så "does not start with https://rotary.se" hindrar inte klick till distriktssajterna.
+        <strong>Varför fungerar undantaget?</strong> Villkoret är "does not start with" — <code>https://rotary2325.se</code> börjar inte med <code>https://rotary.se</code>, så klick till distriktssajterna hindras inte utan räknas som vidareklick. Raden med <code>https://www.rotary.se</code> är en säkerhetsrad: om portalen nås via www-adressen ska interna länkar inte räknas som utgående. ClubRunner-domänerna exkluderas dessutom så att klick till t.ex. inloggningen (<code>portal.clubrunner.ca</code>) inte räknas som vidareklick.
       </div>
 
       <h4>Steg 2 — Skapa tagg</h4>
@@ -1738,7 +1746,7 @@ function() {
         <span class="subsection-label">4f</span>
         <h3>GA4 — Bygg en Utforskning för portaltrafik</h3>
       </div>
-      <p>Portalen behöver en egen Utforskning som visar vidareklick till distrikt och andra sajter. Konfigurationen är enklare än "Custom Events" eftersom eventet är ett — <code>outbound_click</code> — men med <code>link_domain</code> som primär dimension för att bryta ned klick per målsajt.</p>
+      <p>Portalen behöver en egen Utforskning som visar vidareklick till distrikt och andra sajter. Konfigurationen är enklare än "Custom events" eftersom eventet är ett — <code>outbound_click</code> — men med <code>link_domain</code> som primär dimension för att bryta ned klick per målsajt.</p>
 
       <div class="nav-path">Explore <span class="sep">›</span> <span class="nav-end">Blank</span></div>
 
