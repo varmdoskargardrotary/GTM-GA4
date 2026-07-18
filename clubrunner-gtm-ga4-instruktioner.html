@@ -484,7 +484,7 @@
   <!-- Document series note -->
   <div class="context-box" style="border-left-color: var(--gold); padding: 1rem 1.5rem;">
     <p style="font-size:0.82rem; margin:0; color:var(--navy-mid);"><strong style="font-family:'DM Mono',monospace; font-size:0.72rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--gold);">Del 1 av 2</strong> &nbsp;·&nbsp; Det här dokumentet beskriver hur GTM och GA4 konfigureras. Del 2 — <em>Trafikanalys och rapportering</em> — beskriver hur insamlad data utvärderas och sammanställs till rapport.<br/>
-    Supportsidan om Trafikanalys beskriver varför mätningar och konfigurering behövs.</p>
+    Supportsidan om <a href="https://varmdoskargard.se/page/trafikanalys/" target="_blank">Trafikanalys</a> beskriver varför mätningar och konfigurering behövs.</p>
   </div>
 
   <!-- TOC -->
@@ -511,7 +511,7 @@
       <div class="domain-item"><span>Admin-gränssnitt</span>admin.clubrunner.ca</div>
       <div class="domain-item"><span>Medlems- och klubbdata</span>crsadmin.com</div>
     </div>
-    <p style="font-size:0.8rem; margin-top:0.75rem; margin-bottom:0; color:var(--warm-gray);">Filer som besökare laddar ned via ClubRunner serveras dessutom från en separat blob-domän: <code>clubrunner.blob.core.windows.net</code>. Det kräver en egen trigger (se avsnitt 2e).</p>
+    <p style="font-size:0.8rem; margin-top:0.75rem; margin-bottom:0; color:var(--warm-gray);">Filer som besökare laddar ned via ClubRunner hämtas dessutom från en separat blob-domän: <code>clubrunner.blob.core.windows.net</code>. Det kräver en egen trigger (se avsnitt 2e).</p>
   </div>
 
   <!-- Language box -->
@@ -566,7 +566,7 @@
         Webbplatsen <span class="sep">›</span> Webbplatsinställningar <span class="sep">›</span> <span class="nav-end">Analys</span>
       </div>
 
-      <p>Sidan har tre avsnitt:</p>
+      <p>Sidan har två fält för spårning:</p>
 
       <table class="config-table">
         <tr>
@@ -587,7 +587,7 @@
       </table>
 
       <div class="callout callout-warning">
-        <strong>Stream ID ska vara tomt</strong> — Om du fyller i ett GA4 Stream ID vid sidan av GTM dubbelregistreras all trafik: varje sidvisning syns som två separata träffar i GA4. Lämna fältet tomt och låt GTM hantera all spårning.
+        <strong>Stream ID ska vara tomt</strong> — Om du fyller i ett GA4 Stream ID vid sidan av GTM dubbelregistreras all trafik: varje sidvisning syns som två separata träffar i GA4. Lämna fältet tomt och låt GTM hantera all spårning. Om du tidigare har spårat från ClubRunner direkt till GA4, fortsätt att använda samma GA4-kod i GTM.
       </div>
     </div>
   </div>
@@ -618,7 +618,7 @@
           <div class="step-num">1</div>
           <div class="step-body">
             <div class="step-title">Öppna GA4 Admin</div>
-            <div class="step-desc">Gå till <strong>ga4.google.com</strong>, välj rätt GA4-egenskap, klicka på <strong>Admin</strong> (kugghjulsikonen längst ned i vänstermenyn).</div>
+            <div class="step-desc">Gå till <strong>analytics.google.com</strong>, välj rätt GA4-egendom, klicka på <strong>Admin</strong> (kugghjulsikonen längst ned i vänstermenyn).</div>
           </div>
         </div>
         <div class="step">
@@ -657,7 +657,7 @@
 <span class="d">clubrunner.blob.core.windows.net</span></div>
 
       <div class="callout callout-tip">
-        <strong>Tips:</strong> Det räcker med <code>clubrunner.ca</code> för att täcka portal, content och admin-subdomänerna. Lägg gärna till dem ändå för tydlighet. <code>clubrunner.blob.core.windows.net</code> behöver läggas till separat — det är domänen ClubRunner serverar sidfiler ifrån.
+        <strong>Tips:</strong> Det räcker med <code>clubrunner.ca</code> för att täcka portal, content och admin-subdomänerna. Lägg gärna till dem ändå för tydlighet. <code>clubrunner.blob.core.windows.net</code> behöver läggas till separat — det är domänen ClubRunner hämtar sidfiler ifrån.
       </div>
     </div>
 
@@ -718,7 +718,7 @@
         <span class="subsection-label">1c</span>
         <h3>Registrera custom dimensions för event-parametrar</h3>
       </div>
-      <p>Events som skapas i GTM kan skicka med parametrar (t.ex. vilken URL som klickades). Parametrarna syns inte automatiskt i GA4-rapporter — de måste registreras som "custom dimensions" för att bli sökbara och rapporterbara.</p>
+      <p>Events som skapas i GTM kan skicka med parametrar (t.ex. vilken URL som klickades). Parametrarna syns inte automatiskt i GA4-rapporter — de måste registreras som "custom dimensions" för att bli sökbara och rapporterbara. Rapporterna byggs i nästa avsnitt 1d.</p>
 
       <div class="nav-path">
         Admin <span class="sep">›</span> Custom definitions <span class="sep">›</span> <span class="nav-end">Create custom dimension</span>
@@ -768,7 +768,7 @@
         <span class="subsection-label">1d</span>
         <h3>Bygg en Utforskning med fyra flikar för custom events</h3>
       </div>
-      <p>GA4:s standardrapporter visar totalantal per event men inte <em>vad</em> som klickades eller söktes. Det kräver en <strong>Utforskning</strong> (Explore). Bygg en gemensam utforskning med fyra flikar — en per custom event — så att all detaljdata finns samlad på ett ställe.</p>
+      <p>GA4:s standardrapporter visar totalantal per event men inte <em>vad</em> som klickades eller söktes. Det kräver en <strong>Utforskning</strong> (Explore). Bygg en gemensam utforskning med fyra flikar — en per custom event — så att all detaljdata finns samlad på ett ställe. Inställningarna nedan är för att komma igång, ändra själv på inställningarna för att anpassa rapporterna ytterligare.</p>
 
       <div class="nav-path">Explore <span class="sep">›</span> <span class="nav-end">Blank</span></div>
 
@@ -787,7 +787,7 @@
 <span class="k">Metric:</span>
   <span class="d">Event count</span></div>
         </li>
-        <li>Skapa sedan fyra flikar i ordning nedan. Varje flik konfigureras i <strong>Tab Settings</strong>-panelen (höger).</li>
+        <li>Skapa sedan fyra flikar i ordning nedan. Varje flik konfigureras i <strong>Tab Settings</strong>-panelen (höger). Tips: Efter första rapporten, tryck på nerpilen i fliknamnet och duplicera fliken, då behöver du bara göra några mindre ändringar på nya flikens Settings. Redigera fliknamn genom att klicka i namnet.</li>
       </ol>
 
       <h4>Flik 1 — UTgående klick</h4>
@@ -832,7 +832,7 @@
 
 <span class="k">Sort:</span>        <span class="d">File name</span>  <span class="v">descending</span></div>
       <div class="callout callout-info">
-        <strong>Två triggers, ett event:</strong> taggen för 2f (dokumentsidor) och taggen för 2g (blob-filer) använder båda eventnamnet <code>file_download</code>. De syns som ett och samma event — <code>file_name</code> innehåller full URL och skiljer källorna åt. Filtrera på <code>clubrunner.blob.core.windows.net</code> om du vill separera dem.
+        <strong>Två triggers, ett event:</strong> taggen för 2f (dokumentsidor) och taggen för 2g (blob-filer) använder båda eventnamnet <code>file_download</code>. De syns som ett och samma event i rapporten — <code>file_name</code> innehåller full URL och skiljer källorna åt. Filtrera på <code>clubrunner.blob.core.windows.net</code> om du vill separera dem.
       </div>
 
       <h4>Flik 4 — Bulletin viewed</h4>
@@ -1072,7 +1072,7 @@
           <div class="step-num">2</div>
           <div class="step-body">
             <div class="step-title">Ange Tag ID</div>
-            <div class="step-desc">Fyll i ditt GA4 Measurement ID, format <code>G-XXXXXXXXXX</code>. Hittas i GA4 under Admin → Data Streams → din ström.</div>
+            <div class="step-desc">Fyll i ditt GA4 Measurement ID, format <code>G-XXXXXXXXXX</code>. Hittas i GA4 under Admin → Data Streams → din ström. Om du redan använder GA4, fortsätt med samma ID även om spårningen går via GTM.</div>
           </div>
         </div>
         <div class="step">
@@ -1098,7 +1098,8 @@
         <span class="subsection-label">2c</span>
         <h3>Microsoft Clarity — tagg</h3>
       </div>
-      <p>Microsoft Clarity är ett kostnadsfritt verktyg för session recording och heatmaps. Det kan också fungera som ett oberoende mått att jämföra med GA4-siffror, bl.a. för att uppskatta bortfall från nekade cookies.</p>
+      <p>Microsoft Clarity är ett kostnadsfritt verktyg för session recording och heatmaps. Det kan också fungera som ett oberoende mått att jämföra med GA4-siffror, bl.a. för att uppskatta bortfall från nekade cookies. </p>
+        <p>Clarity-projekt-ID hittas under <strong>Settings → Setup → Get tracking code</strong> i Microsoft Clarity <a href="https://clarity.microsoft.com/" target="_blank">clarity.microsoft.com</a>. Det är en kort alfanumerisk sträng, t.ex. <code>abc123xyz</code>.</p>
 
       <div class="nav-path">Tags <span class="sep">›</span> New <span class="sep">›</span> <span class="nav-end">Microsoft Clarity</span></div>
 
@@ -1126,7 +1127,6 @@
   })(window, document, "clarity", "script", <span class="d">"DITT_CLARITY_PROJEKT_ID"</span>);
 &lt;/script&gt;</div>
 
-      <p>Clarity-projekt-ID hittas under <strong>Settings → Setup → Get tracking code</strong> i Microsoft Clarity (clarity.microsoft.com). Det är en kort alfanumerisk sträng, t.ex. <code>abc123xyz</code>.</p>
     </div>
 
     <!-- 2d -->
@@ -1135,7 +1135,7 @@
         <span class="subsection-label">2d</span>
         <h3>Utgående länkklick — trigger och tagg</h3>
       </div>
-      <p>Registrerar klick på externa länkar. ClubRunners egna domäner, bulletin-länkar och blob-filnedladdningar måste exkluderas så att de inte räknas som externa eller dubbelräknas mot nedladdningstaggarna.</p>
+      <p>Registrerar klick på externa länkar. ClubRunners egna domäner, bulletin-länkar och sid-filnedladdningar måste exkluderas så att de inte räknas som externa eller dubbelräknas mot nedladdningstaggarna.</p>
 
       <h4>Steg 1 — Skapa trigger</h4>
       <div class="nav-path">Triggers <span class="sep">›</span> New</div>
@@ -1223,7 +1223,7 @@
         <span class="subsection-label">2f</span>
         <h3>Dokumentnedladdning — trigger och tagg</h3>
       </div>
-      <p>Fångar klick på ClubRunners dokumentlänkar (protokoll, PDF:er m.m.). Matcha på <em>sökvägen</em> <code>/documents/sv-se/</code> i URL:en i stället för filtypsändelse — ClubRunners dokumentlänkar har inte alltid en filändelse, och sökvägsmatchning är enklare och mer robust.</p>
+      <p>Fångar klick på ClubRunners dokumentlänkar (filer i Dokument). Matcha på <em>sökvägen</em> <code>/documents/sv-se/</code> i URL:en i stället för filtypsändelse — ClubRunners dokumentlänkar har inte alltid en filändelse, och sökvägsmatchning är enklare och mer robust.</p>
 
       <h4>Steg 1 — Skapa trigger</h4>
       <div class="config-block"><span class="k">Trigger type:</span>          <span class="v">Click – Just Links</span>
@@ -1257,7 +1257,7 @@
         <span class="subsection-label">2g</span>
         <h3>Nedladdning av sidfiler via ClubRunner blob-lagring — trigger och tagg</h3>
       </div>
-      <p>ClubRunner serverar filer som är uppladdade via sajt-editorn från en separat domän: <code>clubrunner.blob.core.windows.net</code>. Dessa filer ligger under ett sökvägsprefix som inleds med distriktets organisations-ID (t.ex. <code>/00000060099/</code>). Eftersom det ID:t är unikt för ditt distrikt räcker det som matchning — triggern blir då oberoende av språk- och mappstruktur. De kräver en separat trigger eftersom domänen skiljer sig från din publika sajt.</p>
+      <p>Filer som är uppladdade i widgeten Download Page Files lagrar ClubRunner på en separat domän: <code>clubrunner.blob.core.windows.net</code>. Dessa filer ligger under ett sökvägsprefix som inleds med distriktets/klubbens ClubRunner-ID (t.ex. <code>/00000060099/</code>). Eftersom det ID:t är unikt för distrikt/klubb räcker det som matchning — triggern blir då oberoende av språk- och mappstruktur. De kräver en separat trigger eftersom domänen skiljer sig från din publika sajt.</p>
       <p>Blob-domänen måste också vara med i undantagen i "Outbound link click"-triggern (avsnitt 2d) så att dessa nedladdningar inte samtidigt räknas som externa klick.</p>
 
       <div class="callout callout-info">
@@ -1368,9 +1368,7 @@ function() {
       <div class="callout callout-info">
         <strong>Effekt:</strong> Den automatiska <code>page_view</code> och alla GA4-event som ärver Google-taggen rapporteras nu på den rena sökvägen, oavsett vilken alias-URL besökaren kom in på. Eftersom kampanjparametrarna behålls påverkas inte trafikkällorna.
       </div>
-      <div class="callout callout-tip">
-        <strong>Alternativ:</strong> be ClubRunner 301-omdirigera alias-URL:er till den rena adressen. Så länge de svarar 200 är GTM-omskrivningen ovan den praktiska lösningen.
-      </div>
+  
     </div>
 
     <!-- 2i -->
@@ -1381,7 +1379,7 @@ function() {
       </div>
       <p>ClubRunners inbyggda sökruta (fältet med <code>id="searchString"</code> i sidhuvudet) skickar inte sökordet som en query-parameter (<code>?q=…</code>), vilket är vad GA4:s Enhanced Measurement förväntar sig. Istället navigerar ClubRunner till en sökväg på formen <code>/Search/&lt;sökord&gt;</code>. Det innebär att sökordet måste extraheras ur sökvägen med en Custom JavaScript-variabel.</p>
       <div class="callout callout-warning">
-        <strong>Bekräftat beteende (<code>doSearch()</code>, rotary2405.se):</strong> Innan URL-kodning ersätter ClubRunner tecknen <code>. % ? : / + * &amp; "</code> med platshållarna <code>-~0-</code> till <code>-~8-</code>. Variabeln nedan återställer dessa till originaltecken.
+        <strong>Bekräftat beteende:</strong> Innan URL-kodning ersätter ClubRunner tecknen <code>. % ? : / + * &amp; "</code> med platshållarna <code>-~0-</code> till <code>-~8-</code>. Variabeln nedan återställer dessa till originaltecken.
       </div>
 
       <h4>Steg 1 — Variabel som extraherar sökordet</h4>
@@ -1439,7 +1437,7 @@ function() {
         <span class="subsection-label">2j</span>
         <h3>Testa och publicera</h3>
       </div>
-      <p>Publicera aldrig ändringar utan att testa dem i Preview-läge. Varje osparad ändring i arbetsytan är en "Draft" — publicering gör den aktiv för alla besökare.</p>
+      <p>Publicera aldrig ändringar utan att testa dem i GTM:s Preview-läge. Varje osparad ändring i arbetsytan är en "Draft" — det är först efter publicering som ändringarna blir aktiva och skickar data vidare till GA4.</p>
 
       <div class="steps">
         <div class="step">
@@ -1453,7 +1451,7 @@ function() {
           <div class="step-num">2</div>
           <div class="step-body">
             <div class="step-title">Testa varje trigger</div>
-            <div class="step-desc">Klicka på en extern länk → kontrollera att "GA4 – Outbound link click" syns i "Tags Fired". Klicka på en bulletin-länk → "GA4 – Bulletin view". Klicka på en fil → "GA4 – Document download" eller "GA4 – Page file download".</div>
+            <div class="step-desc">Klicka på en extern länk → kontrollera att "GA4 – Outbound link click" syns i "Tags Fired". Klicka på en bulletin-länk → "GA4 – Bulletin view". Klicka på en länk till fil från Dokument → "GA4 – Document download" och på en länk till en sidfil (i widgeten Page Download Files) "GA4 – Page file download".</div>
           </div>
         </div>
         <div class="step">
@@ -1498,7 +1496,7 @@ function() {
         <span class="subsection-label">3a</span>
         <h3>Sidor utan GTM-täckning</h3>
       </div>
-      <p>ClubRunner injicerar inte GTM-koden i alla sidmallar. Nedanstående sidtyper saknar GTM och registreras därför <em>inte</em> som sidvisningar i GA4. Vissa kan kompenseras med click events; andra kräver en platformsåtgärd från ClubRunner.</p>
+      <p>ClubRunner injicerar inte GTM-koden i alla sidmallar. ClubRunner lägger inte in GTM-kod i nedanstående sidtyper. De registreras därför <em>inte</em> som sidvisningar i GA4, men vi kompenserar med click events.</p>
 
       <table class="config-table">
         <tr>
@@ -1516,21 +1514,8 @@ function() {
           <td>Dokumentvisning</td>
           <td>✅ Nedladdnings-event (avsnitt 2f/2g)</td>
         </tr>
-        <tr>
-          <td><code>/stories/[slug]</code></td>
-          <td>Nyhetsartiklar</td>
-          <td>⚠️ Kontakta ClubRunner support</td>
-        </tr>
-        <tr>
-          <td><code>/event/[id]</code></td>
-          <td>Evenemangssidor</td>
-          <td>⚠️ Kontakta ClubRunner support</td>
-        </tr>
       </table>
 
-      <div class="callout callout-tip">
-        <strong>ClubRunner support:</strong> Kontakta supporten och be dem aktivera GTM-container-ID i samtliga sidmallar. Ange ditt container-ID (format: <code>GTM-XXXXXXX</code>, hittas under GTM Admin → Container settings). Det åtgärdar spårningsgapet för <code>/stories/</code> och <code>/event/</code>.
-      </div>
     </div>
 
     <div class="subsection">
@@ -1539,6 +1524,9 @@ function() {
         <h3>GTM Tag Coverage — tolka rapporten rätt</h3>
       </div>
       <p>GTM:s inbyggda "Tag Coverage"-rapport (Admin → Tag Coverage) visar hur många sidor som saknar GTM-taggning. För ClubRunner-sajter ser siffran dramatisk ut, men majoriteten av de otaggade sidorna är bulletin-sidor, dokumentsidor och interna adminsidor — inte primärt publikt innehåll. Rapporten uppdateras automatiskt när GTM-behållaren publiceras eller när besökare genererar ny trafik.</p>
+      <div class="callout callout-tip">
+        Om det visar sig sidor förblir otaggade trots trafik, felanmäl till ClubRunner support.
+      </div>
     </div>
   </div><!-- /section 3 -->
 
@@ -1573,7 +1561,7 @@ function() {
         </ul>
       </div>
     </div>
-    <p class="footer-note">Checklistan gäller distriktsuppsättningen. För en portal som rotary.se gäller avsnitt 4 — där är utgående klick den primära mätpunkten, och en extra tagg (GA4 – Portal outbound click) och utforskning (Portaltrafik) tillkommer. Ersätt rotary[distrikt].se, G-XXXXXXXXXX, DITT_CLARITY_PROJEKT_ID och 00000060099 med faktiska värden för respektive distrikt.</p>
+    <p class="footer-note">Checklistan gäller uppsättningen för ClubRunners distrikts- och klubbversion. För en nationell portal som rotary.se gäller avsnitt 4 — där är utgående klick den primära mätpunkten, och en extra tagg (GA4 – Portal outbound click) och utforskning (Portaltrafik) tillkommer.</p>
   </div>
 
   <hr class="divider">
@@ -1588,12 +1576,12 @@ function() {
     </div>
 
     <div class="callout callout-info" style="margin-bottom:1.25rem;">
-      <strong>När gäller det här avsnittet?</strong> rotary.se är en ClubRunner-portal vars huvudsyfte är att slussa besökare vidare till de sex svenska distrikten och till fristående rotarysajter (t.ex. <code>rotarystudent.se</code>, <code>rotaryfoundation.se</code>). Här är <em>utgående klick den primära mätpunkten</em>. Avsnittet är komplett och kan följas fristående för en portal.
+      rotary.se är den nationella Rotary-portalen vars huvudsyfte DG-kollegiet för de svenska distrikten har bestämt till att slussa besökare vidare till distrikten och till andra Rotarysajter (t.ex. <code>rotarystudent.se</code>, <code>rotaryfoundation.se</code>). Här är <em>utgående klick den primära mätpunkten</em>. Avsnittet är komplett och kan följas fristående för en portal.
     </div>
 
     <div class="context-box" style="margin-bottom:1.5rem;">
-      <h3>Principskillnaden mot ett distrikt</h3>
-      <p style="font-size:0.85rem; margin-bottom:0;">På ett distrikt <em>dämpar</em> du utgående brus och håller alla ClubRunner-domäner interna. På portalen vill du tvärtom <em>räkna</em> klicken ut till distrikts- och projektsajterna. De är äkta externa sajter med egna GA4-properties — de ska därför <strong>inte</strong> läggas i unwanted referrals och <strong>inte</strong> undantas i triggern. Endast ClubRunners egen infrastruktur hålls intern. Eftersom varje destination har en egen GA4-egenskap ska du <strong>inte</strong> sätta upp cross-domain-mätning — den gäller bara när samma property spänner över flera domäner.</p>
+      <h3>Principskillnaden mot distrikt/klubb</h3>
+      <p style="font-size:0.85rem; margin-bottom:0;">På en webbplats för distrikt eller klubb <em>dämpar</em> du utgående brus och håller alla ClubRunner-domäner interna. På portalen vill du tvärtom <em>räkna</em> klicken ut till distrikt och andra Rotarysajter. De är äkta externa sajter med egna GA4-egendomar — de ska därför <strong>inte</strong> läggas i unwanted referrals och <strong>inte</strong> undantas i triggern. Endast ClubRunners egen infrastruktur hålls intern.</p>
     </div>
 
     <!-- 4a -->
@@ -1602,7 +1590,7 @@ function() {
         <span class="subsection-label">4a</span>
         <h3>GA4-grundtaggar — Google tag och Clarity</h3>
       </div>
-      <p>Samma grund som ett distrikt, men med portalens <em>egna</em> konton. Detaljerade klicksteg finns i avsnitt 2b (Google tag) och 2c (Clarity). Konsolideringen av omdöpta sidor (avsnitt 2h) gäller även portalen — sätt samma <code>page_location</code>-omskrivning i portalens Google-tagg.</p>
+      <p>Samma grund som distrikt/klubb, men med portalens <em>egna</em> konton. Detaljerade klicksteg finns i avsnitt 2b (Google tag) och 2c (Clarity). Konsolideringen av omdöpta sidor (avsnitt 2h) gäller även portalen — sätt samma <code>page_location</code>-omskrivning i portalens Google-tagg.</p>
 
       <div class="config-block"><span class="cm">// Google tag — initierar GA4</span>
 <span class="k">Tag type:</span>   <span class="v">Google tag</span>
@@ -1622,7 +1610,7 @@ function() {
         <span class="subsection-label">4b</span>
         <h3>GA4 — List unwanted referrals (endast ClubRunner-infrastruktur)</h3>
       </div>
-      <p>Eftersom portalen själv kör ClubRunner ska dess egen infrastruktur hållas intern, precis som för ett distrikt.</p>
+      <p>Eftersom portalen själv kör ClubRunner ska dess egen infrastruktur hållas intern, precis som för distrikt/klubb.</p>
 
       <div class="nav-path">
         Admin <span class="sep">›</span> Data Streams <span class="sep">›</span> [din ström] <span class="sep">›</span> Configure tag settings <span class="sep">›</span> <span class="nav-end">List unwanted referrals</span>
@@ -1633,9 +1621,6 @@ function() {
 <span class="d">crsadmin.com</span>
 <span class="d">clubrunner.blob.core.windows.net</span></div>
 
-      <div class="callout callout-warning">
-        <strong>Lägg INTE till destinationssajterna här.</strong> <code>rotary2325.se</code>–<code>rotary2405.se</code>, <code>rotarystudent.se</code> m.fl. är externa och ska räknas som utgående trafik. Lägger du dem som unwanted referrals förlorar du hela poängen med portalmätningen.
-      </div>
     </div>
 
     <!-- 4c -->
@@ -1710,7 +1695,7 @@ function() {
         <span class="subsection-label">4e</span>
         <h3>GTM — trigger och tagg för vidareklick</h3>
       </div>
-      <p>Ett enda event som triggas på alla länkar som lämnar rotary.se. Det skalar automatiskt när nya distrikts- eller projektsajter tillkommer — ingen lista att underhålla.</p>
+      <p>Ett enda event som triggas på alla länkar som lämnar rotary.se. Det skalar automatiskt när nya distrikts- eller andra sajter tillkommer — ingen lista att underhålla.</p>
 
       <h4>Steg 1 — Skapa trigger</h4>
       <div class="nav-path">Triggers <span class="sep">›</span> New</div>
@@ -1749,7 +1734,7 @@ function() {
         <span class="subsection-label">4f</span>
         <h3>Bygg en Utforskning för portaltrafik</h3>
       </div>
-      <p>Portalen behöver en egen Utforskning som fokuserar på vidareklick till distrikts- och projektsajter. Konfigurationen är enklare än "Custom Events" eftersom eventet är ett — <code>outbound_click</code> — men med <code>link_domain</code> som primär dimension för att bryta ned klick per målsajt.</p>
+      <p>Portalen behöver en egen Utforskning som fokuserar på vidareklick till distrikt och andra sajter. Konfigurationen är enklare än "Custom Events" eftersom eventet är ett — <code>outbound_click</code> — men med <code>link_domain</code> som primär dimension för att bryta ned klick per målsajt.</p>
 
       <div class="nav-path">Explore <span class="sep">›</span> <span class="nav-end">Blank</span></div>
 
@@ -1798,7 +1783,7 @@ function() {
 <span class="k">Filter:</span>
   <span class="d">Event name</span>  <span class="v">exactly matches</span>  <span class="d">outbound_click</span></div>
       <div class="callout callout-tip">
-        <strong>Avgränsa till rotary-nätverket:</strong> taggen fångar alla utgående klick (även Facebook, rotary.org m.m.). Vill du bara följa de svenska rotarysajterna, filtrera <code>Link domain</code> på de aktuella domänerna i rapporten — du behöver inte ändra taggen.
+        <strong>Avgränsa till rotary-nätverket:</strong> taggen fångar alla utgående klick (även Facebook, rotary.org m.m.). Vill du bara följa de svenska Rotarysajterna, filtrera <code>Link domain</code> på de aktuella domänerna i rapporten — du behöver inte ändra taggen.
       </div>
     </div>
 
