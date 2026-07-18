@@ -498,13 +498,12 @@
         <span class="subsection-label">1e</span>
         <h3>Anpassade events — nedladdningar, utgående klick, nyhetsbrev, sökord</h3>
       </div>
-      <p>Custom events fångar <em>handling</em>, inte bara visning — en starkare engagemangssignal än sidvisningar. Fem events konfigureras i Del 1; nedladdningar täcks av två separata events som redovisas ihop i utforskningen:</p>
+      <p>Custom events fångar <em>handling</em>, inte bara visning — en starkare engagemangssignal än sidvisningar. Fem events konfigureras i Del 1 och skickas under fyra eventnamn till GA; nedladdningar är i GTM två olika events som använder samma eventnamn <code>file_download</code>:</p>
 
       <table class="config-table">
-        <tr><th>Event</th><th>Vad det fångar</th><th>Viktigaste parameter</th></tr>
-        <tr><td colspan="3" style="background:rgba(200,150,62,0.08); font-size:0.78rem; font-weight:600; color:var(--warm-gray); padding:0.3rem 0.75rem; letter-spacing:0.04em; text-transform:uppercase;">Nedladdningar — 2 events</td></tr>
+        <tr><th>Eventnamn</th><th>Vad det fångar</th><th>Viktigaste parameter</th></tr>
         <tr><td><code>file_download</code></td><td>Nedladdning av filer från Dokument</td><td><code>file_name</code> — vilken fil</td></tr>
-        <tr><td><code>page_file_download</code></td><td>Nedladdning av sidfiler (filer i widgeten Page Download Files, lagras på ClubRunners blob-domän)</td><td><code>file_name</code> — vilken sida/fil</td></tr>
+        <tr><td></td><td>Nedladdning av sidfiler i widgeten Page Download Files, lagras på ClubRunners blob-domän. Event i GTM heter <code>page_file_download</code></td><td><code>file_name</code> — vilken sida/fil</td></tr>
         <tr><td><code>outbound_click</code></td><td>Klick på externa länkar</td><td><code>link_url</code>, <code>link_text</code> — vart och vad</td></tr>
         <tr><td><code>bulletin_viewed</code></td><td>Klick till nyhetsbrev (bulletin)</td><td><code>link_url</code> — vilket utskick</td></tr>
         <tr><td><code>view_search_results</code></td><td>Sökningar i sajtens sökruta</td><td><code>search_term</code> — sökordet</td></tr>
