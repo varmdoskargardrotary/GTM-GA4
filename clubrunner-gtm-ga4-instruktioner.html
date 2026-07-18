@@ -1590,27 +1590,6 @@ function() {
     <!-- 4a -->
     <div class="subsection">
       <div class="subsection-header">
-        <span class="subsection-label">4a</span>
-        <h3>GTM:s grundtaggar Google tag och Clarity, plus omdöpta sidor</h3>
-      </div>
-      <p>Detaljerade klicksteg finns i avsnitt 2b (Google tag) och 2c (Clarity). <br/>
-        Lägg också in konsolideringen av omdöpta sidor (avsnitt 2h), inklusive <code>page_location</code>-omskrivning i portalens Google-tagg.</p>
-
-      <div class="config-block"><span class="cm">// Google tag — initierar GA4</span>
-<span class="k">Tag type:</span>   <span class="v">Google tag</span>
-<span class="k">Tag ID:</span>     <span class="d">G-XXXXXXXXXX</span>   <span class="cm">(rotary.se:s egen Measurement-ID)</span>
-<span class="k">Trigger:</span>    <span class="v">Initialization – All Pages</span>
-<span class="k">Tag name:</span>   <span class="v">Google Analytics</span>
-
-<span class="cm">// Microsoft Clarity (valfritt – session recording + cookieless korsmått)</span>
-<span class="k">Tag type:</span>   <span class="v">Microsoft Clarity</span>  <span class="cm">(från mallgalleriet)</span>
-<span class="k">Project ID:</span> <span class="d">DITT_CLARITY_PROJEKT_ID</span>
-<span class="k">Trigger:</span>    <span class="v">Initialization – All Pages</span></div>
-    </div>
-
-    <!-- 4b -->
-    <div class="subsection">
-      <div class="subsection-header">
         <span class="subsection-label">4b</span>
         <h3>GA4 — List unwanted referrals (endast ClubRunner-infrastruktur)</h3>
       </div>
@@ -1627,7 +1606,7 @@ function() {
 
     </div>
 
-    <!-- 4c -->
+    <!-- 4b -->
     <div class="subsection">
       <div class="subsection-header">
         <span class="subsection-label">4c</span>
@@ -1670,6 +1649,27 @@ function() {
       </div>
     </div>
 
+<!-- 4c -->
+    <div class="subsection">
+      <div class="subsection-header">
+        <span class="subsection-label">4a</span>
+        <h3>GTM:s grundtaggar Google tag och Clarity, plus omdöpta sidor</h3>
+      </div>
+      <p>Detaljerade klicksteg finns i avsnitt 2b (Google tag) och 2c (Clarity). <br/>
+        Lägg också in konsolideringen av omdöpta sidor (avsnitt 2h), inklusive <code>page_location</code>-omskrivning i portalens Google-tagg.</p>
+
+      <div class="config-block"><span class="cm">// Google tag — initierar GA4</span>
+<span class="k">Tag type:</span>   <span class="v">Google tag</span>
+<span class="k">Tag ID:</span>     <span class="d">G-XXXXXXXXXX</span>   <span class="cm">(rotary.se:s egen Measurement-ID)</span>
+<span class="k">Trigger:</span>    <span class="v">Initialization – All Pages</span>
+<span class="k">Tag name:</span>   <span class="v">Google Analytics</span>
+
+<span class="cm">// Microsoft Clarity (valfritt – session recording + cookieless korsmått)</span>
+<span class="k">Tag type:</span>   <span class="v">Microsoft Clarity</span>  <span class="cm">(från mallgalleriet)</span>
+<span class="k">Project ID:</span> <span class="d">DITT_CLARITY_PROJEKT_ID</span>
+<span class="k">Trigger:</span>    <span class="v">Initialization – All Pages</span></div>
+    </div>
+    
     <!-- 4d -->
     <div class="subsection">
       <div class="subsection-header">
