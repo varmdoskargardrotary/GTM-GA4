@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Traffic Analysis and Reporting — Guide for Rotary Districts</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+  :root {
+    --gold: #C8963E;
+    --gold-light: #E8B96A;
+    --navy: #1A2744;
+    --navy-mid: #2A3D5E;
+    --cream: #FAF7F2;
+    --warm-gray: #8B8070;
+    --text: #2C2416;
+    --border: #DDD5C8;
+    --code-bg: #F0ECE4;
+    --success: #2D6A4F;
+    --warning: #7B4F00;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    background: var(--cream);
+    color: var(--text);
+    line-height: 1.7;
+  }
+
+  .header {
+    background: var(--navy);
+    color: white;
+    padding: 3rem 2rem 2.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 300px; height: 300px;
+    border: 2px solid rgba(200,150,62,0.2);
+    border-radius: 50%;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    top: 20px; right: 20px;
+    width: 180px; height: 180px;
+    border: 1px solid rgba(200,150,62,0.15);
+    border-radius: 50%;
+  }
+  .header-inner {
+    max-width: 900px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+  .badge {
+    display: inline-block;
+    background: var(--gold);
+    color: white;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 0.25rem 0.7rem;
+    border-radius: 2px;
+    margin-bottom: 1rem;
+  }
+  h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    font-weight: 400;
+    line-height: 1.2;
+    color: white;
+    margin-bottom: 0.75rem;
+  }
+  h1 em { color: var(--gold-light); font-style: italic; }
+  .header p {
+    color: rgba(255,255,255,0.65);
+    font-size: 0.95rem;
+    max-width: 640px;
+  }
+
+  .content {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2.5rem 2rem 4rem;
+  }
+
+  /* TOC */
+  .toc {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 2.5rem;
+  }
+  .toc-title {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--warm-gray);
+    margin-bottom: 0.75rem;
+  }
+  .toc ol {
+    list-style: none;
+    counter-reset: toc;
+  }
+  .toc li {
+    counter-increment: toc;
+    font-size: 0.85rem;
+    padding: 0.2rem 0;
+    color: var(--navy-mid);
+  }
+  .toc li::before {
+    content: counter(toc) ". ";
+    color: var(--gold);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+  }
+  .toc a { color: inherit; text-decoration: none; }
+  .toc a:hover { color: var(--gold); }
+
+  /* Context box */
+  .context-box {
+    background: white;
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--gold);
+    border-radius: 4px;
+    padding: 1.5rem;
+    margin-bottom: 2.5rem;
+  }
+  .context-box h3 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1rem;
+    font-weight: 400;
+    color: var(--navy);
+    margin-bottom: 0.75rem;
+  }
+
+  /* Sections */
+  .section { margin-bottom: 2.5rem; }
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid var(--navy);
+  }
+  .section-num {
+    background: var(--navy);
+    color: var(--gold);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    font-weight: 500;
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.4rem;
+    font-weight: 400;
+    color: var(--navy);
+  }
+
+  /* Subsection */
+  .subsection {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1.5rem;
+    margin-bottom: 1.25rem;
+  }
+  .subsection-header {
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.6rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .subsection-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: var(--gold);
+    background: rgba(200,150,62,0.08);
+    padding: 0.15rem 0.5rem;
+    border-radius: 2px;
+    white-space: nowrap;
+  }
+  h3 {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--navy);
+    line-height: 1.3;
+  }
+
+  h4 {
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--navy-mid);
+    margin: 1rem 0 0.5rem;
+  }
+
+  p {
+    font-size: 0.88rem;
+    color: #4A3F30;
+    margin-bottom: 0.65rem;
+    line-height: 1.65;
+  }
+  p:last-child { margin-bottom: 0; }
+
+  /* Navigation path */
+  .nav-path {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.25rem;
+    background: var(--navy);
+    color: rgba(255,255,255,0.85);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.73rem;
+    padding: 0.5rem 0.85rem;
+    border-radius: 4px;
+    margin: 0.6rem 0;
+  }
+  .nav-path .sep { color: var(--gold); margin: 0 0.1rem; }
+  .nav-path .nav-end { color: var(--gold-light); font-weight: 500; }
+
+  /* Config table */
+  .config-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.82rem;
+    margin: 0.65rem 0;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .config-table th {
+    background: var(--navy);
+    color: rgba(255,255,255,0.85);
+    font-weight: 500;
+    font-size: 0.71rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.55rem 0.85rem;
+    text-align: left;
+  }
+  .config-table td {
+    padding: 0.5rem 0.85rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    color: var(--text);
+    line-height: 1.5;
+  }
+  .config-table tr:last-child td { border-bottom: none; }
+  .config-table tr:nth-child(even) td { background: var(--cream); }
+
+  code {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.8em;
+    background: var(--code-bg);
+    padding: 0.1em 0.35em;
+    border-radius: 2px;
+    color: var(--navy-mid);
+  }
+
+  /* Callouts */
+  .callout {
+    border-radius: 4px;
+    padding: 0.85rem 1.1rem;
+    margin: 0.65rem 0;
+    font-size: 0.84rem;
+    border-left: 3px solid;
+    line-height: 1.55;
+  }
+  .callout-warning { background: #FFF8EC; border-color: #D4A020; color: #6B4400; }
+  .callout-tip     { background: #F0F7F4; border-color: #4A9E7A; color: #1A5C3A; }
+  .callout-info    { background: #EEF4FA; border-color: #4A80B4; color: #1A3D6A; }
+  .callout strong  { font-weight: 600; }
+
+  hr.divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 2.5rem 0;
+  }
+
+  /* Summary */
+  .summary {
+    background: var(--navy);
+    color: white;
+    border-radius: 6px;
+    padding: 1.75rem;
+    margin-top: 2.5rem;
+  }
+  .summary-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.15rem;
+    color: var(--gold-light);
+    font-weight: 400;
+    margin-bottom: 1.25rem;
+  }
+  .summary-cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+  }
+  @media (max-width: 620px) {
+    .summary-cols { grid-template-columns: 1fr; }
+  }
+  .summary-col h4 {
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 0.6rem;
+    font-family: 'DM Mono', monospace;
+  }
+  .summary-col ul { list-style: none; }
+  .summary-col li {
+    font-size: 0.83rem;
+    color: rgba(255,255,255,0.75);
+    padding: 0.22rem 0 0.22rem 1.1rem;
+    position: relative;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .summary-col li:last-child { border-bottom: none; }
+  .summary-col li::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: var(--gold);
+    font-size: 0.7rem;
+    top: 0.3rem;
+  }
+  .footer-note {
+    margin-top: 1.25rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    font-size: 0.75rem;
+    color: rgba(255,255,255,0.4);
+    font-style: italic;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <div class="badge">Rotary Districts/Rotary Clubs · ClubRunner CMS</div>
+    <h1>PART 2<br/> Traffic Analysis <em>and Reporting</em><br>for Websites Using ClubRunner CMS</h1>
+    <p>Guide to turning collected GA4 data into a one-page report: what to download, where to find the key metrics, and a suggested report structure.</p>
+    <p style="font-size:0.75rem; color:rgba(255,255,255,0.45); margin-top:1.25rem; margin-bottom:0;">Anders Tihkan (Värmdö Skärgård RK) &nbsp;·&nbsp; Updated 18 July 2026</p>
+  </div>
+</div>
+
+<div class="content">
+
+  <!-- Document series note -->
+  <div class="context-box" style="border-left-color: var(--gold); padding: 1rem 1.5rem;">
+    <p style="font-size:0.82rem; margin:0; color:var(--navy-mid);"><strong style="font-family:'DM Mono',monospace; font-size:0.72rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--gold);">Part 2 of 2</strong> &nbsp;·&nbsp; This document describes how collected data is evaluated and compiled.<br/>
+      Part 1 — <em>GTM &amp; GA4 Configuration for Websites Using ClubRunner CMS</em> — describes how measurement is configured and which events are collected.<br/>
+    The support page on <a href="https://rotary2405.se/page/support-trafikanalys/" target="_blank">Traffic Analysis</a> (in Swedish) explains why measurement and configuration are needed.</p>
+  </div>
+
+  <!-- Context box -->
+  <div class="context-box">
+    <h3>Prerequisite</h3>
+    <p>This guide assumes that GTM and GA4 have been configured according to <em>Part 1</em>, and that measurement has collected data for at least one period. That means unwanted referrals are blocked, custom events for downloads (<code>file_download</code> — two GTM tags, same event name), outbound clicks (<code>outbound_click</code>), newsletters (<code>bulletin_viewed</code>) and search terms (<code>view_search_results</code>) are active, and a four-tab exploration has been built as described in section 1d of Part 1. Without that configuration, the event data will be incomplete and several sections of this guide will not apply.</p>
+  </div>
+
+  <!-- TOC -->
+  <div class="toc">
+    <div class="toc-title">Contents</div>
+    <ol>
+      <li><a href="#ladda-ner">What to Download from GA4</a></li>
+      <li><a href="#nyckeltal">Finding the Key Metrics — Summary</a></li>
+      <li><a href="#struktur">Suggested Report Structure</a></li>
+    </ol>
+  </div>
+
+  <!-- ======================================================= -->
+  <!-- Section 1 — What to download                             -->
+  <!-- ======================================================= -->
+  <div class="section" id="ladda-ner">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <h2>What to Download from GA4</h2>
+    </div>
+
+    <!-- 1a -->
+    <div class="subsection">
+      <div class="subsection-header">
+        <span class="subsection-label">1a</span>
+        <h3>Choose the reporting period</h3>
+      </div>
+      <p>Choose the reporting period using the date picker at the top right of the GA4 window.</p>
+
+      <div class="nav-path">
+        [any report under Reports] <span class="sep">›</span> date picker, top right <span class="sep">›</span> <span class="nav-end">Custom · set start date and end date</span>
+      </div>
+
+      <div class="callout callout-tip">
+        <strong>Turn on comparison</strong> — select "Compare: Previous period" or a custom date range to give the figures context. Without a comparison, a single number is hard to interpret.
+      </div>
+    </div>
+
+    <!-- 1b -->
+    <div class="subsection">
+      <div class="subsection-header">
+        <span class="subsection-label">1b</span>
+        <h3>Baseline metrics — reach and engagement</h3>
+      </div>
+      <p>The starting point for every report. Gives the overall picture before moving on to sources and content. Sessions, Engaged sessions, Engagement rate and Average engagement time per session come from the table in <strong>Traffic acquisition</strong>; Users and New users come from the companion report <strong>User acquisition</strong>.</p>
+
+      <div class="nav-path">
+        Reports <span class="sep">›</span> Acquisition <span class="sep">›</span> <span class="nav-end">Traffic acquisition</span>
+      </div>
+
+      <table class="config-table">
+        <tr><th>Metric</th><th>What it measures</th><th>Use</th></tr>
+        <tr><td>Sessions</td><td>Total number of visits — one person can generate several sessions</td><td>Good comparison figure, period over period</td></tr>
+        <tr><td>Engaged sessions</td><td>Visits lasting ≥10 seconds, with ≥2 page views, or containing a key event</td><td>Operational metric — shows whether traffic is qualitative</td></tr>
+        <tr><td>Engagement rate</td><td>Engaged sessions ÷ all sessions</td><td>Operational metric — moves faster than Users and is more sensitive to communication efforts</td></tr>
+        <tr><td>Average engagement time per session</td><td>How long visitors actively interact (not just have the tab open)</td><td>Indicator of content quality</td></tr>
+        <tr><td>Users</td><td>Number of browser instances with an active GA4 cookie — not a count of people</td><td>Long-term trend, not an operational metric for ongoing communication efforts</td></tr>
+        <tr><td>New users</td><td>Browsers with no prior GA4 cookie — a cleared cookie counts as a "new" visitor</td><td>Indicative only, not an operational metric — too dependent on cookie lifespan</td></tr>
+      </table>
+
+      <div class="callout callout-warning">
+        <strong>Users means browsers, not people.</strong> GA4 identifies each "user" by a first-party cookie (<code>_ga</code>) stored in the browser, which is not tied to an account or a person. This creates three important limitations:
+        <ul style="margin: 0.5rem 0 0.5rem 1.25rem;">
+          <li>The same person on mobile and desktop counts as <em>two</em> users.</li>
+          <li>Anyone who clears cookies, switches browser, or uses private/incognito mode counts as a new user on their next visit.</li>
+          <li>Anyone who declines cookies in the consent banner is not tracked at all and is missing from the data.</li>
+        </ul>
+        Users therefore tends to <em>overstate</em> the number of real visitors — while understating those who decline consent. Use Sessions and Engagement rate as operational metrics; Users only gives a rough indication of visit volume over time.
+      </div>
+
+      <p>Download the table using the download icon (↓) at the top right of the report — exports to CSV or Google Sheets.</p>
+    </div>
+
+    <!-- 1c -->
+    <div class="subsection">
+      <div class="subsection-header">
+        <span class="subsection-label">1c</span>
+        <h3>Traffic sources</h3>
+      </div>
+      <p>Shows <em>where</em> visitors come from — essential for assessing whether the site is reached mainly through search engines, direct links (e.g. from club emails), social media, or other sites.</p>
+
+      <div class="nav-path">
+        Reports <span class="sep">›</span> Acquisition <span class="sep">›</span> <span class="nav-end">Traffic acquisition</span>
+      </div>
+
+      <p>Primary dimension: <strong>Session default channel group</strong> (Organic Search, Direct, Referral, Organic Social, Unassigned, etc.). Metrics: Sessions, Engaged sessions, Engagement rate.</p>
+
+      <div class="callout callout-warning">
+        <strong>Check "unwanted referrals" in the GA4 configuration before reading this report.</strong> If ClubRunner's own domains are not blocked, they will appear as false "Referral" sources and skew the picture.
+      </div>
+    </div>
+
+    <!-- 1d -->
+    <div class="subsection">
+      <div class="subsection-header">
+        <span class="subsection-label">1d</span>
+        <h3>Most visited pages</h3>
+      </div>
+      <p>What content is actually being consumed — the basis for assessing whether the district's priority pages (e.g. the project fund, events) are getting through.</p>
+
+      <div class="nav-path">
+        Reports <span class="sep">›</span> Engagement <span class="sep">›</span> <span class="nav-end">Pages and screens</span>
+      </div>
+
+      <p>Dimension: Page title and screen class (or Page path). Metrics: Views, Active users, Average engagement time. Sort descending on Views and include the top 10–15 in the working data — only the 5–10 most relevant will make it into the final report.</p>
+    </div>
+
+    <!-- 1e -->
+    <div class="subsection">
+      <div class="subsection-header">
+        <span class="subsection-label">1e</span>
+        <h3>Custom events — downloads, outbound clicks, newsletters, search terms</h3>
+      </div>
+      <p>Custom events capture <em>action</em>, not just viewing — a stronger engagement signal than page views. Five events are configured in Part 1 and sent to GA4 under four event names; downloads are split across two GTM tags that share the event name <code>file_download</code>:</p>
+
+      <table class="config-table">
+        <tr><th>Event name</th><th>What it captures</th><th>Key parameter</th></tr>
+        <tr><td><code>file_download</code></td><td>Downloads of files from Documents</td><td><code>file_name</code> — which file</td></tr>
+        <tr><td></td><td>Downloads of page files in the Page Download Files widget, stored on ClubRunner's blob domain. The GTM tag is named <code>GA4 – Page file download</code></td><td><code>file_name</code> — which page/file</td></tr>
+        <tr><td><code>outbound_click</code></td><td>Clicks on external links</td><td><code>link_url</code>, <code>link_text</code> — where and what</td></tr>
+        <tr><td><code>bulletin_viewed</code></td><td>Clicks through to a newsletter (bulletin)</td><td><code>link_url</code> — which issue</td></tr>
+        <tr><td><code>view_search_results</code></td><td>Searches in the site's search box</td><td><code>search_term</code> — the search term</td></tr>
+      </table>
+
+      <p style="margin-top:0.75rem;">The standard report only gives total counts per event name. Open the four-tab exploration built in Part 1 (section 1d) to see the breakdown by document, link, or search term:</p>
+
+      <div class="nav-path">
+        Explore <span class="sep">›</span> <span class="nav-end">Custom events [district] [period]</span>
+      </div>
+
+      <div class="callout callout-tip">
+        <strong>Search terms are a direct signal of content gaps.</strong> If visitors search for terms that don't match a good page result (typos, synonyms, missing topics), it points to where the site needs improvement — without having to guess from page-view statistics.
+      </div>
+    </div>
+
+    <!-- 1f -->
+    <div class="subsection">
+      <div class="subsection-header">
+        <span class="subsection-label">1f</span>
+        <h3>Device and geography (sanity check)</h3>
+      </div>
+      <p>Not a main focus for the district report, but worth a quick check: an unusual geographic distribution (a lot of traffic outside Sweden) or an extremely high share of a single device type can indicate bot/spam traffic rather than genuine visitors.</p>
+
+      <div class="nav-path">
+        Reports <span class="sep">›</span> Tech <span class="sep">›</span> Overview <span class="sep">·</span> Reports <span class="sep">›</span> Demographics <span class="sep">›</span> <span class="nav-end">Demographics detail (Country)</span>
+      </div>
+    </div>
+
+
+    <!-- 1g -->
+    <div class="subsection">
+      <div class="subsection-header">
+        <span class="subsection-label">1g</span>
+        <h3>Search traffic from Google — Search Console data</h3>
+      </div>
+      <p>Search Console data in GA4 shows the <em>incoming</em> search traffic: which search terms in Google lead visitors to the site, which pages rank, and how visible the site is in search results. It complements the on-site search tracking (1e), which shows what visitors look for <em>once they are already on the site</em>.</p>
+
+      <div class="nav-path">
+        Reports <span class="sep">›</span> Acquisition <span class="sep">›</span> <span class="nav-end">Search Console</span>
+      </div>
+
+      <h4>What you'll find here</h4>
+      <table class="config-table">
+        <tr>
+          <th>Report</th>
+          <th>Metrics</th>
+          <th>What it tells you</th>
+        </tr>
+        <tr>
+          <td>Queries</td>
+          <td>Clicks, Impressions, CTR, Position</td>
+          <td>Which search terms drive traffic — and which generate impressions without clicks</td>
+        </tr>
+        <tr>
+          <td>Google organic search pages</td>
+          <td>Clicks, Impressions, CTR, Position</td>
+          <td>Which pages rank in Google, and for how many searches</td>
+        </tr>
+      </table>
+
+      <h4>What to look out for</h4>
+      <p><strong>High impression share, low CTR</strong> (click-through rate below ~2%) suggests the page appears in search results but the title or description isn't compelling enough to earn clicks — a sign the metadata needs review.</p>
+      <p><strong>Search terms with no matching page</strong> — if visitors search for, say, "Rotary [city] membership" but no page ranks for it, that may be a content gap to fill.</p>
+      <p><strong>Compare with on-site search:</strong> terms that are frequently searched both in Google <em>and</em> in on-site search (section 1e) are a strong signal that the content is either missing or hard to find.</p>
+
+      <div class="callout callout-warning">
+        <strong>District and club sites rarely appear for generic searches.</strong> Expect search terms tied to the district's name, place names, and specific programme names — not broad Rotary traffic. That is normal.
+      </div>
+    </div>
+
+
+    <!-- 1h -->
+    <div class="subsection">
+      <div class="subsection-header">
+        <span class="subsection-label">1h</span>
+        <h3>Microsoft Clarity — behavioural data that complements GA4</h3>
+      </div>
+      <p>GA4 answers <em>what</em> is happening — how many visits, which pages, which events. Clarity answers <em>why</em>: it records visitor sessions and builds heatmaps showing where visitors click, how far they scroll, and where they get stuck.</p>
+
+      <div class="nav-path">
+        <a href="https://clarity.microsoft.com" style="color:inherit;">clarity.microsoft.com</a> <span class="sep">›</span> <span class="nav-end">your project</span>
+      </div>
+
+      <h4>The key tools</h4>
+      <table class="config-table">
+        <tr>
+          <th>Tool</th>
+          <th>What it shows</th>
+          <th>A good question to ask</th>
+        </tr>
+        <tr>
+          <td>Heatmap — Clicks</td>
+          <td>Where on the page visitors click</td>
+          <td>Are visitors clicking the right elements — or things that aren't clickable?</td>
+        </tr>
+        <tr>
+          <td>Heatmap — Scroll</td>
+          <td>How far down the page visitors scroll</td>
+          <td>Do visitors see the most important content, or do they stop before reaching it?</td>
+        </tr>
+        <tr>
+          <td>Heatmap — Attention</td>
+          <td>Combined view of where visitors focus their attention (time, scroll, position)</td>
+          <td>Is important information above the fold actually being read, or is it missed despite its placement?</td>
+        </tr>
+        <tr>
+          <td>Session recordings</td>
+          <td>Recordings of individual visits with mouse movements and clicks</td>
+          <td>What does a visitor who leaves the page quickly actually do — are they not finding what they're looking for?</td>
+        </tr>
+        <tr>
+          <td>Dead clicks</td>
+          <td>Clicks on elements that aren't clickable</td>
+          <td>Are there images or headings that visitors think are links?</td>
+        </tr>
+        <tr>
+          <td>Rage clicks</td>
+          <td>Repeated clicks in the same spot</td>
+          <td>Is there an element frustrating visitors — e.g. a button that doesn't respond?</td>
+        </tr>
+        <tr>
+          <td>Quick backs</td>
+          <td>Visitors who immediately leave the page and go back</td>
+          <td>Does the page content match what the visitor expected?</td>
+        </tr>
+      </table>
+
+      <h4>Filter by device</h4>
+      <p>All heatmaps can be filtered by device — Desktop, Tablet or Mobile — directly in the heatmap interface. This gives more than GA4's device figures: it shows <em>how</em> behaviour differs, not just how many people visit from each device. ClubRunner sites are rarely fully mobile-optimised, and comparing desktop with mobile can quickly reveal where the layout falls short.</p>
+
+      <h4>AI Insights</h4>
+      <p>Clarity has a built-in AI summary (AI Insights) that automatically analyses heatmaps and recordings and identifies patterns — e.g. "most users click on X but ignore Y" or "many leave the page at this step". It's a good starting point for a webmaster who doesn't want to review dozens of recordings manually.</p>
+
+      <h4>How to use Clarity best alongside GA4</h4>
+      <p>GA4 shows that a page has a high bounce rate — Clarity shows <em>what</em> happens during those visits. Filter recordings to the specific page and watch about ten sessions. Patterns tend to emerge quickly.</p>
+      <p>GA4 shows that a button is rarely clicked — Clarity's heatmap shows whether visitors even see it, or whether it falls below the fold for most visitors.</p>
+
+      <div class="callout callout-info">
+        <strong>Volume requirement.</strong> Clarity needs a certain number of sessions before heatmaps become statistically meaningful. On low-traffic sites, session recordings are more immediately useful — look at individual visits rather than aggregated heatmaps.
+      </div>
+    </div>
+
+    <!-- 1i -->
+    <div class="subsection">
+      <div class="subsection-header">
+        <span class="subsection-label">1i</span>
+        <h3>Video engagement</h3>
+      </div>
+      <p>Shows whether embedded videos are actually watched, or just scrolled past. A tier-3 metric (ongoing monitoring). Two data sources complement each other:</p>
+
+      <table class="config-table">
+        <tr><th>Source</th><th>What it shows</th><th>Where</th></tr>
+        <tr><td>GA4 Enhanced Measurement</td><td><code>video_start</code>, <code>video_progress</code> (25/50/75%), <code>video_complete</code> — for embedded YouTube clips on the site</td><td>Reports › Engagement › Events (filter on "video_")</td></tr>
+        <tr><td>YouTube Analytics</td><td>Total views, average view duration, retention curve — for all views regardless of source</td><td>studio.youtube.com › Analytics</td></tr>
+      </table>
+
+      <div class="callout callout-info">
+        GA4 tracks video events automatically for embedded YouTube videos if Enhanced Measurement is enabled (see Part 1, section 1b). The retention curve in YouTube Analytics is particularly useful — it shows exactly when viewers stop watching.
+      </div>
+    </div>
+
+    <!-- 1j -->
+    <div class="subsection">
+      <div class="subsection-header">
+        <span class="subsection-label">1j</span>
+        <h3>Path exploration</h3>
+      </div>
+      <p>Shows the path visitors take through the website — e.g. whether they move on from an article to a donation page or project fund. Used to assess whether navigation and CTAs are working as intended. A tier-3 metric.</p>
+
+      <div class="nav-path">
+        Explore <span class="sep">›</span> <span class="nav-end">Path exploration</span>
+      </div>
+
+      <p>Choose a starting point (e.g. a specific page or event) and GA4 shows visitors' next steps and where they drop out of the flow. Most useful when analysing a specific visit path: e.g. Homepage → Project fund → Donation form.</p>
+    </div>
+
+  </div><!-- /section 1 -->
+
+  <!-- ======================================================= -->
+  <!-- Section 2 — Finding the key metrics                     -->
+  <!-- ======================================================= -->
+  <div class="section" id="nyckeltal">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <h2>Finding the Key Metrics — Summary</h2>
+    </div>
+
+    <p>All the metrics from section 1, gathered in one place. Use the table as a checklist when building your working data — each row corresponds to a figure that should go into the fact table in the finished report.</p>
+
+    <table class="config-table">
+      <tr><th>Metric</th><th>Where to find it</th><th>What it tells you</th><th>Tier</th></tr>
+      <tr><td>Sessions</td><td>Acquisition › Traffic acquisition</td><td>Total number of visits — good comparison figure period over period</td><td>Trend</td></tr>
+      <tr><td>Engagement rate</td><td>Acquisition › Traffic acquisition</td><td>Share of visits with meaningful interaction</td><td>Trend</td></tr>
+      <tr><td>Sessions per channel group</td><td>Acquisition › Traffic acquisition</td><td>Where visitors come from — direct, organic search, referral, social</td><td>Operational</td></tr>
+      <tr><td>Views per page (top 10–15)</td><td>Engagement › Pages and screens</td><td>Most popular content</td><td>Operational</td></tr>
+      <tr><td>file_download / outbound_click / bulletin_viewed</td><td>Explore → Custom events (four-tab exploration)</td><td>Concrete actions give a stronger signal than page views</td><td>Operational</td></tr>
+      <tr><td>Search traffic (Search Console)</td><td>Reports › Acquisition › Search Console</td><td>Search terms and ranking in Google — shows whether organic visibility is increasing</td><td>Operational</td></tr>
+      <tr><td>view_search_results — on-site search</td><td>Explore → Custom events, Sitesearch CR tab</td><td>What visitors search for on the site — reveals content gaps</td><td>Ongoing</td></tr>
+      <tr><td>Average engagement time per session</td><td>Acquisition › Traffic acquisition</td><td>How long visitors stay actively engaged</td><td>Ongoing</td></tr>
+      <tr><td>Scroll depth</td><td>Microsoft Clarity › scroll heatmap</td><td>How far down visitors scroll — reveals whether longer content gets read</td><td>Ongoing</td></tr>
+      <tr><td>Video engagement</td><td>Reports › Engagement › Events (video_*) + YouTube Analytics</td><td>Whether embedded videos are played and watched to completion</td><td>Ongoing</td></tr>
+      <tr><td>Path exploration</td><td>Explore → Path exploration</td><td>The visitor's path through the site — whether CTAs and navigation are working</td><td>Ongoing</td></tr>
+      <tr><td>Behavioural analysis (Clarity)</td><td>clarity.microsoft.com</td><td>Heatmaps, session recordings, AI-detected patterns</td><td>Ongoing</td></tr>
+      <tr><td>Users</td><td>Acquisition › User acquisition</td><td>Browser instances with an active GA4 cookie — an indication of volume, not an operational metric (see section 1b)</td><td>Indicator</td></tr>
+    </table>
+  </div>
+
+  <!-- ======================================================= -->
+  <!-- Section 3 — Report structure                            -->
+  <!-- ======================================================= -->
+  <div class="section" id="struktur">
+    <div class="section-header">
+      <div class="section-num">3</div>
+      <h2>Suggested Report Structure</h2>
+    </div>
+
+    <div class="subsection">
+      <p>The suggested structure is: <strong>conclusion first, interpretive prose under headings, figures gathered in a table at the end.</strong> The structure below covers web metrics from GA4 and Clarity. Analysis of other channels — newsletters, Facebook, and so on — should be added to give a complete picture of communications. Bear in mind that the report's recipients are unlikely to be GA-literate and are not interested in raw data or unnecessary jargon.<br/>
+        See the support page on <a href="https://rotary2405.se/page/support-trafikanalys/" target="_blank">Traffic Analysis</a> (in Swedish) for suggested key metrics split across three tiers.</p>
+      <p>Feel free to let your favourite AI do the heavy lifting. Upload the text on key metrics from the Traffic Analysis support page along with the CSV files from GA4. Ask it to analyse and compile the report according to the structure below (which you should also upload).</p>
+
+      <table class="config-table">
+        <tr><th>Part</th><th>Content</th></tr>
+        <tr><td>Title</td><td>Site/channel + Rotary year, e.g. "rotary2405.se — Traffic Analysis, Rotary Year 2025/26"</td></tr>
+        <tr><td>Lead (2–4 sentences)</td><td>The headline conclusion, stated plainly: is the site working as intended? Is the trend up or down on the previous year? No subheading needed — this is the core of the report.</td></tr>
+        <tr><td>Heading: Reach</td><td>Sessions trend versus the previous period + engagement rate — not Users as the headline figure; Users is mentioned in the fact table but should not be a communication target</td></tr>
+        <tr><td>Heading: Traffic sources</td><td>Organic Search, Direct, Referral and Social — highlight the strongest source and any changes versus the previous period</td></tr>
+        <tr><td>Heading: Most popular pages</td><td>Top 5–10 pages by page views — comment on whether priority pages (e.g. project pages, events, recruitment) are getting through</td></tr>
+        <tr><td>Heading: Downloads and external clicks</td><td>Which documents are downloaded, which external pages are clicked — concrete action, a stronger signal than page views</td></tr>
+        <tr><td>Fact table</td><td>All key metrics from section 2, compactly gathered — the basis for future comparison against baselines</td></tr>
+      </table>
+    </div>
+  </div>
+
+</div><!-- /content -->
+</body>
+</html>

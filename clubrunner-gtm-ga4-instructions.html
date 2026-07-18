@@ -1,0 +1,1806 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GTM &amp; GA4 Configuration for Websites Using ClubRunner CMS</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+  :root {
+    --gold: #C8963E;
+    --gold-light: #E8B96A;
+    --navy: #1A2744;
+    --navy-mid: #2A3D5E;
+    --cream: #FAF7F2;
+    --warm-gray: #8B8070;
+    --text: #2C2416;
+    --border: #DDD5C8;
+    --code-bg: #F0ECE4;
+    --success: #2D6A4F;
+    --warning: #7B4F00;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    background: var(--cream);
+    color: var(--text);
+    line-height: 1.7;
+  }
+
+  .header {
+    background: var(--navy);
+    color: white;
+    padding: 3rem 2rem 2.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 300px; height: 300px;
+    border: 2px solid rgba(200,150,62,0.2);
+    border-radius: 50%;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    top: 20px; right: 20px;
+    width: 180px; height: 180px;
+    border: 1px solid rgba(200,150,62,0.15);
+    border-radius: 50%;
+  }
+  .header-inner {
+    max-width: 900px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+  .badge {
+    display: inline-block;
+    background: var(--gold);
+    color: white;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 0.25rem 0.7rem;
+    border-radius: 2px;
+    margin-bottom: 1rem;
+  }
+  h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    font-weight: 400;
+    line-height: 1.2;
+    color: white;
+    margin-bottom: 0.75rem;
+  }
+  h1 em { color: var(--gold-light); font-style: italic; }
+  .header p {
+    color: rgba(255,255,255,0.65);
+    font-size: 0.95rem;
+    max-width: 600px;
+  }
+
+  .content {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2.5rem 2rem 4rem;
+  }
+
+  /* TOC */
+  .toc {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 2.5rem;
+  }
+  .toc-title {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--warm-gray);
+    margin-bottom: 0.75rem;
+  }
+  .toc ol {
+    list-style: none;
+    counter-reset: toc;
+  }
+  .toc li {
+    counter-increment: toc;
+    font-size: 0.85rem;
+    padding: 0.2rem 0;
+    color: var(--navy-mid);
+  }
+  .toc li::before {
+    content: counter(toc) ". ";
+    color: var(--gold);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+  }
+  .toc li.nonum { counter-increment: none; }
+  .toc li.nonum::before { content: "· "; }
+  .toc a { color: inherit; text-decoration: none; }
+  .toc a:hover { color: var(--gold); }
+
+  /* Context box */
+  .context-box {
+    background: white;
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--gold);
+    border-radius: 4px;
+    padding: 1.5rem;
+    margin-bottom: 2.5rem;
+  }
+  .context-box h3 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1rem;
+    font-weight: 400;
+    color: var(--navy);
+    margin-bottom: 0.75rem;
+  }
+  .domain-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 0.6rem;
+    margin-top: 0.75rem;
+  }
+  .domain-item {
+    background: var(--code-bg);
+    border-radius: 3px;
+    padding: 0.5rem 0.75rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--navy-mid);
+  }
+  .domain-item span {
+    display: block;
+    color: var(--warm-gray);
+    font-size: 0.65rem;
+    font-family: 'DM Sans', sans-serif;
+    margin-bottom: 0.15rem;
+  }
+
+  /* Sections */
+  .section { margin-bottom: 2.5rem; }
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid var(--navy);
+  }
+  .section-num {
+    background: var(--navy);
+    color: var(--gold);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    font-weight: 500;
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.4rem;
+    font-weight: 400;
+    color: var(--navy);
+  }
+
+  /* Subsection */
+  .subsection {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1.5rem;
+    margin-bottom: 1.25rem;
+  }
+  .subsection-header {
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.6rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .subsection-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: var(--gold);
+    background: rgba(200,150,62,0.08);
+    padding: 0.15rem 0.5rem;
+    border-radius: 2px;
+    white-space: nowrap;
+  }
+  h3 {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--navy);
+    line-height: 1.3;
+  }
+
+  h4 {
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--navy-mid);
+    margin: 1rem 0 0.5rem;
+  }
+
+  p {
+    font-size: 0.88rem;
+    color: #4A3F30;
+    margin-bottom: 0.65rem;
+    line-height: 1.65;
+  }
+  p:last-child { margin-bottom: 0; }
+
+  /* Navigation path */
+  .nav-path {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.25rem;
+    background: var(--navy);
+    color: rgba(255,255,255,0.85);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.73rem;
+    padding: 0.5rem 0.85rem;
+    border-radius: 4px;
+    margin: 0.6rem 0;
+  }
+  .nav-path .sep { color: var(--gold); margin: 0 0.1rem; }
+  .nav-path .nav-end { color: var(--gold-light); font-weight: 500; }
+
+  /* Steps */
+  .steps { counter-reset: steps; margin: 0.5rem 0; }
+  .step {
+    display: flex;
+    gap: 0.85rem;
+    align-items: flex-start;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .step:last-child { border-bottom: none; }
+  .step-num {
+    counter-increment: steps;
+    content: counter(steps);
+    background: var(--gold);
+    color: white;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    font-weight: 500;
+    min-width: 22px; height: 22px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .step-body { flex: 1; }
+  .step-title {
+    font-weight: 600;
+    font-size: 0.87rem;
+    color: var(--navy);
+    margin-bottom: 0.25rem;
+  }
+  .step-desc {
+    font-size: 0.82rem;
+    color: #5A503C;
+    line-height: 1.55;
+  }
+
+  /* Config blocks */
+  .config-block {
+    background: #0F1D36;
+    color: #D8D0C4;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.77rem;
+    line-height: 1.75;
+    padding: 1.1rem 1.3rem;
+    border-radius: 4px;
+    margin: 0.65rem 0;
+    overflow-x: auto;
+    white-space: pre;
+  }
+  .config-block .cm  { color: #5A7A9A; }   /* comment */
+  .config-block .k   { color: #7EB8D4; }   /* key / field label */
+  .config-block .v   { color: #A8D5B5; }   /* value */
+  .config-block .d   { color: #F0C87A; }   /* domain / url */
+  .config-block .rx  { color: #F4A460; }   /* regex */
+  .config-block .ev  { color: #E8A0D8; }   /* event name */
+  .config-block .hl  { color: #FFFFFF; font-weight: 500; } /* highlight */
+
+  /* Config table */
+  .config-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.82rem;
+    margin: 0.65rem 0;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .config-table th {
+    background: var(--navy);
+    color: rgba(255,255,255,0.85);
+    font-weight: 500;
+    font-size: 0.71rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.55rem 0.85rem;
+    text-align: left;
+  }
+  .config-table td {
+    padding: 0.5rem 0.85rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    color: var(--text);
+    line-height: 1.5;
+  }
+  .config-table tr:last-child td { border-bottom: none; }
+  .config-table tr:nth-child(even) td { background: var(--cream); }
+
+  code {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.8em;
+    background: var(--code-bg);
+    padding: 0.1em 0.35em;
+    border-radius: 2px;
+    color: var(--navy-mid);
+  }
+
+  /* Callouts */
+  .callout {
+    border-radius: 4px;
+    padding: 0.85rem 1.1rem;
+    margin: 0.65rem 0;
+    font-size: 0.84rem;
+    border-left: 3px solid;
+    line-height: 1.55;
+  }
+  .callout-warning { background: #FFF8EC; border-color: #D4A020; color: #6B4400; }
+  .callout-tip     { background: #F0F7F4; border-color: #4A9E7A; color: #1A5C3A; }
+  .callout-info    { background: #EEF4FA; border-color: #4A80B4; color: #1A3D6A; }
+  .callout strong  { font-weight: 600; }
+
+  /* Chip tags */
+  .chip {
+    display: inline-block;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    padding: 0.15rem 0.5rem;
+    border-radius: 2px;
+    margin: 0.1rem;
+    border: 1px solid;
+  }
+  .chip-var { border-color: #A8C4E0; background: #EEF4FA; color: #1A4A7A; }
+
+  hr.divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 2.5rem 0;
+  }
+
+  /* Summary */
+  .summary {
+    background: var(--navy);
+    color: white;
+    border-radius: 6px;
+    padding: 1.75rem;
+    margin-top: 2.5rem;
+  }
+  .summary-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.15rem;
+    color: var(--gold-light);
+    font-weight: 400;
+    margin-bottom: 1.25rem;
+  }
+  .summary-cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+  }
+  @media (max-width: 620px) {
+    .summary-cols { grid-template-columns: 1fr; }
+    .domain-grid { grid-template-columns: 1fr; }
+  }
+  .summary-col h4 {
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 0.6rem;
+    font-family: 'DM Mono', monospace;
+  }
+  .summary-col ul { list-style: none; }
+  .summary-col li {
+    font-size: 0.83rem;
+    color: rgba(255,255,255,0.75);
+    padding: 0.22rem 0 0.22rem 1.1rem;
+    position: relative;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .summary-col li:last-child { border-bottom: none; }
+  .summary-col li::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: var(--gold);
+    font-size: 0.7rem;
+    top: 0.3rem;
+  }
+  .footer-note {
+    margin-top: 1.25rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    font-size: 0.75rem;
+    color: rgba(255,255,255,0.4);
+    font-style: italic;
+  }
+
+  .tag-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin: 0.5rem 0;
+  }
+  .tag-pill {
+    background: rgba(200,150,62,0.12);
+    border: 1px solid rgba(200,150,62,0.35);
+    color: var(--gold);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.71rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 20px;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <div class="badge">Rotary Districts/Rotary Clubs · ClubRunner CMS</div>
+    <h1>PART 1<br/>GTM &amp; GA4 <em>Configuration</em><br>for Websites Using ClubRunner CMS</h1>
+    <p>Step-by-step instructions for correct web analytics, tailored to ClubRunner's multi-domain architecture. All field names in GTM and GA4 are given in English, exactly as they appear in the respective interfaces.</p>
+    <p style="font-size:0.75rem; color:rgba(255,255,255,0.45); margin-top:1.25rem; margin-bottom:0;">Anders Tihkan (Värmdö Skärgård RK) &nbsp;·&nbsp; Updated 18 July 2026</p>
+  </div>
+</div>
+
+<div class="content">
+
+  <!-- Document series note -->
+  <div class="context-box" style="border-left-color: var(--gold); padding: 1rem 1.5rem;">
+    <p style="font-size:0.82rem; margin:0; color:var(--navy-mid);"><strong style="font-family:'DM Mono',monospace; font-size:0.72rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--gold);">Part 1 of 2</strong> &nbsp;·&nbsp; This document describes how to configure GTM and GA4.<br/> Part 2 — <em>Traffic Analysis and Reporting</em> — describes how the collected data is evaluated and compiled into a report.<br/>
+    The support page on <a href="https://rotary2405.se/page/support-trafikanalys/" target="_blank">Traffic Analysis</a> (in Swedish) explains why measurement and configuration are needed.</p>
+  </div>
+
+  <!-- TOC -->
+  <div class="toc">
+    <div class="toc-title">Contents</div>
+    <ol>
+      <li style="counter-reset: toc -1;"><a href="#cr-config">ClubRunner — Register the GTM Container</a></li>
+      <li><a href="#ga4">Google Analytics 4 — Settings</a></li>
+      <li><a href="#gtm">Google Tag Manager — Tags and Triggers</a></li>
+      <li><a href="#begransningar">Known Limitations with ClubRunner</a></li>
+      <li class="nonum"><a href="#checklist">Checklist</a></li>
+      <li><a href="#portal">National Portal — rotary.se (Measuring Onward Clicks)</a></li>
+    </ol>
+  </div>
+
+  <!-- Context -->
+  <div class="context-box">
+    <h3>Why ClubRunner Requires Special Configuration</h3>
+    <p style="font-size:0.85rem; margin-bottom:0.75rem;">ClubRunner uses five separate domains. Without the correct configuration, GA4 interprets navigation between the domains as external visits and creates new sessions with incorrect traffic sources. All five must be treated as <em>internal</em>.</p>
+    <div class="domain-grid">
+      <div class="domain-item"><span>Public site (alias)</span>rotary[district].se</div>
+      <div class="domain-item"><span>Portal / CMS backend</span>portal.clubrunner.ca</div>
+      <div class="domain-item"><span>Content API</span>content.clubrunner.ca</div>
+      <div class="domain-item"><span>Admin interface</span>admin.clubrunner.ca</div>
+      <div class="domain-item"><span>Member and club data</span>crsadmin.com</div>
+    </div>
+    <p style="font-size:0.8rem; margin-top:0.75rem; margin-bottom:0; color:var(--warm-gray);">Files that visitors download via ClubRunner are additionally served from a separate blob domain: <code>clubrunner.blob.core.windows.net</code>. This requires its own trigger (see section 2g).</p>
+  </div>
+
+  <!-- Language box -->
+  <div class="context-box" style="border-left-color: var(--navy-mid);">
+    <h3>Switch GTM and GA4 to English</h3>
+    <p style="font-size:0.85rem; margin-bottom:0.75rem;">All menu items and field names in these instructions are in English, exactly as they appear in the interfaces. Follow the steps below to make sure you see the same labels.</p>
+    <p style="font-size:0.85rem; margin-bottom:0.5rem;"><strong style="font-weight:500; color:var(--navy);">Google Tag Manager</strong> — add <code style="font-family:'DM Mono',monospace; font-size:0.8rem; background:var(--code-bg); padding:0.1rem 0.35rem; border-radius:2px;">?hl=en</code> to the address bar:<br>
+    <code style="font-family:'DM Mono',monospace; font-size:0.78rem; background:var(--code-bg); padding:0.2rem 0.5rem; border-radius:2px; display:inline-block; margin-top:0.3rem;">https://tagmanager.google.com/?hl=en</code></p>
+    <p style="font-size:0.85rem; margin-bottom:0;"><strong style="font-weight:500; color:var(--navy);">Google Analytics 4</strong> — add <code style="font-family:'DM Mono',monospace; font-size:0.8rem; background:var(--code-bg); padding:0.1rem 0.35rem; border-radius:2px;">?hl=en</code> to the address bar:<br>
+    <code style="font-family:'DM Mono',monospace; font-size:0.78rem; background:var(--code-bg); padding:0.2rem 0.5rem; border-radius:2px; display:inline-block; margin-top:0.3rem;">https://analytics.google.com/?hl=en</code></p>
+  </div>
+
+  <!-- Club note box -->
+  <div class="context-box" style="border-left-color: var(--warm-gray);">
+    <p style="font-size:0.85rem; margin-bottom:0.75rem;"><strong>For a district, configuring tracking is essential</strong> — see the support page on <a href="https://rotary2405.se/page/support-trafikanalys/" target="_blank">Traffic Analysis</a> (in Swedish).</p>
+
+    <h3>Does this also apply to a club site?</h3>
+    <p style="font-size:0.85rem; margin-bottom:0.75rem;">The same configuration can be applied to a ClubRunner club. The mechanics are identical — domains, triggers and tags work the same way. The difference is that a typical club site has such low traffic volume that statistical measurements rarely yield meaningful results: segmentation, funnel analysis and traffic-source breakdowns require enough observations for the patterns to be reliable.</p>
+    <p style="font-size:0.85rem; margin-bottom:0.5rem;">Several of the advanced tags in this document, however, are valuable <em>regardless of volume</em>, because they don't rely on statistics but instead provide a direct list of concrete events — even a handful of observations is useful:</p>
+    <div class="domain-grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); margin-bottom:0.75rem;">
+      <div class="domain-item"><span>Document downloads (2f/2g)</span>Which minutes, bylaws or forms club members actually download.</div>
+      <div class="domain-item"><span>Search term tracking (2i)</span>What visitors are looking for — reveals content that is missing or hard to find in the menu.</div>
+    </div>
+    <p style="font-size:0.85rem; margin-bottom:0.5rem;">Beyond these, the following headline metrics always provide a good basis, regardless of traffic volume:</p>
+    <div class="domain-grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));">
+      <div class="domain-item"><span>Trend</span>Sessions and users over time — does traffic appear to be growing or shrinking?</div>
+      <div class="domain-item"><span>Content</span>Most visited pages — what content attracts visitors?</div>
+      <div class="domain-item"><span>Traffic sources</span>Organic search, direct traffic or referrals — how do people find the site?</div>
+      <div class="domain-item"><span>Device type</span>Mobile versus desktop — determines whether the layout works for the actual audience.</div>
+      <div class="domain-item"><span>Engagement</span>Average engagement time per session — do visitors stay and read?</div>
+      <div class="domain-item"><span>Bounce</span>Engaged sessions share — proportion of visits with genuine interaction.</div>
+    </div>
+    <p style="font-size:0.8rem; margin-top:0.75rem; margin-bottom:0; color:var(--warm-gray);">Recommendation: set up the base tag, document downloads and search term tracking on a club site regardless of volume — they cost nothing extra and produce directly useful data.</p>
+  </div>
+
+  <!-- ======================================================= -->
+  <!-- BLOCK 0: CLUBRUNNER CONFIGURATION                        -->
+  <!-- ======================================================= -->
+  <div class="section" id="cr-config">
+    <div class="section-header">
+      <div class="section-num">0</div>
+      <h2>ClubRunner — Register the GTM Container</h2>
+    </div>
+
+    <!-- 0a -->
+    <div class="subsection">
+      <div class="subsection-header">
+        <span class="subsection-label">0a</span>
+        <h3>Enter the Container ID in ClubRunner's analytics settings</h3>
+      </div>
+      <p>ClubRunner needs to know your GTM container ID in order to inject the tracking code automatically on every page. Without this, no data reaches GTM or GA4.</p>
+
+      <div class="nav-path">
+        Website <span class="sep">›</span> Website Settings <span class="sep">›</span> <span class="nav-end">Analytics</span>
+      </div>
+
+      <p>The page has two tracking fields:</p>
+
+      <table class="config-table">
+        <tr>
+          <th>Section</th>
+          <th>Field</th>
+          <th>What to do</th>
+        </tr>
+        <tr>
+          <td>Google Analytics</td>
+          <td>Stream ID</td>
+          <td><strong>Must be empty</strong> — delete any existing value.</td>
+        </tr>
+        <tr>
+          <td>Google Tag Manager</td>
+          <td>Container ID</td>
+          <td>Enter your Container ID, e.g. <code>GTM-XXXXXXX</code>. Then click <strong>Save</strong>.</td>
+        </tr>
+      </table>
+
+      <div class="callout callout-warning">
+        <strong>Stream ID must be empty</strong> — If you fill in a GA4 Stream ID alongside GTM, all traffic gets double-counted: every page view shows up as two separate hits in GA4. Leave the field empty and let GTM handle all tracking. If you previously tracked from ClubRunner directly to GA4, keep using the same GA4 ID in GTM.
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================= -->
+  <!-- BLOCK 1: GA4                                             -->
+  <!-- ======================================================= -->
+  <div class="section" id="ga4">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <h2>Google Analytics 4 — Settings</h2>
+    </div>
+
+    <!-- 1a -->
+    <div class="subsection">
+      <div class="subsection-header">
+        <span class="subsection-label">1a</span>
+        <h3>Add ClubRunner's domains as "Unwanted referrals"</h3>
+      </div>
+      <p>This is the single most important setting for ClubRunner sites. It prevents traffic from ClubRunner's own domains from being interpreted as external visits and breaking ongoing sessions, and prevents clicks to these domains from being counted as outbound external link clicks.</p>
+
+      <div class="nav-path">
+        Admin <span class="sep">›</span> Data Streams <span class="sep">›</span> [your stream] <span class="sep">›</span> Configure tag settings <span class="sep">›</span> <span class="nav-end">List unwanted referrals</span>
+      </div>
+
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <div class="step-title">Open GA4 Admin</div>
+            <div class="step-desc">Go to <strong>analytics.google.com</strong>, select the right GA4 property, click <strong>Admin</strong> (the gear icon at the bottom of the left-hand menu).</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <div class="step-title">Open Data Streams</div>
+            <div class="step-desc">Under "Property settings" → click <strong>Data Streams</strong> → click your web data stream (it should show your site's URL).</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <div class="step-title">Open Configure tag settings</div>
+            <div class="step-desc">Scroll down and click <strong>Configure tag settings</strong> (blue link at the bottom of the data stream view).</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-body">
+            <div class="step-title">Open List unwanted referrals</div>
+            <div class="step-desc">Click <strong>Show all</strong> if the list is collapsed, then click <strong>List unwanted referrals</strong>.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">5</div>
+          <div class="step-body">
+            <div class="step-title">Add the domains</div>
+            <div class="step-desc">Click <strong>Add condition</strong> and add one row per domain. Choose match type <strong>"Domain contains"</strong> for each. Save with <strong>Save</strong>.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="config-block"><span class="cm">// Domain contains — add one row per domain:</span>
+<span class="d">clubrunner.ca</span>
+<span class="d">crsadmin.com</span>
+<span class="d">clubrunner.blob.core.windows.net</span></div>
+
+      <div class="callout callout-tip">
+        <strong>Tip:</strong> <code>clubrunner.ca</code> alone is enough to cover the portal, content and admin subdomains. It's still worth adding them individually for clarity. <code>clubrunner.blob.core.windows.net</code> needs to be added separately — it's the domain ClubRunner serves page files from.
+      </div>
+    </div>
+
+    <!-- 1b -->
+    <div class="subsection">
+      <div class="subsection-header">
+        <span class="subsection-label">1b</span>
+        <h3>Turn off outbound clicks in Enhanced Measurement</h3>
+      </div>
+      <p>GA4 can automatically track clicks on outbound links via Enhanced Measurement. Since we handle this in GTM with ClubRunner exceptions (see section 2b), the built-in feature must be turned off — otherwise duplicate events are created.</p>
+
+      <div class="nav-path">
+        Admin <span class="sep">›</span> Data Streams <span class="sep">›</span> [your stream] <span class="sep">›</span> <span class="nav-end">Enhanced Measurement (gear icon)</span>
+      </div>
+
+      <table class="config-table">
+        <tr>
+          <th>Enhanced Measurement feature</th>
+          <th>Setting</th>
+          <th>Comment</th>
+        </tr>
+        <tr>
+          <td>Page views</td>
+          <td>✅ On</td>
+          <td>Always on</td>
+        </tr>
+        <tr>
+          <td>Scrolls</td>
+          <td>✅ On</td>
+          <td>Fires at 90% scroll</td>
+        </tr>
+        <tr>
+          <td>Outbound clicks</td>
+          <td>🚫 <strong>Off</strong></td>
+          <td>Handled via GTM with ClubRunner exceptions</td>
+        </tr>
+        <tr>
+          <td>Site search</td>
+          <td>✅ On (if applicable)</td>
+          <td>Requires the correct query parameter, e.g. <code>q</code></td>
+        </tr>
+        <tr>
+          <td>Video engagement</td>
+          <td>✅ On</td>
+          <td>Captures YouTube embeds</td>
+        </tr>
+        <tr>
+          <td>File downloads</td>
+          <td>🚫 <strong>Off</strong></td>
+          <td>Handled via GTM (2f/2g). The blob files have file extensions and would otherwise be double-counted by the built-in tracking</td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- 1c -->
+    <div class="subsection">
+      <div class="subsection-header">
+        <span class="subsection-label">1c</span>
+        <h3>Register custom dimensions for event parameters</h3>
+      </div>
+      <p>Events created in GTM can carry parameters (e.g. which URL was clicked). Parameters don't automatically appear in GA4 reports — they must be registered as "custom dimensions" to become searchable and reportable. The reports are built in the next section, 1d.</p>
+
+      <div class="nav-path">
+        Admin <span class="sep">›</span> Custom definitions <span class="sep">›</span> <span class="nav-end">Create custom dimension</span>
+      </div>
+
+      <p>Create one row per parameter:</p>
+      <table class="config-table">
+        <tr>
+          <th>Dimension name (your choice)</th>
+          <th>Scope</th>
+          <th>Event parameter / User property</th>
+          <th>Description (used by)</th>
+        </tr>
+        <tr>
+          <td>Link URL</td>
+          <td>Event</td>
+          <td><code>link_url</code></td>
+          <td>outbound_click, bulletin_viewed</td>
+        </tr>
+        <tr>
+          <td>Link text</td>
+          <td>Event</td>
+          <td><code>link_text</code></td>
+          <td>outbound_click, file_download (tags in 2f and 2g)</td>
+        </tr>
+        <tr>
+          <td>File name</td>
+          <td>Event</td>
+          <td><code>file_name</code></td>
+          <td>file_download (tags in 2f and 2g)</td>
+        </tr>
+        <tr>
+          <td>Search term</td>
+          <td>Event</td>
+          <td><code>search_term</code></td>
+          <td>view_search_results</td>
+        </tr>
+      </table>
+      <div class="callout callout-info">
+        <strong>Note:</strong> It can take up to 24 hours before custom dimensions start populating in reports after being created. "Event parameter" is a dropdown — the parameter <code>search_term</code> only appears in the list once GA4 has received it from a real search on the published site. Registration is not retroactive.
+      </div>
+    </div>
+
+    <!-- 1d -->
+    <div class="subsection" id="explore">
+      <div class="subsection-header">
+        <span class="subsection-label">1d</span>
+        <h3>Build an Exploration with four tabs for custom events</h3>
+      </div>
+      <p>GA4's standard reports show total counts per event but not <em>what</em> was clicked or searched for. That requires an <strong>Exploration</strong> (Explore). Build one shared exploration with four tabs — one per custom event — so all the detail data lives in one place. The settings below are a starting point; adjust them yourself to tailor the reports further.</p>
+
+      <div class="nav-path">Explore <span class="sep">›</span> <span class="nav-end">Blank</span></div>
+
+      <h4>Getting started</h4>
+     <div> <ol>
+        <li>Go to <strong>Explore → Blank exploration</strong>.</li>
+        <li>Name the exploration, e.g. <strong>Custom events [district] [period]</strong>.</li>
+        <li>Open the <strong>Variables</strong> panel (left) and click <strong>+</strong> next to Dimensions and Metrics respectively to add these shared variables for all tabs:</div>
+          <div class="config-block" style="margin-top:0.5rem;"><span class="k">Dimensions:</span>
+  <span class="d">Event name</span>
+  <span class="d">Link text</span>
+  <span class="d">Link URL</span>
+  <span class="d">File name</span>
+  <span class="d">Search term</span>
+
+<span class="k">Metric:</span>
+  <span class="d">Event count</span></div>
+        </li>
+      <div>
+      <li>Then create four tabs in the order below. Each tab is configured in the <strong>Tab Settings</strong> panel (right). <br/>
+          Tip: After the first report, click the down arrow on the tab name and duplicate the tab — then you only need to make a few small changes to the new tab's Settings. Edit the tab name by clicking on it.</li>
+      </ol></div>
+
+      <h4>Tab 1 — Outbound clicks</h4>
+      <div class="config-block"><span class="k">Tab name:</span>    <span class="v">Outbound clicks</span>
+
+<span class="k">Rows:</span>
+  <span class="d">Link text</span>   <span class="cm">// primary row</span>
+  <span class="d">Link URL</span>    <span class="cm">// nested row</span>
+
+<span class="k">Nested rows:</span> <span class="v">Yes</span>
+<span class="k">Show rows:</span>   <span class="v">100</span>
+
+<span class="k">Filter:</span>
+  <span class="d">Event name</span>  <span class="v">exactly matches</span>  <span class="d">outbound_click</span>
+
+<span class="k">Sort:</span>        <span class="d">Event count</span>  <span class="v">descending</span></div>
+
+      <h4>Tab 2 — Sitesearch CR</h4>
+      <div class="config-block"><span class="k">Tab name:</span>    <span class="v">Sitesearch CR</span>
+
+<span class="k">Rows:</span>
+  <span class="d">Search term</span>
+
+<span class="k">Nested rows:</span> <span class="v">No</span>
+<span class="k">Show rows:</span>   <span class="v">25</span>
+
+<span class="k">Filter:</span>
+  <span class="d">Event name</span>  <span class="v">exactly matches</span>  <span class="d">view_search_results</span></div>
+
+      <h4>Tab 3 — Downloads</h4>
+      <div class="config-block"><span class="k">Tab name:</span>    <span class="v">Downloads</span>
+
+<span class="k">Rows:</span>
+  <span class="d">Link text</span>
+  <span class="d">File name</span>
+
+<span class="k">Nested rows:</span> <span class="v">No</span>
+<span class="k">Show rows:</span>   <span class="v">50</span>
+
+<span class="k">Filter:</span>
+  <span class="d">Event name</span>  <span class="v">exactly matches</span>  <span class="d">file_download</span>
+
+<span class="k">Sort:</span>        <span class="d">File name</span>  <span class="v">descending</span></div>
+      <div class="callout callout-info">
+        <strong>Two triggers, one event:</strong> the tag for 2f (document pages) and the tag for 2g (blob files) both use the event name <code>file_download</code>. They appear as one and the same event in the report — <code>file_name</code> contains the full URL and distinguishes the sources. Filter on <code>clubrunner.blob.core.windows.net</code> if you want to separate them.
+      </div>
+
+      <h4>Tab 4 — Bulletin viewed</h4>
+      <div class="config-block"><span class="k">Tab name:</span>    <span class="v">Bulletin viewed</span>
+
+<span class="k">Rows:</span>
+  <span class="d">Link text</span>   <span class="cm">// primary row</span>
+  <span class="d">Link URL</span>    <span class="cm">// nested row</span>
+
+<span class="k">Nested rows:</span> <span class="v">Yes</span>
+<span class="k">Show rows:</span>   <span class="v">100</span>
+
+<span class="k">Filter:</span>
+  <span class="d">Event name</span>  <span class="v">exactly matches</span>  <span class="d">bulletin_viewed</span></div>
+      <div class="callout callout-tip">
+        <strong>UUID not readable?</strong> Each <code>/bulletin/View/[uuid]</code> is unique to a specific newsletter. Look up the UUID in ClubRunner under Bulletins to identify which issue each row refers to.
+      </div>
+    </div>
+    <!-- 1e -->
+    <div class="subsection">
+      <div class="subsection-header">
+        <span class="subsection-label">1e</span>
+        <h3>Block referral spam in "List unwanted referrals"</h3>
+      </div>
+      <p>Referral spam works via the GA4 Measurement Protocol — spam domains inject fake sessions directly against your measurement ID without any real visitor ever reaching the site. A single domain like <code>leadsgo.io</code> can account for 90% of all referral traffic on a given day and severely distort engagement data. Add these to the same list as the ClubRunner domains in section 1a.</p>
+      <p>GA4 allows a maximum of <strong>50 domains</strong> per data stream in "List unwanted referrals". The list below contains around 30 domains — there is room to add more if needed.</p>
+
+      <div class="nav-path">
+        Admin <span class="sep">›</span> Data Streams <span class="sep">›</span> [your stream] <span class="sep">›</span> Configure tag settings <span class="sep">›</span> <span class="nav-end">List unwanted referrals</span>
+      </div>
+
+      <h4>Active Measurement Protocol spammers (priority 1)</h4>
+      <p>Send fake sessions directly to GA4 without ever visiting the site. Add these immediately.</p>
+      <table class="config-table">
+        <tr>
+          <th>Domain</th>
+          <th>Note</th>
+        </tr>
+        <tr>
+          <td><code>leadsgo.io</code></td>
+          <td>Most common in 2024–2025; "the new Semalt"</td>
+        </tr>
+        <tr>
+          <td><code>semalt.com</code></td>
+          <td>Classic spammer, active since 2014</td>
+        </tr>
+        <tr>
+          <td><code>semalt.net</code></td>
+          <td>Variant of the above</td>
+        </tr>
+        <tr>
+          <td><code>trafficpeak.io</code></td>
+          <td>Actively reported in 2024–2025</td>
+        </tr>
+        <tr>
+          <td><code>news.grets.store</code></td>
+          <td>Actively reported in 2024–2025</td>
+        </tr>
+        <tr>
+          <td><code>static.seders.website</code></td>
+          <td>Actively reported in 2024–2025</td>
+        </tr>
+        <tr>
+          <td><code>info.seders.website</code></td>
+          <td>Variant of the above</td>
+        </tr>
+        <tr>
+          <td><code>kar.razas.site</code></td>
+          <td>Actively reported in 2024–2025</td>
+        </tr>
+      </table>
+
+      <h4>Button/widget spam (priority 2)</h4>
+      <p>Poses as shared social buttons to attract clicks.</p>
+      <div class="domain-grid">
+        <div class="domain-item">buttons-for-website.com</div>
+        <div class="domain-item">buttons-for-your-website.com</div>
+        <div class="domain-item">free-share-buttons.com</div>
+        <div class="domain-item">free-social-buttons.com</div>
+        <div class="domain-item">free-floating-buttons.com</div>
+        <div class="domain-item">floating-share-buttons.com</div>
+        <div class="domain-item">simple-share-buttons.com</div>
+        <div class="domain-item">share-buttons.xyz</div>
+        <div class="domain-item">social-buttons.com</div>
+        <div class="domain-item">social-widget.xyz</div>
+      </div>
+
+      <h4>Traffic spam (priority 2)</h4>
+      <p>Domains that sell or simulate website traffic.</p>
+      <div class="domain-grid">
+        <div class="domain-item">darodar.com</div>
+        <div class="domain-item">priceg.com</div>
+        <div class="domain-item">blackhatworth.com</div>
+        <div class="domain-item">makemoneyonline.com</div>
+        <div class="domain-item">ilovevitaly.com</div>
+        <div class="domain-item">econom.co</div>
+        <div class="domain-item">anticrawler.org</div>
+        <div class="domain-item">ghostvisitor.com</div>
+        <div class="domain-item">gammatraffic.com</div>
+        <div class="domain-item">traffic-cash.xyz</div>
+        <div class="domain-item">bot-traffic.xyz</div>
+        <div class="domain-item">trafficbot.life</div>
+        <div class="domain-item">free-traffic.xyz</div>
+        <div class="domain-item">bottraffic4free.club</div>
+        <div class="domain-item">rapidhits.net</div>
+      </div>
+
+      <h4>Email/newsletter proxies to watch</h4>
+      <p>May be legitimate — investigate if you don't recognise the sender before blocking.</p>
+      <table class="config-table">
+        <tr>
+          <th>Domain</th>
+          <th>Note</th>
+        </tr>
+        <tr>
+          <td><code>url41.mailanyone.net</code></td>
+          <td>Email tracking proxy — add if you don't send newsletters via the service</td>
+        </tr>
+        <tr>
+          <td><code>statics.teams.cdn.office.net</code></td>
+          <td>Microsoft Teams link preview — may be internal traffic</td>
+        </tr>
+      </table>
+
+      <div class="callout callout-warning">
+        <strong>New spam domains appear continuously.</strong> Recommended routine: review the Source/Medium report filtered on <code>medium = referral</code> once a month. Domains with an unrealistically high engagement rate (&gt;95%) and long session duration but zero conversions are typical spam signatures.
+      </div>
+    </div>
+
+    <!-- 1f -->
+    <div class="subsection">
+      <div class="subsection-header">
+        <span class="subsection-label">1f</span>
+        <h3>Connect Google Search Console to GA4</h3>
+      </div>
+      <p>Google Search Console (GSC) shows which search terms in Google lead visitors to the site — the <em>incoming</em> search traffic. This complements the search term tracking in section 2i, which captures what visitors search for <em>on</em> the site once they're already there.</p>
+
+      <div class="callout callout-info">
+        <strong>Prerequisite:</strong> The site must already be verified in Google Search Console. The easiest way to verify is with an HTML meta tag in GTM (the Google tag's Additional configuration → Custom fields → <code>google-site-verification</code>).
+      </div>
+
+      <div class="nav-path">
+        Admin <span class="sep">›</span> Property settings <span class="sep">›</span> Product links <span class="sep">›</span> <span class="nav-end">Search Console links</span>
+      </div>
+
+      <ol>
+        <li>Click <strong>Link</strong>.</li>
+        <li>Select the Search Console property that matches the site.</li>
+        <li>Select the data stream and confirm.</li>
+      </ol>
+
+      <p>Once the link is active, data appears under <strong>Reports → Acquisition → Search Console</strong> with the following dimensions:</p>
+      <table class="config-table">
+        <tr>
+          <th>Report</th>
+          <th>What it shows</th>
+        </tr>
+        <tr>
+          <td>Queries</td>
+          <td>Which search terms in Google generated clicks and impressions</td>
+        </tr>
+        <tr>
+          <td>Google organic search pages</td>
+          <td>Which pages ranked, with clicks, impressions, CTR and average position</td>
+        </tr>
+      </table>
+
+      <div class="callout callout-warning">
+        <strong>2–3 day delay.</strong> GSC data in GA4 is not updated in real time — expect the most recent days to be missing from the report.
+      </div>
+    </div>
+
+  </div><!-- /section 1 -->
+
+  <hr class="divider">
+
+  <!-- ======================================================= -->
+  <!-- BLOCK 2: GTM                                             -->
+  <!-- ======================================================= -->
+  <div class="section" id="gtm">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <h2>Google Tag Manager — Tags and Triggers</h2>
+    </div>
+
+    <div class="callout callout-info" style="margin-bottom:1.25rem;">
+      <strong>Order:</strong> Always create the <em>trigger</em> first, then the <em>tag</em> that references it. Always start by enabling the necessary built-in variables (2a) before creating triggers that rely on click data.
+    </div>
+
+    <!-- 2a -->
+    <div class="subsection">
+      <div class="subsection-header">
+        <span class="subsection-label">2a</span>
+        <h3>Enable built-in variables for click tracking</h3>
+      </div>
+      <p>GTM has built-in variables that capture click data (which URL, which link text, etc.). They must be enabled manually before they can be used in triggers and tags.</p>
+
+      <div class="nav-path">
+        Variables <span class="sep">›</span> <span class="nav-end">Configure (button, top right)</span>
+      </div>
+
+      <p>Tick the following under the <strong>"Clicks"</strong> section:</p>
+      <div class="tag-list">
+        <span class="chip chip-var">Click Element</span>
+        <span class="chip chip-var">Click Classes</span>
+        <span class="chip chip-var">Click ID</span>
+        <span class="chip chip-var">Click Target</span>
+        <span class="chip chip-var">Click URL</span>
+        <span class="chip chip-var">Click Text</span>
+      </div>
+      <p>Close the configuration panel (the cross, top right). The variables are now available in all triggers and tags.</p>
+
+      <div class="callout callout-warning">
+        <strong>UI tip:</strong> When filling in conditions in a trigger and clicking directly from the variable field to the value field with the mouse, the variable selection is reset. Press <strong>Tab</strong> instead to move focus between fields — this preserves the selection.
+      </div>
+    </div>
+
+    <!-- 2b -->
+    <div class="subsection">
+      <div class="subsection-header">
+        <span class="subsection-label">2b</span>
+        <h3>Google tag — GA4 base configuration</h3>
+      </div>
+      <p>The central tag that initialises GA4. All other GA4 event tags reference this one. It must be of type <strong>Google tag</strong> (not the older "GA4 Configuration").</p>
+
+      <div class="nav-path">Tags <span class="sep">›</span> New <span class="sep">›</span> <span class="nav-end">Google tag</span></div>
+
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <div class="step-title">Choose tag type</div>
+            <div class="step-desc">Click "Tag Configuration" → choose <strong>Google tag</strong> (not "Google Analytics: GA4 Event").</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <div class="step-title">Enter the Tag ID</div>
+            <div class="step-desc">Enter your GA4 Measurement ID, format <code>G-XXXXXXXXXX</code>. Found in GA4 under Admin → Data Streams → your stream. If you already use GA4, keep using the same ID even though tracking now goes via GTM.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <div class="step-title">Set the trigger</div>
+            <div class="step-desc">Click "Triggering" → choose <strong>Initialization – All Pages</strong>. Note: this is <em>not</em> "All Pages (Page View)" — the Google tag must be initialised early in the page load.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-body">
+            <div class="step-title">Name the tag and save</div>
+            <div class="step-desc">Name the tag, e.g. <strong>Google Analytics</strong>. Save with <strong>Save</strong>.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2c -->
+    <div class="subsection">
+      <div class="subsection-header">
+        <span class="subsection-label">2c</span>
+        <h3>Microsoft Clarity — tag</h3>
+      </div>
+      <p>Microsoft Clarity is a free tool for session recording and heatmaps. It can also serve as an independent metric to compare against GA4 figures, for instance to estimate drop-off from declined cookies.</p>
+        <p>The Clarity project ID is found under <strong>Settings → Setup → Get tracking code</strong> in Microsoft Clarity at <a href="https://clarity.microsoft.com/" target="_blank">clarity.microsoft.com</a>. It's a short alphanumeric string, e.g. <code>abc123xyz</code>.</p>
+
+      <div class="nav-path">Tags <span class="sep">›</span> New <span class="sep">›</span> <span class="nav-end">Microsoft Clarity</span></div>
+
+      <div class="callout callout-info">
+        <strong>Note:</strong> Microsoft Clarity is available as a ready-made tag template in GTM's template gallery. Search for "Clarity" under Tag Configuration → choose the template from Microsoft. Then you only need to paste the Clarity project ID into one field, without handling the HTML code below manually. If the template is unavailable, use the Custom HTML option.
+      </div>
+
+      <h4>Option A — Clarity template (recommended)</h4>
+      <div class="config-block"><span class="k">Tag type:</span>     <span class="v">Microsoft Clarity</span>  <span class="cm">(from the template gallery)</span>
+<span class="k">Project ID:</span>   <span class="d">YOUR_CLARITY_PROJECT_ID</span>
+<span class="k">Trigger:</span>      <span class="v">Initialization – All Pages</span></div>
+
+      <h4>Option B — Custom HTML</h4>
+      <div class="config-block"><span class="k">Tag type:</span>     <span class="v">Custom HTML</span>
+<span class="k">Trigger:</span>      <span class="v">Initialization – All Pages</span>
+
+<span class="cm">// HTML to paste:</span>
+&lt;script type="text/javascript"&gt;
+  (function(c,l,a,r,i,t,y){
+    c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+    t=l.createElement(r);t.async=1;
+    t.src="https://www.clarity.ms/tag/"+i;
+    y=l.getElementsByTagName(r)[0];
+    y.parentNode.insertBefore(t,y);
+  })(window, document, "clarity", "script", <span class="d">"YOUR_CLARITY_PROJECT_ID"</span>);
+&lt;/script&gt;</div>
+
+    </div>
+
+    <!-- 2d -->
+    <div class="subsection">
+      <div class="subsection-header">
+        <span class="subsection-label">2d</span>
+        <h3>Outbound link clicks — trigger and tag</h3>
+      </div>
+      <p>Registers clicks on external links. ClubRunner's own domains, bulletin links and page file downloads must be excluded so they aren't counted as external or double-counted against the download tags.</p>
+
+      <h4>Step 1 — Create the trigger</h4>
+      <div class="nav-path">Triggers <span class="sep">›</span> New</div>
+
+      <div class="config-block"><span class="k">Trigger type:</span>          <span class="v">Click – Just Links</span>
+<span class="k">This trigger fires on:</span> <span class="v">Some Link Clicks</span>
+
+<span class="cm">// Conditions — fires when ALL are met:</span>
+<span class="cm">// Gate: real http(s) links only – blocks filter/JS links with no href</span>
+<span class="k">Click URL</span>  <span class="v">matches RegEx</span>       <span class="rx">^https?://</span>
+<span class="cm">// Replace rotary[district].se with your public domain:</span>
+<span class="k">Click URL</span>  <span class="v">does not start with</span>  <span class="d">https://rotary[district].se</span>
+<span class="k">Click URL</span>  <span class="v">does not start with</span>  <span class="d">https://portal.clubrunner.ca</span>
+<span class="k">Click URL</span>  <span class="v">does not start with</span>  <span class="d">https://content.clubrunner.ca</span>
+<span class="k">Click URL</span>  <span class="v">does not start with</span>  <span class="d">https://admin.clubrunner.ca</span>
+<span class="k">Click URL</span>  <span class="v">does not contain</span>     <span class="d">crsadmin.com</span>
+<span class="k">Click URL</span>  <span class="v">does not contain</span>     <span class="d">clubrunner.blob.core.windows.net</span>
+<span class="k">Click URL</span>  <span class="v">does not contain</span>     <span class="d">/bulletin/View/</span>
+<span class="k">Click URL</span>  <span class="v">does not contain</span>     <span class="d">view.officeapps.live.com</span>
+
+<span class="k">Trigger name:</span>  <span class="v">Outbound link click</span></div>
+
+      <div class="callout callout-info">
+        <strong>Why the blob domain and Office Viewer are excluded:</strong> Files in the "Documents" widget are served from <code>clubrunner.blob.core.windows.net</code> and are already captured by the download tag in section 2g. Without this row, the same click would also trigger <code>outbound_click</code> and be double-counted as external. <code>view.officeapps.live.com</code> is added as a defensive exception: Word, Excel and PowerPoint documents under <code>/documents/sv-se/</code> are already covered by the trigger in 2f (ClubRunner's <code>href</code> always points to <code>rotary2405.se</code> and the redirect happens server-side), but if a link is accidentally hardcoded directly to Office Viewer, it would otherwise not be captured as <code>outbound_click</code>.
+      </div>
+
+      <div class="callout callout-warning">
+        <strong>Important:</strong> Each row is its own condition. Click "+ Add condition" for every new row. All conditions in the list must be met <em>simultaneously</em> for the trigger to fire — that is the correct behaviour here.
+      </div>
+
+      <div class="callout callout-tip">
+        <strong>Why the RegEx row is needed:</strong> A trigger with only <em>negative</em> conditions ("does not…") fires incorrectly on links with no real <code>href</code> — e.g. ClubRunner's "Filter" button on the events page, which filters via JavaScript. In that case <code>{{Click URL}}</code> is empty, and an empty string satisfies every negative condition at once. The condition <code>Click URL matches RegEx ^https?://</code> requires a genuine http(s) address and suppresses the false match. (Triggers 2e–2g are not affected, since they rely on positive <code>contains</code>/<code>starts with</code> conditions.)
+      </div>
+
+      <h4>Step 2 — Create the tag</h4>
+      <div class="nav-path">Tags <span class="sep">›</span> New</div>
+
+      <div class="config-block"><span class="k">Tag type:</span>        <span class="v">Google Analytics: GA4 Event</span>
+<span class="k">Configuration:</span>   <span class="v">[select your Google tag]</span>
+<span class="k">Event name:</span>      <span class="ev">outbound_click</span>
+
+<span class="k">Event parameters:</span>
+  <span class="k">Parameter name:</span>  <span class="v">link_url</span>    <span class="k">Value:</span> <span class="v">{{Click URL}}</span>
+  <span class="k">Parameter name:</span>  <span class="v">link_text</span>   <span class="k">Value:</span> <span class="v">{{Click Text}}</span>
+
+<span class="k">Trigger:</span>         <span class="v">Outbound link click</span>
+<span class="k">Tag name:</span>        <span class="v">GA4 – Outbound link click</span></div>
+    </div>
+
+    <!-- 2e -->
+    <div class="subsection">
+      <div class="subsection-header">
+        <span class="subsection-label">2e</span>
+        <h3>Newsletter view (bulletin) — trigger and tag</h3>
+      </div>
+      <p>ClubRunner does not include GTM on <code>/bulletin/View/</code> pages. The solution is to capture the click on the link in the <em>originating session</em> instead, which produces an event tied to the active session.</p>
+      <p>The trigger must also be added as an exception in the "Outbound link click" trigger (section 2d) so that bulletin clicks aren't counted twice.</p>
+
+      <div class="callout callout-warning">
+        <strong>Case-sensitive:</strong> ClubRunner uses a capital V in the URL: <code>/bulletin/View/</code>. Wrong case in the condition means the trigger never fires.
+      </div>
+
+      <h4>Step 1 — Create the trigger</h4>
+      <div class="config-block"><span class="k">Trigger type:</span>          <span class="v">Click – Just Links</span>
+<span class="k">This trigger fires on:</span> <span class="v">Some Link Clicks</span>
+
+<span class="k">Click URL</span>  <span class="v">contains</span>  <span class="d">/bulletin/View/</span>
+
+<span class="k">Trigger name:</span>  <span class="v">Bulletin-view</span></div>
+
+      <h4>Step 2 — Create the tag</h4>
+      <div class="config-block"><span class="k">Tag type:</span>      <span class="v">Google Analytics: GA4 Event</span>
+<span class="k">Configuration:</span> <span class="v">[select your Google tag]</span>
+<span class="k">Event name:</span>    <span class="ev">bulletin_viewed</span>
+
+<span class="k">Event Parameters</span>
+<span class="k">  Parameter name:</span>  <span class="d">link_url</span>   <span class="k">Value:</span>  <span class="v">{{Click URL}}</span>
+
+<span class="k">Trigger:</span>       <span class="v">Bulletin-view</span>
+<span class="k">Tag name:</span>      <span class="v">GA4 – Bulletin view</span></div>
+    </div>
+
+    <!-- 2f -->
+    <div class="subsection">
+      <div class="subsection-header">
+        <span class="subsection-label">2f</span>
+        <h3>Document download — trigger and tag</h3>
+      </div>
+      <p>Captures clicks on ClubRunner's document links (files in Documents). Match on the <em>path</em> <code>/documents/sv-se/</code> in the URL rather than the file extension — ClubRunner's document links don't always have a file extension, and path matching is simpler and more robust.</p>
+
+      <h4>Step 1 — Create the trigger</h4>
+      <div class="config-block"><span class="k">Trigger type:</span>          <span class="v">Click – Just Links</span>
+<span class="k">This trigger fires on:</span> <span class="v">Some Link Clicks</span>
+
+<span class="k">Click URL</span>  <span class="v">contains</span>  <span class="d">/documents/sv-se/</span>
+
+<span class="cm">// Matches ClubRunner's document pages – simpler and more specific than RegEx</span>
+<span class="k">Trigger name:</span>  <span class="v">Document download</span></div>
+
+      <div class="callout callout-tip">
+        <strong>Automatically covers Office documents:</strong> ClubRunner uses the same URL pattern (<code>/documents/sv-se/</code>) in the <code>href</code> attribute for all document types — PDF, Word, Excel and PowerPoint. The redirect to Microsoft Office Online Viewer (<code>view.officeapps.live.com</code>) happens server-side <em>after</em> the click; GTM captures the <code>href</code> attribute <em>before</em> the redirect. No separate trigger is needed for Office documents. Events that appear in GA4 as outbound clicks to <code>view.officeapps.live.com</code> are an artefact of Enhanced Measurement and disappear once Outbound clicks is turned off (section 1b).
+      </div>
+
+      <h4>Step 2 — Create the tag</h4>
+      <div class="config-block"><span class="k">Tag type:</span>      <span class="v">Google Analytics: GA4 Event</span>
+<span class="k">Configuration:</span> <span class="v">[select your Google tag]</span>
+<span class="k">Event name:</span>    <span class="ev">file_download</span>
+
+<span class="k">Event parameters:</span>
+  <span class="k">Parameter name:</span>  <span class="v">file_name</span>   <span class="k">Value:</span> <span class="v">{{Click URL}}</span>
+  <span class="k">Parameter name:</span>  <span class="v">link_text</span>   <span class="k">Value:</span> <span class="v">{{Click Text}}</span>
+
+<span class="k">Trigger:</span>  <span class="v">Document download</span>
+<span class="k">Tag name:</span> <span class="v">GA4 – Document download</span></div>
+    </div>
+
+    <!-- 2g -->
+    <div class="subsection">
+      <div class="subsection-header">
+        <span class="subsection-label">2g</span>
+        <h3>Page file downloads via ClubRunner blob storage — trigger and tag</h3>
+      </div>
+      <p>Files uploaded in the Download Page Files widget are stored by ClubRunner on a separate domain: <code>clubrunner.blob.core.windows.net</code>. These files sit under a path prefix that starts with the district's/club's ClubRunner ID (e.g. <code>/00000060099/</code>). Since that ID is unique to the district/club, it's sufficient as a match — the trigger then becomes independent of language and folder structure. They require a separate trigger because the domain differs from your public site.</p>
+      <p>The blob domain must also be included in the exceptions in the "Outbound link click" trigger (section 2d) so these downloads aren't simultaneously counted as external clicks.</p>
+
+      <div class="callout callout-info">
+        <strong>What's the difference from 2f?</strong> Both triggers match on <em>path</em>, not file type. 2f captures document links on your own domain (<code>/documents/sv-se/</code>), while 2g captures files that ClubRunner serves from blob storage on a different domain (<code>clubrunner.blob.core.windows.net/[org-ID]/</code>). They sit on different domains and therefore each need their own trigger.
+      </div>
+
+      <h4>Step 1 — Create the trigger</h4>
+      <div class="config-block"><span class="k">Trigger type:</span>          <span class="v">Click – Just Links</span>
+<span class="k">This trigger fires on:</span> <span class="v">Some Link Clicks</span>
+
+<span class="k">Click URL</span>  <span class="v">starts with</span>  <span class="d">https://clubrunner.blob.core.windows.net/00000060099/</span>
+
+<span class="cm">// The org ID is unique to your district/club and is sufficient as a match – nothing else in the path is needed.</span>
+<span class="cm">// Replace 00000060099 with your district/club ClubRunner organisation ID.</span>
+<span class="cm">// You can see your ClubRunner ID while logged in, in the address bar: https://admin.clubrunner.ca/[ID]/</span>
+
+<span class="k">Trigger name:</span>  <span class="v">Page file download</span></div>
+
+      <h4>Step 2 — Create the tag</h4>
+      <div class="config-block"><span class="k">Tag type:</span>      <span class="v">Google Analytics: GA4 Event</span>
+<span class="k">Configuration:</span> <span class="v">[select your Google tag]</span>
+<span class="k">Event name:</span>    <span class="ev">file_download</span>
+
+<span class="k">Event parameters:</span>
+  <span class="k">Parameter name:</span>  <span class="v">file_name</span>   <span class="k">Value:</span> <span class="v">{{Click URL}}</span>
+  <span class="k">Parameter name:</span>  <span class="v">link_text</span>   <span class="k">Value:</span> <span class="v">{{Click Text}}</span>
+
+<span class="k">Trigger:</span>  <span class="v">Page file download</span>
+<span class="k">Tag name:</span> <span class="v">GA4 – Page file download</span></div>
+
+      <div class="callout callout-tip">
+        <strong>Note:</strong> Both download tags (2f and 2g) use the same event name <code>file_download</code>. In GA4 they appear as a single combined metric under Engagement → Events. The <code>file_name</code> parameter contains the full URL, and you can filter by domain to separate them in reports.
+      </div>
+    </div>
+
+    <!-- 2h -->
+    <div class="subsection">
+      <div class="subsection-header">
+        <span class="subsection-label">2h</span>
+        <h3>Consolidating page views: renamed pages and case correction (canonical path)</h3>
+      </div>
+      <p>GA4 groups page views by <code>page_location</code> (the actual URL). On ClubRunner, this often causes the same page to be split across several rows for two reasons: <strong>renamed pages</strong> are reachable via an old alias URL alongside the clean address, and <strong>case</strong> in the path (<code>/Events</code> vs <code>/events</code>, <code>/ClubInfo/…</code> vs <code>/clubinfo/…</code>) creates duplicates. The variable below fixes both.</p>
+      <p>When a page is renamed, ClubRunner lets the old address keep working — but <em>without</em> a 301 redirect. The content is served on a long alias URL, e.g. <code>/60099/Page/Show?ClassCode=Page&amp;Slug=…</code>, alongside the clean <code>/page/&lt;slug&gt;</code>. The result is two pages in the report for the same content.</p>
+
+      <div class="callout callout-warning">
+        <strong>Two pitfalls:</strong>
+        <strong>(1)</strong> the alias URL does <em>not</em> 301-redirect — it responds with <code>200</code> — so GA4 registers both addresses as separate pages.
+        <strong>(2)</strong> the <code>canonical</code> tag on the alias page points to the wrong <em>host</em>: <code>portal.clubrunner.ca</code> instead of the public domain. Copying the canonical straight into <code>page_location</code> therefore gives you a <code>portal.clubrunner.ca</code> row instead.
+      </div>
+
+      <p>Here's what it actually looks like for the same page reached via two entry points:</p>
+      <table class="config-table">
+        <tr>
+          <th>Entry point (URL you click)</th>
+          <th>Canonical sent by ClubRunner</th>
+        </tr>
+        <tr>
+          <td><code>rotary2405.se/page/support-logga-in-hjälp</code></td>
+          <td><code>https://rotary2405.se/page/support-logga-in-hjälp</code> ✅</td>
+        </tr>
+        <tr>
+          <td><code>rotary2405.se/60099/Page/Show?…&amp;Slug=support-logga-in-hjälp</code></td>
+          <td><code>https://portal.clubrunner.ca/page/support-logga-in-hjälp</code> ❌ wrong host</td>
+        </tr>
+      </table>
+      <p>The point: the <em>path</em> <code>/page/support-logga-in-hjälp</code> is identical in both canonicals — only the host differs. That's why the variable builds <code>page_location</code> from the canonical <em>path</em> (correct in both cases) but always sets it on the public domain via <code>location.origin</code>.</p>
+
+      <h4>Step 1 — Variable that builds a clean page_location</h4>
+      <div class="nav-path">Variables <span class="sep">›</span> New <span class="sep">›</span> <span class="nav-end">Custom JavaScript</span></div>
+      <div class="config-block"><span class="k">Variable type:</span>  <span class="v">Custom JavaScript</span>
+<span class="k">Variable name:</span>  <span class="v">Canonical Page Location</span>
+
+function() {
+  var keep = ['utm_source','utm_medium','utm_campaign','utm_term',
+              'utm_content','utm_id','gclid','gbraid','wbraid',
+              'dclid','gclsrc','fbclid','msclkid','srsltid'];
+  var path;
+  try {
+    var c = document.querySelector('link[rel="canonical"]');
+    path = c &amp;&amp; c.href ? new URL(c.href).pathname : location.pathname;
+  } catch (e) {
+    path = location.pathname;
+  }
+  path = path.toLowerCase();                                 <span class="cm">// ClubRunner is case-insensitive – merges /Events, /ClubInfo/… etc.</span>
+  if (/^\/page\/showhomepage\/?$/.test(path)) path = '/';    <span class="cm">// homepage's internal route → root</span>
+  var loc = location.origin + path;            <span class="cm">// public domain + canonical path</span>
+  var src = new URLSearchParams(location.search);
+  var out = new URLSearchParams();
+  keep.forEach(function(k){ if (src.has(k)) out.set(k, src.get(k)); });
+  var qs = out.toString();
+  return qs ? loc + '?' + qs : loc;
+}</div>
+      <p><strong>Canonical path (renamed pages).</strong> The variable takes the <em>path</em> from the canonical tag (the same clean <code>/page/&lt;slug&gt;</code> regardless of whether the visitor arrived via the alias URL or the clean address), sets it on the public domain via <code>location.origin</code>, and keeps only campaign parameters (<code>utm_*</code>, <code>gclid</code>, etc.) so attribution survives.</p>
+      <p><strong>Case correction.</strong> The line <code>path = path.toLowerCase()</code> lowercases the path — ClubRunner is case-insensitive, so <code>/Events</code>, <code>/ClubInfo/…</code> and <code>/ClubsMap</code> are merged with their lowercase variants (in a year's worth of data for rotary2405.se, roughly 1,466 views were spread across 184 such duplicate groups, with <code>/clubinfo/*</code> often split into three case variants). Lowercasing also normalises the case of %-encoding (<code>%C3%A4</code> → <code>%c3%a4</code>). Since only the path is lowercased, campaign parameter values are unaffected.</p>
+
+      <div class="callout callout-warning">
+        <strong>Precondition for lowercasing:</strong> this is safe specifically because ClubRunner serves the same page regardless of URL case. On a server where paths are case-sensitive, <code>toLowerCase()</code> could merge two <em>different</em> pages — in that case, this line could not be used.
+      </div>
+
+      <div class="callout callout-info">
+        <strong>Special case — the homepage:</strong> ClubRunner serves the homepage on <em>two</em> live addresses — the clean root <code>/</code> and the internal route <code>/page/showhomepage</code> (which logo/"Home" links often point to). Both have <em>self-referencing</em> canonicals, so canonical alone doesn't merge them; that's why the <code>if</code> line in the variable forces <code>/page/showhomepage</code> to the root. The bare route <code>/60099/Page/Show</code> <em>without</em> <code>?…&amp;Slug=</code>, however, is an error page ("Account not found", soft 404) — it should <strong>not</strong> be normalised away. If it turns up in reports, it's a useful signal of broken links (e.g. set an alert on <code>page_title</code> containing "General Error").
+      </div>
+
+      <h4>Step 2 — Override page_location in the Google tag</h4>
+      <p>Open the Google tag from section 2b. Under <strong>Configuration settings</strong> (Shared event settings), add a parameter:</p>
+      <div class="config-block"><span class="k">Configuration parameter:</span>  <span class="v">page_location</span>
+<span class="k">Value:</span>                    <span class="v">{{Canonical Page Location}}</span></div>
+      <div class="callout callout-info">
+        <strong>Effect:</strong> The automatic <code>page_view</code> and all GA4 events that inherit the Google tag are now reported on the clean path, regardless of which alias URL the visitor arrived on. Since campaign parameters are preserved, traffic sources are unaffected.
+      </div>
+
+    </div>
+
+    <!-- 2i -->
+    <div class="subsection">
+      <div class="subsection-header">
+        <span class="subsection-label">2i</span>
+        <h3>The header search box — tracking search terms (site search)</h3>
+      </div>
+      <p>ClubRunner's built-in search box (the field with <code>id="searchString"</code> in the header) doesn't send the search term as a query parameter (<code>?q=…</code>), which is what GA4's Enhanced Measurement expects. Instead, ClubRunner navigates to a path of the form <code>/Search/&lt;term&gt;</code>. This means the search term must be extracted from the path using a Custom JavaScript variable.</p>
+      <div class="callout callout-warning">
+        <strong>Confirmed behaviour:</strong> Before URL encoding, ClubRunner replaces the characters <code>. % ? : / + * &amp; "</code> with the placeholders <code>-~0-</code> through <code>-~8-</code>. The variable below restores these to the original characters.
+      </div>
+
+      <h4>Step 1 — Variable that extracts the search term</h4>
+      <div class="nav-path">Variables <span class="sep">›</span> New <span class="sep">›</span> <span class="nav-end">Custom JavaScript</span></div>
+      <div class="config-block"><span class="k">Variable type:</span>  <span class="v">Custom JavaScript</span>
+<span class="k">Variable name:</span>  <span class="v">JS-sitesearch CR</span>
+
+<span class="fn">function</span>() {
+  <span class="k">var</span> path = window.location.pathname;
+  <span class="k">var</span> match = path.match(<span class="d">/^\/[Ss]earch\/(.+)$/</span>);
+  <span class="k">if</span> (!match) <span class="k">return</span> undefined;
+
+  <span class="k">var</span> term = decodeURIComponent(match[1]);
+
+  <span class="cm">// Restore ClubRunner's placeholders to the original characters (see doSearch())</span>
+  <span class="k">var</span> replacements = [
+    [<span class="d">'-~0-'</span>, <span class="d">'.'</span>], [<span class="d">'-~1-'</span>, <span class="d">'%'</span>], [<span class="d">'-~2-'</span>, <span class="d">'?'</span>], [<span class="d">'-~3-'</span>, <span class="d">':'</span>],
+    [<span class="d">'-~4-'</span>, <span class="d">'/'</span>], [<span class="d">'-~5-'</span>, <span class="d">'+'</span>], [<span class="d">'-~6-'</span>, <span class="d">'*'</span>], [<span class="d">'-~7-'</span>, <span class="d">'&amp;'</span>], [<span class="d">'-~8-'</span>, <span class="d">'"'</span>]
+  ];
+  <span class="k">for</span> (<span class="k">var</span> i = 0; i &lt; replacements.length; i++) {
+    term = term.split(replacements[i][0]).join(replacements[i][1]);
+  }
+  <span class="k">return</span> term;
+}</div>
+
+      <h4>Step 2 — Trigger</h4>
+      <div class="nav-path">Triggers <span class="sep">›</span> <span class="nav-end">New</span></div>
+      <div class="config-block"><span class="k">Trigger type:</span>          <span class="v">Page View</span>
+<span class="k">This trigger fires on:</span> <span class="v">Some Page Views</span>
+
+<span class="k">Page Path</span>  <span class="v">matches RegEx</span>  <span class="d">^/[Ss]earch/</span>
+
+<span class="k">Trigger name:</span>  <span class="v">CR-sitesearch</span></div>
+
+      <h4>Step 3 — Tag</h4>
+      <div class="nav-path">Tags <span class="sep">›</span> <span class="nav-end">New</span></div>
+      <div class="config-block"><span class="k">Tag type:</span>      <span class="v">Google Analytics: GA4 Event</span>
+<span class="k">Configuration:</span> <span class="v">[select your Google tag]</span>
+<span class="k">Event name:</span>    <span class="ev">view_search_results</span>  <span class="cm">// GA4's recommended event name for searches</span>
+
+<span class="k">Event Parameters</span>
+<span class="k">  Parameter name:</span>  <span class="d">search_term</span>   <span class="k">Value:</span>  <span class="v">{{JS-sitesearch CR}}</span>
+
+<span class="k">Trigger:</span>       <span class="v">CR-sitesearch</span>
+<span class="k">Tag name:</span>      <span class="v">GA4 – sitesearch CR</span></div>
+      <div class="callout callout-tip">
+        <strong>UI trap in eventSettingsTable:</strong> when filling in the parameter value, type <code>{{</code> and choose the variable from the list that pops up — confirm with Tab or by clicking outside the field. If you click directly from the variable field to the value field with the mouse, the selection is reset.
+      </div>
+
+    </div>
+
+    <!-- 2j -->
+    <div class="subsection">
+      <div class="subsection-header">
+        <span class="subsection-label">2j</span>
+        <h3>Test and publish</h3>
+      </div>
+      <p>Never publish changes without testing them in GTM's Preview mode. Every unsaved change in the workspace is a "Draft" — only after publishing do the changes become active and start sending data to GA4.</p>
+
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <div class="step-title">Start Preview mode</div>
+            <div class="step-desc">Click <strong>Preview</strong> (top right in GTM). Enter your site's URL and click <strong>Connect</strong>. A new tab opens with the site, and the GTM Tag Assistant panel is shown.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <div class="step-title">Test each trigger</div>
+            <div class="step-desc">Click an external link → check that "GA4 – Outbound link click" appears in "Tags Fired". Click a bulletin link → "GA4 – Bulletin view". Click a link to a file from Documents → "GA4 – Document download", and a link to a page file (in the Page Download Files widget) → "GA4 – Page file download".</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <div class="step-title">Verify in GA4 DebugView</div>
+            <div class="step-desc">In GA4: <strong>Admin → DebugView</strong>. Events should appear within a few seconds. Check that event parameters (link_url, file_name) are populated correctly.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-body">
+            <div class="step-title">Publish the container</div>
+            <div class="step-desc">Exit Preview. Click <strong>Submit</strong> (top right) → <strong>Publish</strong>. Give the version a descriptive name, e.g. "GA4 + Clarity + outbound + bulletin + downloads".</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">5</div>
+          <div class="step-body">
+            <div class="step-title">Wait 24–48 hours</div>
+            <div class="step-desc">The GA4 Realtime report updates immediately. Standard reports under Engagement → Events can take up to 48 hours to populate.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /section 2 -->
+
+  <hr class="divider">
+
+  <!-- ======================================================= -->
+  <!-- BLOCK 3: Limitations                                     -->
+  <!-- ======================================================= -->
+  <div class="section" id="begransningar">
+    <div class="section-header">
+      <div class="section-num">3</div>
+      <h2>Known Limitations with ClubRunner</h2>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-header">
+        <span class="subsection-label">3a</span>
+        <h3>Pages without GTM coverage</h3>
+      </div>
+      <p>ClubRunner does not inject the GTM code on every page template. ClubRunner does not add GTM code on the page types below. They are therefore <em>not</em> registered as page views in GA4, but we compensate with click events.</p>
+
+      <table class="config-table">
+        <tr>
+          <th>URL pattern</th>
+          <th>Content</th>
+          <th>Compensation</th>
+        </tr>
+        <tr>
+          <td><code>/bulletin/View/[uuid]</code></td>
+          <td>Newsletter</td>
+          <td>✅ Click event in the originating session (section 2e)</td>
+        </tr>
+        <tr>
+          <td><code>/documents/[uuid]</code></td>
+          <td>Document view</td>
+          <td>✅ Download event (section 2f/2g)</td>
+        </tr>
+      </table>
+
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-header">
+        <span class="subsection-label">3b</span>
+        <h3>GTM Tag Coverage — reading the report correctly</h3>
+      </div>
+      <p>GTM's built-in "Tag Coverage" report (Admin → Tag Coverage) shows how many pages lack GTM tagging. For ClubRunner sites the figure looks dramatic, but the majority of untagged pages are bulletin pages, document pages and internal admin pages — not primarily public-facing content. The report updates automatically when the GTM container is published or when visitors generate new traffic.</p>
+      <div class="callout callout-tip">
+        If pages appear to remain untagged despite traffic, first check with Google Tag Assistant whether the page has GTM code at all. If the code is missing, report it to ClubRunner support.
+      </div>
+    </div>
+  </div><!-- /section 3 -->
+
+  <hr class="divider">
+
+  <!-- ======================================================= -->
+  <!-- Checklist                                                -->
+  <!-- ======================================================= -->
+  <div class="summary" id="checklist">
+    <div class="summary-title">Checklist — Quick Summary</div>
+    <div class="summary-cols">
+      <div class="summary-col">
+        <h4>Google Analytics 4</h4>
+        <ul>
+          <li>List unwanted referrals: add <code>clubrunner.ca</code>, <code>crsadmin.com</code>, <code>clubrunner.blob.core.windows.net</code> — plus the referral spam list in section 1e</li>
+          <li>Enhanced Measurement: turn off <em>Outbound clicks</em> and <em>File downloads</em></li>
+          <li>Custom dimensions (Event scope): <code>link_url</code>, <code>link_text</code>, <code>file_name</code>, <code>search_term</code></li>
+          <li>Exploration "Custom events [district] [period]" with four tabs: Outbound clicks, Sitesearch CR, Downloads, Bulletin viewed (section 1d)</li>
+          <li>Verify events in DebugView after publishing</li>
+        </ul>
+      </div>
+      <div class="summary-col">
+        <h4>Google Tag Manager — 7 tags</h4>
+        <ul>
+          <li><strong>Google tag</strong> (GA4) — trigger: Initialization – All Pages</li>
+          <li><strong>Microsoft Clarity</strong> — trigger: Initialization – All Pages</li>
+          <li><strong>GA4 Event: <code>outbound_click</code></strong> — gate <code>^https?://</code> + exclude ClubRunner domains and <code>/bulletin/View/</code></li>
+          <li><strong>GA4 Event: <code>bulletin_viewed</code></strong> — click on <code>/bulletin/View/</code></li>
+          <li><strong>GA4 Event: <code>file_download</code></strong> (2f) — path trigger for <code>/documents/sv-se/</code></li>
+          <li><strong>GA4 Event: <code>file_download</code></strong> (2g) — blob URL trigger for ClubRunner page files</li>
+          <li><strong>GA4 Event: <code>view_search_results</code></strong> — regex <code>^/[Ss]earch/</code> on path</li>
+        </ul>
+      </div>
+    </div>
+    <p class="footer-note">This checklist covers the setup for ClubRunner's district and club version. For a national portal such as rotary.se, section 4 applies — there, outbound clicks are the primary measurement point, and an extra tag (GA4 – Portal outbound click) and exploration (Portal traffic) are added.</p>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ======================================================= -->
+  <!-- BLOCK 4: Portal variant rotary.se                        -->
+  <!-- ======================================================= -->
+  <div class="section" id="portal">
+    <div class="section-header">
+      <div class="section-num">4</div>
+      <h2>National Portal — rotary.se (Measuring Onward Clicks)</h2>
+    </div>
+
+    <div class="callout callout-info" style="margin-bottom:1.25rem;">
+      rotary.se is the national Rotary portal, whose purpose — as decided by the DG council for the Swedish districts — is to funnel visitors onward to the districts and to other Rotary sites (e.g. <code>rotarystudent.se</code>, <code>rotaryfoundation.se</code>). <br/>Here, <em>outbound clicks are the primary measurement point</em>. This section is self-contained and can be followed independently for a portal.
+    </div>
+
+    <div class="context-box" style="margin-bottom:1.5rem;">
+      <h3>The key difference from district/club</h3>
+      <p style="font-size:0.85rem; margin-bottom:0;">On a district or club website, you <em>suppress</em> outbound noise and keep all ClubRunner domains internal. On the portal, you instead want to <em>count</em> clicks out to districts and other Rotary sites. These are genuine external sites with their own GA4 properties — they must therefore <strong>not</strong> be added to unwanted referrals and must <strong>not</strong> be excluded in the trigger. Only ClubRunner's own infrastructure is kept internal.</p>
+    </div>
+
+    <!-- 4a -->
+    <div class="subsection">
+      <div class="subsection-header">
+        <span class="subsection-label">4a</span>
+        <h3>GA4 — List unwanted referrals (ClubRunner infrastructure only)</h3>
+      </div>
+      <p>Since the portal itself runs ClubRunner, its own infrastructure should be kept internal, just as for district/club.</p>
+
+      <div class="nav-path">
+        Admin <span class="sep">›</span> Data Streams <span class="sep">›</span> [your stream] <span class="sep">›</span> Configure tag settings <span class="sep">›</span> <span class="nav-end">List unwanted referrals</span>
+      </div>
+
+      <div class="config-block"><span class="cm">// Domain contains — add one row per domain:</span>
+<span class="d">clubrunner.ca</span>
+<span class="d">crsadmin.com</span>
+<span class="d">clubrunner.blob.core.windows.net</span></div>
+
+    </div>
+
+    <!-- 4b -->
+    <div class="subsection">
+      <div class="subsection-header">
+        <span class="subsection-label">4b</span>
+        <h3>GA4 — Enhanced Measurement and custom dimensions</h3>
+      </div>
+      <p>Turn off <strong>Outbound clicks</strong> in Enhanced Measurement (same reason as section 1b — we handle outbound clicks in GTM so we can attach the target domain). Other Enhanced Measurement features can stay on.</p>
+
+      <p style="margin-top:0.75rem;">Register custom dimensions so clicks can be reported per site:</p>
+      <div class="nav-path">
+        Admin <span class="sep">›</span> Custom definitions <span class="sep">›</span> <span class="nav-end">Create custom dimension</span>
+      </div>
+      <table class="config-table">
+        <tr>
+          <th>Dimension name</th>
+          <th>Scope</th>
+          <th>Event parameter / User property</th>
+          <th>Purpose</th>
+        </tr>
+        <tr>
+          <td>Link domain</td>
+          <td>Event</td>
+          <td><code>link_domain</code></td>
+          <td><strong>Target domain — break down clicks per site</strong></td>
+        </tr>
+        <tr>
+          <td>Link URL</td>
+          <td>Event</td>
+          <td><code>link_url</code></td>
+          <td>Full destination URL</td>
+        </tr>
+        <tr>
+          <td>Link text</td>
+          <td>Event</td>
+          <td><code>link_text</code></td>
+          <td>The link text that was clicked</td>
+        </tr>
+      </table>
+      <div class="callout callout-info">
+        <strong>Note:</strong> <code>link_domain</code> is what distinguishes the portal setup from district/club — it's the dimension you group the report on.
+      </div>
+    </div>
+
+<!-- 4c -->
+    <div class="subsection">
+      <div class="subsection-header">
+        <span class="subsection-label">4c</span>
+        <h3>GTM — base tags Google tag and Clarity, plus renamed pages</h3>
+      </div>
+      <p>Detailed click steps are in section 2b (Google tag) and 2c (Clarity). <br/>
+        Also add the renamed-pages consolidation (section 2h), including the <code>page_location</code> rewrite in the portal's Google tag.</p>
+
+      <div class="config-block"><span class="cm">// Google tag — initialises GA4</span>
+<span class="k">Tag type:</span>   <span class="v">Google tag</span>
+<span class="k">Tag ID:</span>     <span class="d">G-XXXXXXXXXX</span>   <span class="cm">(rotary.se's own Measurement ID)</span>
+<span class="k">Trigger:</span>    <span class="v">Initialization – All Pages</span>
+<span class="k">Tag name:</span>   <span class="v">Google Analytics</span>
+
+<span class="cm">// Microsoft Clarity (optional – session recording + cookieless cross-check)</span>
+<span class="k">Tag type:</span>   <span class="v">Microsoft Clarity</span>  <span class="cm">(from the template gallery)</span>
+<span class="k">Project ID:</span> <span class="d">YOUR_CLARITY_PROJECT_ID</span>
+<span class="k">Trigger:</span>    <span class="v">Initialization – All Pages</span></div>
+    </div>
+
+    <!-- 4d -->
+    <div class="subsection">
+      <div class="subsection-header">
+        <span class="subsection-label">4d</span>
+        <h3>GTM — variable that extracts the target domain</h3>
+      </div>
+      <p>First enable the built-in click variables (<strong>Click URL</strong>, <strong>Click Text</strong>, etc.) as described in section 2a. Then create a variable that extracts just the hostname from the clicked link, so the report can be grouped per site instead of per full URL.</p>
+
+      <div class="nav-path">Variables <span class="sep">›</span> New <span class="sep">›</span> <span class="nav-end">Custom JavaScript</span></div>
+
+      <div class="config-block"><span class="k">Variable type:</span>  <span class="v">Custom JavaScript</span>
+<span class="k">Variable name:</span>  <span class="v">Click URL Hostname</span>
+
+function() {
+  try {
+    return new URL(<span class="v">{{Click URL}}</span>).hostname.replace(/^www\./, '');
+  } catch (e) {
+    return undefined;
+  }
+}</div>
+      <p>The variable returns, for example, <code>rotary2405.se</code> or <code>rotarystudent.se</code> and strips a leading <code>www.</code> so the same site isn't split across two rows.</p>
+    </div>
+
+    <!-- 4e -->
+    <div class="subsection">
+      <div class="subsection-header">
+        <span class="subsection-label">4e</span>
+        <h3>GTM — trigger and tag for onward clicks</h3>
+      </div>
+      <p>A single event that fires on every link that leaves rotary.se. It scales automatically as new district or other sites are added — no list to maintain.</p>
+
+      <h4>Step 1 — Create the trigger</h4>
+      <div class="nav-path">Triggers <span class="sep">›</span> New</div>
+      <div class="config-block"><span class="k">Trigger type:</span>          <span class="v">Click – Just Links</span>
+<span class="k">This trigger fires on:</span> <span class="v">Some Link Clicks</span>
+
+<span class="cm">// Fires on every link that leaves rotary.se:</span>
+<span class="cm">// Gate: real http(s) links only – blocks filter/JS links with no href</span>
+<span class="k">Click URL</span>  <span class="v">matches RegEx</span>       <span class="rx">^https?://</span>
+<span class="k">Click URL</span>  <span class="v">does not start with</span>  <span class="d">https://rotary.se</span>
+<span class="k">Click URL</span>  <span class="v">does not start with</span>  <span class="d">https://www.rotary.se</span>
+<span class="k">Click URL</span>  <span class="v">does not contain</span>     <span class="d">clubrunner.ca</span>
+<span class="k">Click URL</span>  <span class="v">does not contain</span>     <span class="d">clubrunner.blob.core.windows.net</span>
+<span class="k">Click URL</span>  <span class="v">does not contain</span>     <span class="d">crsadmin.com</span>
+
+<span class="k">Trigger name:</span>  <span class="v">Portal outbound click</span></div>
+
+      <div class="callout callout-tip">
+        <strong>Why does the exception work?</strong> The condition is "does not start with" — <code>https://rotary2325.se</code> does not start with <code>https://rotary.se</code>, so clicks to the district sites aren't blocked and are counted as onward clicks. The <code>https://www.rotary.se</code> row is a safety row: if the portal is reached via the www address, internal links shouldn't be counted as outbound. The ClubRunner domains are also excluded so that clicks to, for example, the login (<code>portal.clubrunner.ca</code>) aren't counted as onward clicks.
+      </div>
+
+      <h4>Step 2 — Create the tag</h4>
+      <div class="nav-path">Tags <span class="sep">›</span> New</div>
+      <div class="config-block"><span class="k">Tag type:</span>      <span class="v">Google Analytics: GA4 Event</span>
+<span class="k">Configuration:</span> <span class="v">[select your Google tag]</span>
+<span class="k">Event name:</span>      <span class="ev">outbound_click</span>
+
+<span class="k">Event parameters:</span>
+  <span class="k">Parameter name:</span>  <span class="d">link_url</span>     <span class="k">Value:</span> <span class="v">{{Click URL}}</span>
+  <span class="k">Parameter name:</span>  <span class="d">link_text</span>    <span class="k">Value:</span> <span class="v">{{Click Text}}</span>
+  <span class="k">Parameter name:</span>  <span class="d">link_domain</span>  <span class="k">Value:</span> <span class="v">{{Click URL Hostname}}</span>
+
+<span class="k">Trigger:</span>         <span class="v">Portal outbound click</span>
+<span class="k">Tag name:</span>        <span class="v">GA4 – Portal outbound click</span></div>
+    </div>
+
+    <!-- 4f -->
+    <div class="subsection">
+      <div class="subsection-header">
+        <span class="subsection-label">4f</span>
+        <h3>GA4 — Build an Exploration for portal traffic</h3>
+      </div>
+      <p>The portal needs its own Exploration showing onward clicks to districts and other sites. The configuration is simpler than "Custom events" since there's only one event — <code>outbound_click</code> — but with <code>link_domain</code> as the primary dimension to break down clicks by target site.</p>
+
+      <div class="nav-path">Explore <span class="sep">›</span> <span class="nav-end">Blank</span></div>
+
+      <h4>Getting started</h4>
+      <ol>
+        <li>Go to <strong>Explore → Blank exploration</strong>.</li>
+        <li>Name the exploration <strong>Portal traffic</strong>.</li>
+        <li>Add these shared variables in the <strong>Variables</strong> panel:
+          <div class="config-block" style="margin-top:0.5rem;"><span class="k">Dimensions:</span>
+  <span class="d">Event name</span>
+  <span class="d">Link domain</span>
+  <span class="d">Link URL</span>
+
+<span class="k">Metric:</span>
+  <span class="d">Event count</span></div>
+        </li>
+        <li>Then create two tabs in the order below.</li>
+      </ol>
+
+      <h4>Tab 1 — Event sum</h4>
+      <p style="font-size:0.85rem; margin-bottom:0.5rem;">An overview of all event types — gives a quick picture of the traffic without filters.</p>
+      <div class="config-block"><span class="k">Tab name:</span>    <span class="v">Event sum</span>
+
+<span class="k">Rows:</span>
+  <span class="d">Event name</span>
+
+<span class="k">Nested rows:</span> <span class="v">No</span>
+<span class="k">Show rows:</span>   <span class="v">50</span>
+<span class="k">Cell type:</span>   <span class="v">Bar chart</span>
+
+<span class="cm">// No filters — shows all event types</span></div>
+
+      <h4>Tab 2 — Outbound clicks</h4>
+      <p style="font-size:0.85rem; margin-bottom:0.5rem;">Clicks broken down by target site and URL — the portal's primary reporting tool.</p>
+      <div class="config-block"><span class="k">Tab name:</span>    <span class="v">Outbound clicks</span>
+
+<span class="k">Rows:</span>
+  <span class="d">Link domain</span>  <span class="cm">// primary row — groups by site</span>
+  <span class="d">Link URL</span>     <span class="cm">// nested row — shows specific page</span>
+  <span class="d">Event name</span>   <span class="cm">// confirms it's outbound_click</span>
+
+<span class="k">Nested rows:</span> <span class="v">Yes</span>
+<span class="k">Show rows:</span>   <span class="v">50</span>
+<span class="k">Cell type:</span>   <span class="v">Bar chart</span>
+
+<span class="k">Filter:</span>
+  <span class="d">Event name</span>  <span class="v">exactly matches</span>  <span class="d">outbound_click</span></div>
+      <div class="callout callout-tip">
+        <strong>Narrow it to the Rotary network:</strong> the tag captures all outbound clicks (including Facebook, rotary.org, etc.). If you only want to follow the Swedish Rotary sites, filter <code>Link domain</code> to the relevant domains in the report — no need to change the tag.
+      </div>
+    </div>
+
+  </div><!-- /section 4 -->
+
+</div><!-- /content -->
+</body>
+</html>
