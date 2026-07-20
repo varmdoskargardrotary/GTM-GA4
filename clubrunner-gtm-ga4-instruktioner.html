@@ -770,16 +770,16 @@
     <div class="subsection" id="explore">
       <div class="subsection-header">
         <span class="subsection-label">1d</span>
-        <h3>Bygg en Utforskning med fyra flikar för custom events</h3>
+        <h3>Bygg en Utforskning med fem flikar för custom events</h3>
       </div>
-      <p>GA4:s standardrapporter visar totalantal per event men inte <em>vad</em> som klickades eller söktes. Det kräver en <strong>Utforskning</strong> (Explore). Bygg en gemensam utforskning med fyra flikar — en per custom event — så att all detaljdata finns samlad på ett ställe. Inställningarna nedan är för att komma igång, ändra själv på inställningarna för att anpassa rapporterna ytterligare.</p>
+      <p>GA4:s standardrapporter visar totalantal per event men inte <em>vad</em> som klickades eller söktes. Det kräver en <strong>Utforskning</strong> (Explore). Bygg en gemensam utforskning med fem flikar — en per custom event — så att all detaljdata finns samlad på ett ställe. Inställningarna nedan är för att komma igång, ändra själv på inställningarna för att anpassa rapporterna ytterligare.</p>
 
       <div class="nav-path">Explore <span class="sep">›</span> <span class="nav-end">Blank</span></div>
 
       <h4>Kom igång</h4>
      <div> <ol>
         <li>Gå till <strong>Explore → Blank exploration</strong>.</li>
-        <li>Namnge utforskningen, t.ex. <strong>Custom events [distrikt] [period]</strong>.</li>
+        <li>Namnge utforskningen, t.ex. <strong>Custom events [period]</strong>.</li>
         <li>Öppna <strong>Variables</strong>-panelen (vänster) och klicka på <strong>+</strong> bredvid Dimensions resp. Metrics för att lägga till dessa gemensamma variabler för alla flikar:</div>
           <div class="config-block" style="margin-top:0.5rem;"><span class="k">Dimensions:</span>
   <span class="d">Event name</span>
@@ -787,12 +787,13 @@
   <span class="d">Link URL</span>
   <span class="d">File name</span>
   <span class="d">Search term</span>
+  <span class="d">Special Event Label</span>
 
 <span class="k">Metric:</span>
   <span class="d">Event count</span></div>
         </li>
       <div>
-      <li>Skapa sedan fyra flikar i ordning nedan. Varje flik konfigureras i <strong>Tab Settings</strong>-panelen (höger). <br/>
+      <li>Skapa sedan fem flikar i ordning nedan. Varje flik konfigureras i <strong>Tab Settings</strong>-panelen (höger). <br/>
           Tips: Efter första rapporten, tryck på nerpilen i fliknamnet och duplicera fliken, då behöver du bara göra några mindre ändringar på nya flikens Settings. Redigera fliknamn genom att klicka i namnet.</li>
       </ol></div>
 
@@ -855,6 +856,23 @@
   <span class="d">Event name</span>  <span class="v">exactly matches</span>  <span class="d">bulletin_viewed</span></div>
       <div class="callout callout-tip">
         <strong>UUID inte läsbar?</strong> Varje <code>/bulletin/View/[uuid]</code> är unik för ett specifikt nyhetsbrev. Slå upp UUID:et i ClubRunner under Bulletins för att identifiera vilket utskick varje rad avser.
+      </div>
+
+      <h4>Flik 5 — Special Event</h4>
+      <div class="config-block"><span class="k">Tab name:</span>    <span class="v">Special Event</span>
+
+<span class="k">Rows:</span>
+  <span class="d">Special Event Label</span>
+
+<span class="k">Nested rows:</span> <span class="v">No</span>
+<span class="k">Show rows:</span>   <span class="v">10</span>
+
+<span class="k">Filter:</span>
+  <span class="d">Event name</span>  <span class="v">exactly matches</span>  <span class="d">special_event</span>
+
+<span class="k">Sort:</span>        <span class="d">Event count</span>  <span class="v">descending</span></div>
+      <div class="callout callout-info">
+        Ingen nästlad URL-rad här, till skillnad från flik 1 och 4: varje etikett är per definition kopplad till en specifik, utvald länk (2j), så det uppstår aldrig flera URL-varianter under samma etikett. Relevant först när avsnitt 2j är konfigurerat — flikens filter matchar helt enkelt inga rader förrän dess.
       </div>
     </div>
     <!-- 1e -->
@@ -1688,7 +1706,7 @@ function() {
           <li>List unwanted referrals: lägg till <code>clubrunner.ca</code>, <code>crsadmin.com</code>, <code>clubrunner.blob.core.windows.net</code> — plus referral-spam-listan i avsnitt 1e</li>
           <li>Enhanced Measurement: stäng av <em>Outbound clicks</em> och <em>File downloads</em></li>
           <li>Custom dimensions (Event scope): <code>link_url</code>, <code>link_text</code>, <code>file_name</code>, <code>search_term</code>, <code>special_event_label</code></li>
-          <li>Utforskning "Custom events [distrikt] [period]" med fyra flikar: UTgående klick, Sitesearch CR, Nedladdningar, Bulletin viewed (avsnitt 1d)</li>
+          <li>Utforskning "Custom events [period]" med fem flikar: UTgående klick, Sitesearch CR, Nedladdningar, Bulletin viewed, Special Event (avsnitt 1d)</li>
           <li>Verifiera events i DebugView efter publicering</li>
         </ul>
       </div>

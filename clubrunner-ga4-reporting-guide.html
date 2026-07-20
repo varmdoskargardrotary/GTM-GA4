@@ -367,7 +367,7 @@
     <div class="badge">Rotary Districts/Rotary Clubs · ClubRunner CMS</div>
     <h1>PART 2<br/> Traffic Analysis <em>and Reporting</em><br>for Websites Using ClubRunner CMS</h1>
     <p>Guide to turning collected GA4 data into a one-page report: what to download, where to find the key metrics, and a suggested report structure.</p>
-    <p style="font-size:0.75rem; color:rgba(255,255,255,0.45); margin-top:1.25rem; margin-bottom:0;">Anders Tihkan (Värmdö Skärgård RK) &nbsp;·&nbsp; Updated 18 July 2026</p>
+    <p style="font-size:0.75rem; color:rgba(255,255,255,0.45); margin-top:1.25rem; margin-bottom:0;">Anders Tihkan (Värmdö Skärgård RK) &nbsp;·&nbsp; Updated 20 July 2026</p>
   </div>
 </div>
 
@@ -383,7 +383,7 @@
   <!-- Context box -->
   <div class="context-box">
     <h3>Prerequisite</h3>
-    <p>This guide assumes that GTM and GA4 have been configured according to <em>Part 1</em>, and that measurement has collected data for at least one period. That means unwanted referrals are blocked, custom events for downloads (<code>file_download</code> — two GTM tags, same event name), outbound clicks (<code>outbound_click</code>), newsletters (<code>bulletin_viewed</code>) and search terms (<code>view_search_results</code>) are active, and a four-tab exploration has been built as described in section 1d of Part 1. Without that configuration, the event data will be incomplete and several sections of this guide will not apply.</p>
+    <p>This guide assumes that GTM and GA4 have been configured according to <em>Part 1</em>, and that measurement has collected data for at least one period. That means unwanted referrals are blocked, custom events for downloads (<code>file_download</code> — two GTM tags, same event name), outbound clicks (<code>outbound_click</code>), newsletters (<code>bulletin_viewed</code>) and search terms (<code>view_search_results</code>) are active, and a five-tab exploration has been built as described in section 1d of Part 1. If you have also configured special events (<code>special_event</code>, section 2j of Part 1) for selected links/buttons, that is an add-on beyond the base configuration. Without the base configuration, the event data will be incomplete and several sections of this guide will not apply.</p>
   </div>
 
   <!-- TOC -->
@@ -495,9 +495,9 @@
     <div class="subsection">
       <div class="subsection-header">
         <span class="subsection-label">1e</span>
-        <h3>Custom events — downloads, outbound clicks, newsletters, search terms</h3>
+        <h3>Custom events — downloads, outbound clicks, newsletters, search terms, special events</h3>
       </div>
-      <p>Custom events capture <em>action</em>, not just viewing — a stronger engagement signal than page views. Five events are configured in Part 1 and sent to GA4 under four event names; downloads are split across two GTM tags that share the event name <code>file_download</code>:</p>
+      <p>Custom events capture <em>action</em>, not just viewing — a stronger engagement signal than page views. Six events are configured in Part 1 and sent to GA4 under five event names; downloads are split across two GTM tags that share the event name <code>file_download</code>:</p>
 
       <table class="config-table">
         <tr><th>Event name</th><th>What it captures</th><th>Key parameter</th></tr>
@@ -506,12 +506,17 @@
         <tr><td><code>outbound_click</code></td><td>Clicks on external links</td><td><code>link_url</code>, <code>link_text</code> — where and what</td></tr>
         <tr><td><code>bulletin_viewed</code></td><td>Clicks through to a newsletter (bulletin)</td><td><code>link_url</code> — which issue</td></tr>
         <tr><td><code>view_search_results</code></td><td>Searches in the site's search box</td><td><code>search_term</code> — the search term</td></tr>
+        <tr><td><code>special_event</code></td><td>Clicks on selected, curated links/buttons (e.g. a sign-up form)</td><td><code>special_event_label</code> — which event</td></tr>
       </table>
 
-      <p style="margin-top:0.75rem;">The standard report only gives total counts per event name. Open the four-tab exploration built in Part 1 (section 1d) to see the breakdown by document, link, or search term:</p>
+      <div class="callout callout-info">
+        <strong>special_event and outbound_click can overlap.</strong> If a curated special_event link points to an external domain, the click is intentionally counted as both <code>special_event</code> and <code>outbound_click</code> (see Part 1, section 2j) — the same click therefore shows up in both the "Special Event" tab and the "Outbound clicks" tab of the exploration. Don't sum the totals from the two tabs as if they were independent metrics — they partially overlap.
+      </div>
+
+      <p style="margin-top:0.75rem;">The standard report only gives total counts per event name. Open the five-tab exploration built in Part 1 (section 1d) to see the breakdown by document, link, or search term:</p>
 
       <div class="nav-path">
-        Explore <span class="sep">›</span> <span class="nav-end">Custom events [district] [period]</span>
+        Explore <span class="sep">›</span> <span class="nav-end">Custom events [period]</span>
       </div>
 
       <div class="callout callout-tip">
@@ -699,7 +704,7 @@
       <tr><td>Engagement rate</td><td>Acquisition › Traffic acquisition</td><td>Share of visits with meaningful interaction</td><td>Trend</td></tr>
       <tr><td>Sessions per channel group</td><td>Acquisition › Traffic acquisition</td><td>Where visitors come from — direct, organic search, referral, social</td><td>Operational</td></tr>
       <tr><td>Views per page (top 10–15)</td><td>Engagement › Pages and screens</td><td>Most popular content</td><td>Operational</td></tr>
-      <tr><td>file_download / outbound_click / bulletin_viewed</td><td>Explore → Custom events (four-tab exploration)</td><td>Concrete actions give a stronger signal than page views</td><td>Operational</td></tr>
+      <tr><td>file_download / outbound_click / bulletin_viewed / special_event</td><td>Explore → Custom events (five-tab exploration)</td><td>Concrete actions give a stronger signal than page views</td><td>Operational</td></tr>
       <tr><td>Search traffic (Search Console)</td><td>Reports › Acquisition › Search Console</td><td>Search terms and ranking in Google — shows whether organic visibility is increasing</td><td>Operational</td></tr>
       <tr><td>view_search_results — on-site search</td><td>Explore → Custom events, Sitesearch CR tab</td><td>What visitors search for on the site — reveals content gaps</td><td>Ongoing</td></tr>
       <tr><td>Average engagement time per session</td><td>Acquisition › Traffic acquisition</td><td>How long visitors stay actively engaged</td><td>Ongoing</td></tr>
@@ -733,6 +738,7 @@
         <tr><td>Heading: Traffic sources</td><td>Organic Search, Direct, Referral and Social — highlight the strongest source and any changes versus the previous period</td></tr>
         <tr><td>Heading: Most popular pages</td><td>Top 5–10 pages by page views — comment on whether priority pages (e.g. project pages, events, recruitment) are getting through</td></tr>
         <tr><td>Heading: Downloads and external clicks</td><td>Which documents are downloaded, which external pages are clicked — concrete action, a stronger signal than page views</td></tr>
+        <tr><td>Heading: Selected events (sign-ups, etc.)</td><td>special_event — how many clicked through on curated CTAs (e.g. a sign-up form). A conversion signal rather than general traffic; include if you have configured special events for the period</td></tr>
         <tr><td>Fact table</td><td>All key metrics from section 2, compactly gathered — the basis for future comparison against baselines</td></tr>
       </table>
     </div>

@@ -477,7 +477,7 @@
     <div class="badge">Rotary Districts/Rotary Clubs · ClubRunner CMS</div>
     <h1>PART 1<br/>GTM &amp; GA4 <em>Configuration</em><br>for Websites Using ClubRunner CMS</h1>
     <p>Step-by-step instructions for correct web analytics, tailored to ClubRunner's multi-domain architecture.</p>
-    <p style="font-size:0.75rem; color:rgba(255,255,255,0.45); margin-top:1.25rem; margin-bottom:0;">Anders Tihkan (Värmdö Skärgård RK) &nbsp;·&nbsp; Updated 18 July 2026</p>
+    <p style="font-size:0.75rem; color:rgba(255,255,255,0.45); margin-top:1.25rem; margin-bottom:0;">Anders Tihkan (Värmdö Skärgård RK) &nbsp;·&nbsp; Updated 20 July 2026</p>
   </div>
 </div>
 
@@ -770,16 +770,16 @@
     <div class="subsection" id="explore">
       <div class="subsection-header">
         <span class="subsection-label">1d</span>
-        <h3>Build an Exploration with four tabs for custom events</h3>
+        <h3>Build an Exploration with five tabs for custom events</h3>
       </div>
-      <p>GA4's standard reports show total counts per event but not <em>what</em> was clicked or searched for. That requires an <strong>Exploration</strong> (Explore). Build one shared exploration with four tabs — one per custom event — so all the detail data lives in one place. The settings below are a starting point; adjust them yourself to tailor the reports further.</p>
+      <p>GA4's standard reports show total counts per event but not <em>what</em> was clicked or searched for. That requires an <strong>Exploration</strong> (Explore). Build one shared exploration with five tabs — one per custom event — so all the detail data lives in one place. The settings below are a starting point; adjust them yourself to tailor the reports further.</p>
 
       <div class="nav-path">Explore <span class="sep">›</span> <span class="nav-end">Blank</span></div>
 
       <h4>Getting started</h4>
      <div> <ol>
         <li>Go to <strong>Explore → Blank exploration</strong>.</li>
-        <li>Name the exploration, e.g. <strong>Custom events [district] [period]</strong>.</li>
+        <li>Name the exploration, e.g. <strong>Custom events [period]</strong>.</li>
         <li>Open the <strong>Variables</strong> panel (left) and click <strong>+</strong> next to Dimensions and Metrics respectively to add these shared variables for all tabs:</div>
           <div class="config-block" style="margin-top:0.5rem;"><span class="k">Dimensions:</span>
   <span class="d">Event name</span>
@@ -787,12 +787,13 @@
   <span class="d">Link URL</span>
   <span class="d">File name</span>
   <span class="d">Search term</span>
+  <span class="d">Special Event Label</span>
 
 <span class="k">Metric:</span>
   <span class="d">Event count</span></div>
         </li>
       <div>
-      <li>Then create four tabs in the order below. Each tab is configured in the <strong>Tab Settings</strong> panel (right). <br/>
+      <li>Then create five tabs in the order below. Each tab is configured in the <strong>Tab Settings</strong> panel (right). <br/>
           Tip: After the first report, click the down arrow on the tab name and duplicate the tab — then you only need to make a few small changes to the new tab's Settings. Edit the tab name by clicking on it.</li>
       </ol></div>
 
@@ -855,6 +856,23 @@
   <span class="d">Event name</span>  <span class="v">exactly matches</span>  <span class="d">bulletin_viewed</span></div>
       <div class="callout callout-tip">
         <strong>UUID not readable?</strong> Each <code>/bulletin/View/[uuid]</code> is unique to a specific newsletter. Look up the UUID in ClubRunner under Bulletins to identify which issue each row refers to.
+      </div>
+
+      <h4>Tab 5 — Special Event</h4>
+      <div class="config-block"><span class="k">Tab name:</span>    <span class="v">Special Event</span>
+
+<span class="k">Rows:</span>
+  <span class="d">Special Event Label</span>
+
+<span class="k">Nested rows:</span> <span class="v">No</span>
+<span class="k">Show rows:</span>   <span class="v">10</span>
+
+<span class="k">Filter:</span>
+  <span class="d">Event name</span>  <span class="v">exactly matches</span>  <span class="d">special_event</span>
+
+<span class="k">Sort:</span>        <span class="d">Event count</span>  <span class="v">descending</span></div>
+      <div class="callout callout-info">
+        No nested URL row here, unlike tab 1 and 4: each label is by design tied to one specific, selected link (2j), so multiple URL variants never occur under the same label. Only relevant once section 2j has been configured — the tab's filter simply matches no rows until then.
       </div>
     </div>
     <!-- 1e -->
@@ -1442,6 +1460,143 @@ function() {
     <div class="subsection">
       <div class="subsection-header">
         <span class="subsection-label">2j</span>
+        <h3>Special Event — selected links and buttons with a custom label</h3>
+      </div>
+      <p>Beyond the general categories above (outbound clicks, downloads, search) you sometimes want to track individual, selected links or buttons in reports — e.g. a sign-up link — with a readable label in GA4 (e.g. "Interest form") instead of just the link address. A shared event name, <code>special_event</code>, is used for all of these, regardless of how many different links/buttons are tracked. New special events normally require <em>no</em> new trigger or tag — just a row change in one of two shared components. On ClubRunner web pages, links come in three main types, depending on which widget is used for the link:</p>
+
+      <table class="config-table">
+        <tr>
+          <th>ClubRunner widget</th>
+          <th>What can be edited</th>
+          <th>Matched via</th>
+        </tr>
+        <tr>
+          <td>Text widget (link in body text)</td>
+          <td>Link text only, no HTML</td>
+          <td>URL list (Special Event – Link List)</td>
+        </tr>
+        <tr>
+          <td>Button widget ("Just a Button")</td>
+          <td>Button text and link address, no HTML</td>
+          <td>URL list (Special Event – Link List)</td>
+        </tr>
+        <tr>
+          <td>Custom widget</td>
+          <td>Free-form HTML, incl. attributes</td>
+          <td><code>data-ga-label</code> attribute (Special Event – Attribute)</td>
+        </tr>
+      </table>
+
+      <div class="callout callout-info">
+        <strong>The button widget adds a trailing space</strong> to the link address (e.g. <code>href="https://example.com "</code>), which means an exact <code>equals</code> condition misses the match. The RegEx matching used in the configuration below does not require an exact end match and is therefore unaffected by the space.
+      </div>
+
+      <h4>Recommended solution: data-ga-label in a Custom widget</h4>
+      <p>Use this pattern when the link/button sits in a Custom widget (HTML-editable) — simplest, and requires no future GTM changes.</p>
+      <p>EXAMPLE code for a blue button that changes colour on mouse-over (same style and colours as ClubRunner's "Read more" buttons) whose label (Interest form) shows up clearly in the GA4 report:</p>
+      <div class="config-block">&lt;a href=<span class="v">"https://example.com"</span>
+   <span class="hl">data-ga-label</span>=<span class="v">"Interest form"</span>
+   onmouseout="this.style.backgroundColor='#0083EF'"
+   onmouseover="this.style.backgroundColor='#0067BC'"
+   style="display:inline-block; background-color:#0083EF; color:#ffffff; padding:4px 10px; border-radius:4px; text-decoration:none; font-weight:bold; font-family:Arial, sans-serif;"
+   target="_blank"&gt;Fill in and submit here ...&lt;/a&gt;</div>
+      <p>Text widgets and button widgets have no HTML editing and cannot carry the attribute — the method under "Configure your first special event" below is used instead.</p>
+
+      <h4>Base setup — built once, regardless of which variant is used</h4>
+
+      <p style="margin-bottom:0.5rem;"><strong>Step 1 — Variable: Click Data Label</strong></p>
+      <div class="nav-path">Variables <span class="sep">›</span> New <span class="sep">›</span> <span class="nav-end">Auto-Event Variable</span></div>
+      <div class="config-block"><span class="k">Variable type:</span>    <span class="v">Element Attribute</span>
+<span class="k">Attribute Name:</span>  <span class="v">data-ga-label</span>
+<span class="k">Variable name:</span>   <span class="v">Click Data Label</span></div>
+
+      <p style="margin:0.75rem 0 0.5rem;"><strong>Step 2 — Variable: Special Event Label Lookup (created empty)</strong></p>
+      <div class="nav-path">Variables <span class="sep">›</span> New <span class="sep">›</span> <span class="nav-end">Lookup Table</span></div>
+      <div class="config-block"><span class="k">Input Variable:</span>  <span class="v">{{Click URL}}</span>
+<span class="cm">// Don't add any row yet — an empty table is risk-free,</span>
+<span class="cm">// it just returns "no value" until rows exist.</span>
+<span class="k">Set Default Value:</span>  <span class="v">unchecked</span>
+<span class="k">Variable name:</span>      <span class="v">Special Event Label Lookup</span></div>
+
+      <p style="margin:0.75rem 0 0.5rem;"><strong>Step 3 — Variable: Special Event Label (fallback chain)</strong></p>
+      <div class="nav-path">Variables <span class="sep">›</span> New <span class="sep">›</span> <span class="nav-end">Custom JavaScript</span></div>
+      <div class="config-block"><span class="k">Variable name:</span> <span class="v">Special Event Label</span>
+
+function() {
+  <span class="cm">// 1. Custom widget: the attribute always wins</span>
+  if ({{Click Data Label}}) return {{Click Data Label}};
+  <span class="cm">// 2. Text widget/button widget: look it up in the list</span>
+  var l = {{Special Event Label Lookup}};
+  if (l) return l;
+  <span class="cm">// 3. Last resort: visible link text/button text</span>
+  return {{Click Text}};
+}</div>
+
+      <p style="margin:0.75rem 0 0.5rem;"><strong>Step 4 — Trigger: Special Event – Attribute</strong></p>
+      <div class="nav-path">Triggers <span class="sep">›</span> New</div>
+      <div class="config-block"><span class="k">Trigger type:</span>          <span class="v">Click – All Elements</span>
+<span class="k">This trigger fires on:</span> <span class="v">Some Clicks</span>
+
+<span class="k">Click Element</span>  <span class="v">matches CSS selector</span>  <span class="d">[data-ga-label]</span>
+
+<span class="k">Trigger name:</span>  <span class="v">Special Event – Attribute</span></div>
+
+      <h4>Configure your first special event</h4>
+      <p>Which of the steps below applies depends on the widget type (see the table above) — the base setup works the same regardless of whether your first case has a label or not.</p>
+
+      <p style="margin-bottom:0.5rem;"><strong>If Custom widget (label):</strong> add <code>data-ga-label</code> to the HTML code as in the example above. Nothing more to do — Special Event – Attribute captures it automatically.</p>
+
+      <p style="margin-bottom:0.5rem;"><strong>If text widget or button widget (no label possible):</strong></p>
+
+      <p style="margin-bottom:0.5rem;"><strong>Step 5 — Add a row to Special Event Label Lookup</strong></p>
+      <div class="config-block"><span class="k">Input:</span>   <span class="v">your link's full URL</span>
+<span class="k">Output:</span>  <span class="v">desired label, e.g. "Interest form"</span></div>
+
+      <p style="margin:0.75rem 0 0.5rem;"><strong>Step 6 — Trigger: Special Event – Link List</strong></p>
+      <div class="nav-path">Triggers <span class="sep">›</span> New</div>
+      <div class="config-block"><span class="k">Trigger type:</span>          <span class="v">Click – Just Links</span>
+<span class="k">This trigger fires on:</span> <span class="v">Some Link Clicks</span>
+
+<span class="k">Click URL</span>  <span class="v">matches RegEx</span>  <span class="d">(your URL)</span>
+
+<span class="k">Trigger name:</span>  <span class="v">Special Event – Link List</span></div>
+
+      <p style="margin:0.75rem 0 0.5rem;"><strong>Step 7 — Tag: GA4 – Special Event</strong></p>
+      <div class="nav-path">Tags <span class="sep">›</span> New</div>
+      <div class="config-block"><span class="k">Tag type:</span>        <span class="v">Google Analytics: GA4 Event</span>
+<span class="k">Configuration:</span>   <span class="v">[select your Google tag]</span>
+<span class="k">Event name:</span>      <span class="ev">special_event</span>
+
+<span class="k">Event parameters:</span>
+  <span class="k">Parameter name:</span>  <span class="v">special_event_label</span>  <span class="k">Value:</span> <span class="v">{{Special Event Label}}</span>
+  <span class="k">Parameter name:</span>  <span class="v">link_url</span>            <span class="k">Value:</span> <span class="v">{{Click URL}}</span>
+  <span class="k">Parameter name:</span>  <span class="v">link_text</span>           <span class="k">Value:</span> <span class="v">{{Click Text}}</span>
+
+<span class="k">Trigger:</span>  <span class="v">Special Event – Attribute</span> <span class="cm">and/or</span> <span class="v">Special Event – Link List</span> <span class="cm">— both if you already have cases of both types now</span>
+<span class="k">Tag name:</span> <span class="v">GA4 – Special Event</span></div>
+
+      <p style="margin:0.75rem 0 0.5rem;"><strong>Step 8 — GA4: register custom dimension</strong></p>
+      <div class="nav-path">Admin <span class="sep">›</span> Custom definitions <span class="sep">›</span> <span class="nav-end">Create custom dimension</span></div>
+      <table class="config-table">
+        <tr><th>Dimension name</th><th>Scope</th><th>Event parameter</th><th>Description</th></tr>
+        <tr><td>Special Event Label</td><td>Event</td><td><code>special_event_label</code></td><td>special_event</td></tr>
+      </table>
+
+      <div class="callout callout-info">
+        <strong><code>special_event</code> does not affect the outbound click count.</strong> Special event links can be either internal or external. An external special event link is genuinely an outbound click and is already naturally included in the "Outbound link click" total (2d) — it is not counted extra or differently for also being a special event. An internal special event link is not affected by 2d at all, since that trigger only matches external domains.
+      </div>
+
+      <h4>Update — adding more special events later</h4>
+      <ul style="margin-left:1.25rem; font-size:0.88rem; color:#4A3F30;">
+        <li><strong>Custom widget (with label):</strong> add <code>data-ga-label="label"</code> to the HTML code. Done, no GTM change.</li>
+        <li><strong>Text widget/button widget (no label):</strong> add a row to Special Event Label Lookup. Does the Special Event – Link List trigger already exist (step 6)? Add <code>|newURL</code> to the end of the RegEx expression. Doesn't exist yet? Create it per step 6, and attach it to the GA4 – Special Event tag.</li>
+      </ul>
+    </div>
+
+    <!-- 2k -->
+    <div class="subsection">
+      <div class="subsection-header">
+        <span class="subsection-label">2k</span>
         <h3>Test and publish</h3>
       </div>
       <p>Never publish changes without testing them in GTM's Preview mode. Every unsaved change in the workspace is a "Draft" — only after publishing do the changes become active and start sending data to GA4.</p>
@@ -1451,14 +1606,14 @@ function() {
           <div class="step-num">1</div>
           <div class="step-body">
             <div class="step-title">Start Preview mode</div>
-            <div class="step-desc">Click <strong>Preview</strong> (top right in GTM). Enter your site's URL and click <strong>Connect</strong>. A new tab opens with the site, and the GTM Tag Assistant panel is shown.</div>
+            <div class="step-desc">Click <strong>Preview</strong> (top right in GTM). Enter your site's URL and click <strong>Connect</strong>. A new tab opens with the site, and the GTM Tag Assistant panel is shown. <strong>Restarted Preview after a change and it still doesn't fire?</strong> Exit and fully restart Preview — an ongoing session doesn't always reflect saved changes.</div>
           </div>
         </div>
         <div class="step">
           <div class="step-num">2</div>
           <div class="step-body">
             <div class="step-title">Test each trigger</div>
-            <div class="step-desc">Click an external link → check that "GA4 – Outbound link click" appears in "Tags Fired". Click a bulletin link → "GA4 – Bulletin view". Click a link to a file from Documents → "GA4 – Document download", and a link to a page file (in the Page Download Files widget) → "GA4 – Page file download".</div>
+            <div class="step-desc">Click an external link → check that "GA4 – Outbound link click" appears in "Tags Fired". Click a bulletin link → "GA4 – Bulletin view". Click a link to a file from Documents → "GA4 – Document download", and a link to a page file (in the Page Download Files widget) → "GA4 – Page file download". Click a special event → "GA4 – Special Event".</div>
           </div>
         </div>
         <div class="step">
@@ -1550,13 +1705,13 @@ function() {
         <ul>
           <li>List unwanted referrals: add <code>clubrunner.ca</code>, <code>crsadmin.com</code>, <code>clubrunner.blob.core.windows.net</code> — plus the referral spam list in section 1e</li>
           <li>Enhanced Measurement: turn off <em>Outbound clicks</em> and <em>File downloads</em></li>
-          <li>Custom dimensions (Event scope): <code>link_url</code>, <code>link_text</code>, <code>file_name</code>, <code>search_term</code></li>
-          <li>Exploration "Custom events [district] [period]" with four tabs: Outbound clicks, Sitesearch CR, Downloads, Bulletin viewed (section 1d)</li>
+          <li>Custom dimensions (Event scope): <code>link_url</code>, <code>link_text</code>, <code>file_name</code>, <code>search_term</code>, <code>special_event_label</code></li>
+          <li>Exploration "Custom events [period]" with five tabs: Outbound clicks, Sitesearch CR, Downloads, Bulletin viewed, Special Event (section 1d)</li>
           <li>Verify events in DebugView after publishing</li>
         </ul>
       </div>
       <div class="summary-col">
-        <h4>Google Tag Manager — 7 tags</h4>
+        <h4>Google Tag Manager — 8 tags</h4>
         <ul>
           <li><strong>Google tag</strong> (GA4) — trigger: Initialization – All Pages</li>
           <li><strong>Microsoft Clarity</strong> — trigger: Initialization – All Pages</li>
@@ -1565,6 +1720,7 @@ function() {
           <li><strong>GA4 Event: <code>file_download</code></strong> (2f) — path trigger for <code>/documents/sv-se/</code></li>
           <li><strong>GA4 Event: <code>file_download</code></strong> (2g) — blob URL trigger for ClubRunner page files</li>
           <li><strong>GA4 Event: <code>view_search_results</code></strong> — regex <code>^/[Ss]earch/</code> on path</li>
+          <li><strong>GA4 Event: <code>special_event</code></strong> (2j) — Click Element [data-ga-label] or URL list, label via fallback chain</li>
         </ul>
       </div>
     </div>

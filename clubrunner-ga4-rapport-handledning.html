@@ -367,7 +367,7 @@
     <div class="badge">Rotarydistrikt/Rotaryklubbar · ClubRunner CMS</div>
     <h1>DEL 2<br/> Trafikanalys <em>och rapportering</em><br>för webbplatser med ClubRunner CMS</h1>
     <p>Handledning för hur insamlad GA4-data omsätts till en rapport på max en sida: vad som bör laddas ner, var nyckeltalen hittas, och en föreslagen rapportstruktur.</p>
-    <p style="font-size:0.75rem; color:rgba(255,255,255,0.45); margin-top:1.25rem; margin-bottom:0;">Anders Tihkan (Värmdö Skärgård RK) &nbsp;·&nbsp; Uppdaterat 2026-07-18</p>
+    <p style="font-size:0.75rem; color:rgba(255,255,255,0.45); margin-top:1.25rem; margin-bottom:0;">Anders Tihkan (Värmdö Skärgård RK) &nbsp;·&nbsp; Uppdaterat 2026-07-20</p>
   </div>
 </div>
 
@@ -383,7 +383,7 @@
   <!-- Context box -->
   <div class="context-box">
     <h3>Förutsättning</h3>
-    <p>Handledningen förutsätter att GTM och GA4 är konfigurerade enligt <em>Del 1</em>, och att mätningen samlat in data i minst en period. Det innebär att unwanted referrals är blockerade, att custom events för nedladdningar (<code>file_download</code> — två GTM-taggar, samma eventnamn), utgående klick (<code>outbound_click</code>), nyhetsbrev (<code>bulletin_viewed</code>) och sökord (<code>view_search_results</code>) är aktiva, och att en fyrafliksutforskning är byggd enligt avsnitt 1d i Del 1. Utan den konfigurationen blir event-data ofullständig och flera avsnitt i den här handledningen inte tillämpliga.</p>
+    <p>Handledningen förutsätter att GTM och GA4 är konfigurerade enligt <em>Del 1</em>, och att mätningen samlat in data i minst en period. Det innebär att unwanted referrals är blockerade, att custom events för nedladdningar (<code>file_download</code> — två GTM-taggar, samma eventnamn), utgående klick (<code>outbound_click</code>), nyhetsbrev (<code>bulletin_viewed</code>) och sökord (<code>view_search_results</code>) är aktiva, och att en femfliksutforskning är byggd enligt avsnitt 1d i Del 1. Har ni även konfigurerat specialevent (<code>special_event</code>, avsnitt 2j i Del 1) för utvalda länkar/knappar är det ett tillägg utöver grundkonfigurationen. Utan grundkonfigurationen blir event-data ofullständig och flera avsnitt i den här handledningen inte tillämpliga.</p>
   </div>
 
   <!-- TOC -->
@@ -495,9 +495,9 @@
     <div class="subsection">
       <div class="subsection-header">
         <span class="subsection-label">1e</span>
-        <h3>Anpassade events — nedladdningar, utgående klick, nyhetsbrev, sökord</h3>
+        <h3>Anpassade events — nedladdningar, utgående klick, nyhetsbrev, sökord, specialevent</h3>
       </div>
-      <p>Custom events fångar <em>handling</em>, inte bara visning — en starkare engagemangssignal än sidvisningar. Fem events konfigureras i Del 1 och skickas under fyra eventnamn till GA4; nedladdningar är i GTM två olika taggar som använder samma eventnamn <code>file_download</code>:</p>
+      <p>Custom events fångar <em>handling</em>, inte bara visning — en starkare engagemangssignal än sidvisningar. Sex events konfigureras i Del 1 och skickas under fem eventnamn till GA4; nedladdningar är i GTM två olika taggar som använder samma eventnamn <code>file_download</code>:</p>
 
       <table class="config-table">
         <tr><th>Eventnamn</th><th>Vad det fångar</th><th>Viktigaste parameter</th></tr>
@@ -506,12 +506,17 @@
         <tr><td><code>outbound_click</code></td><td>Klick på externa länkar</td><td><code>link_url</code>, <code>link_text</code> — vart och vad</td></tr>
         <tr><td><code>bulletin_viewed</code></td><td>Klick till nyhetsbrev (bulletin)</td><td><code>link_url</code> — vilket utskick</td></tr>
         <tr><td><code>view_search_results</code></td><td>Sökningar i sajtens sökruta</td><td><code>search_term</code> — sökordet</td></tr>
+        <tr><td><code>special_event</code></td><td>Klick på utvalda, kuraterade länkar/knappar (t.ex. anmälningsformulär)</td><td><code>special_event_label</code> — vilken händelse</td></tr>
       </table>
 
-      <p style="margin-top:0.75rem;">Standardrapporten ger bara totalantal per eventnamn. Öppna den fyrafliksutforskning som byggdes i Del 1 (avsnitt 1d) för att se uppdelningen per dokument, länk eller sökord:</p>
+      <div class="callout callout-info">
+        <strong>special_event och outbound_click kan överlappa.</strong> Pekar en kuraterad special_event-länk mot en extern domän räknas klicket avsiktligt både som <code>special_event</code> och som <code>outbound_click</code> (se Del 1, avsnitt 2j) — samma klick syns alltså i både fliken "Special Event" och fliken "UTgående klick" i utforskningen. Summera därför inte totalerna från de två flikarna som om de vore fristående mått — de överlappar delvis.
+      </div>
+
+      <p style="margin-top:0.75rem;">Standardrapporten ger bara totalantal per eventnamn. Öppna den femfliksutforskning som byggdes i Del 1 (avsnitt 1d) för att se uppdelningen per dokument, länk eller sökord:</p>
 
       <div class="nav-path">
-        Explore <span class="sep">›</span> <span class="nav-end">Custom events [distrikt] [period]</span>
+        Explore <span class="sep">›</span> <span class="nav-end">Custom events [period]</span>
       </div>
 
       <div class="callout callout-tip">
@@ -699,7 +704,7 @@
       <tr><td>Engagement rate</td><td>Acquisition › Traffic acquisition</td><td>Andel besök med meningsfull interaktion</td><td>Trend</td></tr>
       <tr><td>Sessions per channel group</td><td>Acquisition › Traffic acquisition</td><td>Varifrån besökarna kommer — direkt, organisk sökning, referral, social</td><td>Operativt</td></tr>
       <tr><td>Views per sida (topp 10–15)</td><td>Engagement › Pages and screens</td><td>Populäraste innehållet</td><td>Operativt</td></tr>
-      <tr><td>file_download / outbound_click / bulletin_viewed</td><td>Explore → Custom events (fyrafliksutforskning)</td><td>Konkreta handlingar ger starkare signal än sidvisning</td><td>Operativt</td></tr>
+      <tr><td>file_download / outbound_click / bulletin_viewed / special_event</td><td>Explore → Custom events (femfliksutforskning)</td><td>Konkreta handlingar ger starkare signal än sidvisning</td><td>Operativt</td></tr>
       <tr><td>Söktrafik (Search Console)</td><td>Reports › Acquisition › Search Console</td><td>Sökord och ranking i Google — visar om organisk synlighet ökar</td><td>Operativt</td></tr>
       <tr><td>view_search_results — intern sökning</td><td>Explore → Custom events, fliken Sitesearch CR</td><td>Vad besökare söker efter på sajten — visar innehållsgap</td><td>Löpande</td></tr>
       <tr><td>Average engagement time per session</td><td>Acquisition › Traffic acquisition</td><td>Hur länge besökare stannar aktivt</td><td>Löpande</td></tr>
@@ -733,6 +738,7 @@
         <tr><td>Rubrik: Trafikkällor</td><td>Organic Search, Direct, Referral och Social — lyft fram starkaste källan och eventuella förändringar jämfört med föregående period</td></tr>
         <tr><td>Rubrik: Populäraste sidor</td><td>Topp 5–10 sidor med flest sidvisningar — kommentera om prioriterade sidor (t.ex. projektsidor, evenemang, rekrytering) når fram</td></tr>
         <tr><td>Rubrik: Nedladdningar och externa klick</td><td>Vilka dokument laddas ned, vilka externa sidor klickas — konkret handling, starkare signal än sidvisning</td></tr>
+        <tr><td>Rubrik: Utvalda händelser (anmälningar m.m.)</td><td>special_event — hur många som klickade på kuraterade CTA:er (t.ex. anmälningsformulär). En konverteringssignal snarare än allmän trafik; ta med om ni har konfigurerat specialevent för perioden</td></tr>
         <tr><td>Faktatabell</td><td>Samtliga nyckeltal från avsnitt 2, kompakt samlade — underlag för kommande jämförelse mot baslinjer</td></tr>
       </table>
     </div>
