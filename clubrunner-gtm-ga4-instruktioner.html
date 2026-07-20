@@ -477,7 +477,7 @@
     <div class="badge">Rotarydistrikt/Rotaryklubbar · ClubRunner CMS</div>
     <h1>DEL 1<br/>GTM &amp; GA4 <em>konfiguration</em><br>för webbplatser med ClubRunner CMS</h1>
     <p>Steg-för-steg-instruktioner för korrekt webbanalys, anpassade för ClubRunners multi-domänarkitektur. Alla fältnamn i GTM och GA4 anges på engelska, exakt som de visas i respektive gränssnitt.</p>
-    <p style="font-size:0.75rem; color:rgba(255,255,255,0.45); margin-top:1.25rem; margin-bottom:0;">Anders Tihkan (Värmdö Skärgård RK) &nbsp;·&nbsp; Uppdaterat 2026-07-18</p>
+    <p style="font-size:0.75rem; color:rgba(255,255,255,0.45); margin-top:1.25rem; margin-bottom:0;">Anders Tihkan (Värmdö Skärgård RK) &nbsp;·&nbsp; Uppdaterat 2026-07-20</p>
   </div>
 </div>
 
@@ -1442,6 +1442,143 @@ function() {
     <div class="subsection">
       <div class="subsection-header">
         <span class="subsection-label">2j</span>
+        <h3>Special Event — utvalda länkar och knappar med egen etikett</h3>
+      </div>
+      <p>Utöver de generella kategorierna ovan (utgående klick, nedladdningar, sökning) vill man ibland följa enskilda, utvalda länkar eller knappar individuellt i rapporter — t.ex. en anmälningslänk — med en läsbar etikett i GA4 (t.ex. "Intresseanmälan") i stället för bara länkadressen. Ett gemensamt eventnamn, <code>special_event</code>, används för alla dessa, oavsett hur många olika länkar/knappar som spåras. Nya specialevent kräver normalt <em>ingen</em> ny trigger eller tagg — bara en radändring i en av två delade komponenter. På ClubRunner webbsidor finns länkarna i tre huvudtyper, beroende på vilken widget som används för länken:</p>
+
+      <table class="config-table">
+        <tr>
+          <th>ClubRunner-widget</th>
+          <th>Vad som går att redigera</th>
+          <th>Matchas via</th>
+        </tr>
+        <tr>
+          <td>Textwidget (länk i löpande text)</td>
+          <td>Bara länktext, ingen HTML</td>
+          <td>URL-lista (Special Event – Link List)</td>
+        </tr>
+        <tr>
+          <td>Knapp-widget ("Bara en knapp")</td>
+          <td>Knapptext och länkadress, ingen HTML</td>
+          <td>URL-lista (Special Event – Link List)</td>
+        </tr>
+        <tr>
+          <td>Custom widget</td>
+          <td>Fri HTML, inkl. attribut</td>
+          <td><code>data-ga-label</code>-attribut (Special Event – Attribute)</td>
+        </tr>
+      </table>
+
+      <div class="callout callout-info">
+        <strong>Knapp-widgeten lägger till ett efterföljande mellanslag</strong> i länkadressen (t.ex. <code>href="https://exempel.se "</code>), vilket gör att ett exakt <code>equals</code>-villkor missar träffen. RegEx-matchningen som används i konfigurationen nedan kräver ingen exakt slutmatchning och påverkas därför inte av mellanslaget.
+      </div>
+
+      <h4>Rekommenderad lösning: data-ga-label i Custom widget</h4>
+      <p>Använd det här mönstret när länken/knappen ligger i en Custom widget (HTML-redigerbar) — enklast, och kräver ingen framtida GTM-ändring.</p>
+      <p>EXEMPEL på kod med blå knapp som växlar färg vid mouse-over (samma stil och färger som ClubRunners Läs mer-knappar) vars etikett (Intresseanmälan) syns tydligt i GA4-rapporten:</p>
+      <div class="config-block">&lt;a href=<span class="v">"https://exempel.se"</span>
+   <span class="hl">data-ga-label</span>=<span class="v">"Intresseanmälan"</span>
+   onmouseout="this.style.backgroundColor='#0083EF'"
+   onmouseover="this.style.backgroundColor='#0067BC'"
+   style="display:inline-block; background-color:#0083EF; color:#ffffff; padding:4px 10px; border-radius:4px; text-decoration:none; font-weight:bold; font-family:Arial, sans-serif;"
+   target="_blank"&gt;Fyll i här och skicka in ...&lt;/a&gt;</div>
+      <p>Textwidget och knapp-widget saknar HTML-redigering och kan inte bära attributet — då används metoden i "Konfigurera ditt första specialevent" nedan i stället.</p>
+
+      <h4>Grundinstallation — byggs en gång, oavsett vilken variant som används</h4>
+
+      <p style="margin-bottom:0.5rem;"><strong>Steg 1 — Variabel: Click Data Label</strong></p>
+      <div class="nav-path">Variables <span class="sep">›</span> New <span class="sep">›</span> <span class="nav-end">Auto-Event Variable</span></div>
+      <div class="config-block"><span class="k">Variable type:</span>    <span class="v">Element Attribute</span>
+<span class="k">Attribute Name:</span>  <span class="v">data-ga-label</span>
+<span class="k">Variable name:</span>   <span class="v">Click Data Label</span></div>
+
+      <p style="margin:0.75rem 0 0.5rem;"><strong>Steg 2 — Variabel: Special Event Label Lookup (skapas tom)</strong></p>
+      <div class="nav-path">Variables <span class="sep">›</span> New <span class="sep">›</span> <span class="nav-end">Lookup Table</span></div>
+      <div class="config-block"><span class="k">Input Variable:</span>  <span class="v">{{Click URL}}</span>
+<span class="cm">// Lägg inte till någon rad ännu — en tom tabell är riskfri,</span>
+<span class="cm">// den returnerar bara "inget värde" tills rader finns.</span>
+<span class="k">Set Default Value:</span>  <span class="v">avbockad</span>
+<span class="k">Variable name:</span>      <span class="v">Special Event Label Lookup</span></div>
+
+      <p style="margin:0.75rem 0 0.5rem;"><strong>Steg 3 — Variabel: Special Event Label (fallback-kedja)</strong></p>
+      <div class="nav-path">Variables <span class="sep">›</span> New <span class="sep">›</span> <span class="nav-end">Custom JavaScript</span></div>
+      <div class="config-block"><span class="k">Variable name:</span> <span class="v">Special Event Label</span>
+
+function() {
+  <span class="cm">// 1. Custom widget: attributet vinner alltid</span>
+  if ({{Click Data Label}}) return {{Click Data Label}};
+  <span class="cm">// 2. Textwidget/knapp-widget: slå upp i listan</span>
+  var l = {{Special Event Label Lookup}};
+  if (l) return l;
+  <span class="cm">// 3. Sista utväg: synlig länktext/knapptext</span>
+  return {{Click Text}};
+}</div>
+
+      <p style="margin:0.75rem 0 0.5rem;"><strong>Steg 4 — Trigger: Special Event – Attribute</strong></p>
+      <div class="nav-path">Triggers <span class="sep">›</span> New</div>
+      <div class="config-block"><span class="k">Trigger type:</span>          <span class="v">Click – All Elements</span>
+<span class="k">This trigger fires on:</span> <span class="v">Some Clicks</span>
+
+<span class="k">Click Element</span>  <span class="v">matches CSS selector</span>  <span class="d">[data-ga-label]</span>
+
+<span class="k">Trigger name:</span>  <span class="v">Special Event – Attribute</span></div>
+
+      <h4>Konfigurera ditt första specialevent</h4>
+      <p>Vilket av stegen nedan som gäller beror på widgettypen (se tabellen ovan) — grundinstallationen fungerar likadant oavsett om ditt första fall har en etikett eller inte.</p>
+
+      <p style="margin-bottom:0.5rem;"><strong>Om Custom widget (etikett):</strong> lägg till <code>data-ga-label</code> i HTML-koden enligt exemplet högst upp. Inget mer att göra — Special Event – Attribute fångar den automatiskt.</p>
+
+      <p style="margin-bottom:0.5rem;"><strong>Om textwidget eller knapp-widget (ingen etikett möjlig):</strong></p>
+
+      <p style="margin-bottom:0.5rem;"><strong>Steg 5 — Lägg till en rad i Special Event Label Lookup</strong></p>
+      <div class="config-block"><span class="k">Input:</span>   <span class="v">din länks fullständiga URL</span>
+<span class="k">Output:</span>  <span class="v">önskad etikett, t.ex. "Intresseanmälan"</span></div>
+
+      <p style="margin:0.75rem 0 0.5rem;"><strong>Steg 6 — Trigger: Special Event – Link List</strong></p>
+      <div class="nav-path">Triggers <span class="sep">›</span> New</div>
+      <div class="config-block"><span class="k">Trigger type:</span>          <span class="v">Click – Just Links</span>
+<span class="k">This trigger fires on:</span> <span class="v">Some Link Clicks</span>
+
+<span class="k">Click URL</span>  <span class="v">matches RegEx</span>  <span class="d">(din URL)</span>
+
+<span class="k">Trigger name:</span>  <span class="v">Special Event – Link List</span></div>
+
+      <p style="margin:0.75rem 0 0.5rem;"><strong>Steg 7 — Tagg: GA4 – Special Event</strong></p>
+      <div class="nav-path">Tags <span class="sep">›</span> New</div>
+      <div class="config-block"><span class="k">Tag type:</span>        <span class="v">Google Analytics: GA4 Event</span>
+<span class="k">Configuration:</span>   <span class="v">[välj din Google tag]</span>
+<span class="k">Event name:</span>      <span class="ev">special_event</span>
+
+<span class="k">Event parameters:</span>
+  <span class="k">Parameter name:</span>  <span class="v">special_event_label</span>  <span class="k">Value:</span> <span class="v">{{Special Event Label}}</span>
+  <span class="k">Parameter name:</span>  <span class="v">link_url</span>            <span class="k">Value:</span> <span class="v">{{Click URL}}</span>
+  <span class="k">Parameter name:</span>  <span class="v">link_text</span>           <span class="k">Value:</span> <span class="v">{{Click Text}}</span>
+
+<span class="k">Trigger:</span>  <span class="v">Special Event – Attribute</span> <span class="cm">och/eller</span> <span class="v">Special Event – Link List</span> <span class="cm">— båda om du redan nu har fall av båda typerna</span>
+<span class="k">Tag name:</span> <span class="v">GA4 – Special Event</span></div>
+
+      <p style="margin:0.75rem 0 0.5rem;"><strong>Steg 8 — GA4: registrera custom dimension</strong></p>
+      <div class="nav-path">Admin <span class="sep">›</span> Custom definitions <span class="sep">›</span> <span class="nav-end">Create custom dimension</span></div>
+      <table class="config-table">
+        <tr><th>Dimension name</th><th>Scope</th><th>Event parameter</th><th>Description</th></tr>
+        <tr><td>Special Event Label</td><td>Event</td><td><code>special_event_label</code></td><td>special_event</td></tr>
+      </table>
+
+      <div class="callout callout-info">
+        <strong><code>special_event</code> påverkar inte räkningen av utgående klick.</strong> Special event-länkar kan vara både interna och externa. En extern special event-länk är genuint ett utgående klick och ingår redan naturligt i den totalen i "Outbound link click" (2d) — den räknas inte extra eller annorlunda för att den även är ett specialevent. En intern special event-länk berörs inte alls av 2d, eftersom den triggern bara matchar externa domäner.
+      </div>
+
+      <h4>Update — lägga till fler specialevent senare</h4>
+      <ul style="margin-left:1.25rem; font-size:0.88rem; color:#4A3F30;">
+        <li><strong>Custom widget (med etikett):</strong> lägg till <code>data-ga-label="etikett"</code> i HTML-koden. Klart, ingen GTM-ändring.</li>
+        <li><strong>Textwidget/knapp-widget (utan etikett):</strong> lägg till en rad i Special Event Label Lookup. Finns triggern Special Event – Link List redan (steg 6): lägg till <code>|nyURL</code> sist i RegEx-uttrycket. Finns den inte än: skapa den enligt steg 6, och koppla den till taggen GA4 – Special Event.</li>
+      </ul>
+    </div>
+
+    <!-- 2k -->
+    <div class="subsection">
+      <div class="subsection-header">
+        <span class="subsection-label">2k</span>
         <h3>Testa och publicera</h3>
       </div>
       <p>Publicera aldrig ändringar utan att testa dem i GTM:s Preview-läge. Varje osparad ändring i arbetsytan är en "Draft" — det är först efter publicering som ändringarna blir aktiva och skickar data vidare till GA4.</p>
@@ -1451,14 +1588,14 @@ function() {
           <div class="step-num">1</div>
           <div class="step-body">
             <div class="step-title">Starta Preview-läge</div>
-            <div class="step-desc">Klicka <strong>Preview</strong> (uppe till höger i GTM). Ange din sajts URL och klicka <strong>Connect</strong>. En ny flik öppnas med sajten, och GTM Tag Assistant-panelen visas.</div>
+            <div class="step-desc">Klicka <strong>Preview</strong> (uppe till höger i GTM). Ange din sajts URL och klicka <strong>Connect</strong>. En ny flik öppnas med sajten, och GTM Tag Assistant-panelen visas. <strong>Startade du om Preview efter en ändring och det ändå inte triggar?</strong> Avsluta och starta om Preview helt — en pågående session speglar inte alltid sparade ändringar.</div>
           </div>
         </div>
         <div class="step">
           <div class="step-num">2</div>
           <div class="step-body">
             <div class="step-title">Testa varje trigger</div>
-            <div class="step-desc">Klicka på en extern länk → kontrollera att "GA4 – Outbound link click" syns i "Tags Fired". Klicka på en bulletin-länk → "GA4 – Bulletin view". Klicka på en länk till fil från Dokument → "GA4 – Document download" och på en länk till en sidfil (i widgeten Page Download Files) "GA4 – Page file download".</div>
+            <div class="step-desc">Klicka på en extern länk → kontrollera att "GA4 – Outbound link click" syns i "Tags Fired". Klicka på en bulletin-länk → "GA4 – Bulletin view". Klicka på en länk till fil från Dokument → "GA4 – Document download" och på en länk till en sidfil (i widgeten Page Download Files) "GA4 – Page file download". Klicka på ett specialevent → "GA4 – Special Event".</div>
           </div>
         </div>
         <div class="step">
@@ -1550,13 +1687,13 @@ function() {
         <ul>
           <li>List unwanted referrals: lägg till <code>clubrunner.ca</code>, <code>crsadmin.com</code>, <code>clubrunner.blob.core.windows.net</code> — plus referral-spam-listan i avsnitt 1e</li>
           <li>Enhanced Measurement: stäng av <em>Outbound clicks</em> och <em>File downloads</em></li>
-          <li>Custom dimensions (Event scope): <code>link_url</code>, <code>link_text</code>, <code>file_name</code>, <code>search_term</code></li>
+          <li>Custom dimensions (Event scope): <code>link_url</code>, <code>link_text</code>, <code>file_name</code>, <code>search_term</code>, <code>special_event_label</code></li>
           <li>Utforskning "Custom events [distrikt] [period]" med fyra flikar: UTgående klick, Sitesearch CR, Nedladdningar, Bulletin viewed (avsnitt 1d)</li>
           <li>Verifiera events i DebugView efter publicering</li>
         </ul>
       </div>
       <div class="summary-col">
-        <h4>Google Tag Manager — 7 taggar</h4>
+        <h4>Google Tag Manager — 8 taggar</h4>
         <ul>
           <li><strong>Google tag</strong> (GA4) — trigger: Initialization – All Pages</li>
           <li><strong>Microsoft Clarity</strong> — trigger: Initialization – All Pages</li>
@@ -1565,6 +1702,7 @@ function() {
           <li><strong>GA4 Event: <code>file_download</code></strong> (2f) — sökvägstrigger för <code>/documents/sv-se/</code></li>
           <li><strong>GA4 Event: <code>file_download</code></strong> (2g) — blob-URL-trigger för ClubRunner-sidfiler</li>
           <li><strong>GA4 Event: <code>view_search_results</code></strong> — regex <code>^/[Ss]earch/</code> på sökväg</li>
+          <li><strong>GA4 Event: <code>special_event</code></strong> (2j) — Click Element [data-ga-label] eller URL-lista, etikett via fallback-kedja</li>
         </ul>
       </div>
     </div>
