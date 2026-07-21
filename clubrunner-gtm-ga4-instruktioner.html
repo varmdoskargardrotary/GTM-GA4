@@ -486,6 +486,7 @@
     <h1>DEL 1<br/>GTM &amp; GA4 <em>konfiguration</em><br>för webbplatser med ClubRunner CMS</h1>
     <p>Steg-för-steg-instruktioner för korrekt webbanalys, anpassade för ClubRunners multi-domänarkitektur. Alla fältnamn i GTM och GA4 anges på engelska, exakt som de visas i respektive gränssnitt.</p>
     <p style="font-size:0.75rem; color:rgba(255,255,255,0.45); margin-top:1.25rem; margin-bottom:0;">Anders Tihkan <a href="https://varmdoskargard.se" target="_blank">(Värmdö Skärgård RK)</a> &nbsp;·&nbsp; Uppdaterat 2026-07-20</p>
+    <p style="font-size:0.8rem; color:rgba(255,255,255,0.7); margin-top:0.75rem; margin-bottom:0;">Har du synpunkter på den här guiden? <a href="https://forms.gle/68b5WZYrkqso8PdV8" target="_blank" style="color:var(--gold-light); text-decoration:underline;">Lämna feedback</a> — det hjälper oss att förbättra materialet.</p>
   </div>
 </div>
 
@@ -791,10 +792,10 @@
       <div class="nav-path">Explore <span class="sep">›</span> <span class="nav-end">Blank</span></div>
 
       <h4>Kom igång</h4>
-     <div> <ol>
+      <ol>
         <li>Gå till <strong>Explore → Blank exploration</strong>.</li>
         <li>Namnge utforskningen, t.ex. <strong>Custom events [period]</strong>.</li>
-        <li>Öppna <strong>Variables</strong>-panelen (vänster) och klicka på <strong>+</strong> bredvid Dimensions resp. Metrics för att lägga till dessa gemensamma variabler för alla flikar:</div>
+        <li>Öppna <strong>Variables</strong>-panelen (vänster) och klicka på <strong>+</strong> bredvid Dimensions resp. Metrics för att lägga till dessa gemensamma variabler för alla flikar:
           <div class="config-block" style="margin-top:0.5rem;"><span class="k">Dimensions:</span>
   <span class="d">Event name</span>
   <span class="d">Link text</span>
@@ -806,10 +807,9 @@
 <span class="k">Metric:</span>
   <span class="d">Event count</span></div>
         </li>
-      <div>
-      <li>Skapa sedan fem flikar i ordning nedan. Varje flik konfigureras i <strong>Tab Settings</strong>-panelen (höger). <br/>
+        <li>Skapa sedan fem flikar i ordning nedan. Varje flik konfigureras i <strong>Tab Settings</strong>-panelen (höger). <br/>
           Tips: Efter första rapporten, tryck på nerpilen i fliknamnet och duplicera fliken, då behöver du bara göra några mindre ändringar på nya flikens Settings. Redigera fliknamn genom att klicka i namnet.</li>
-      </ol></div>
+      </ol>
 
       <h4>Flik 1 — UTgående klick</h4>
       <div class="config-block"><span class="k">Tab name:</span>    <span class="v">UTgående klick</span>
@@ -893,17 +893,18 @@
     <div class="subsection">
       <div class="subsection-header">
         <span class="subsection-label">1e</span>
-        <h3>Spärra referral-spam i "List unwanted referrals"</h3>
+        <h3>Referral-spam — domänlista och hostname-filter</h3>
       </div>
-      <p>Referral-spam fungerar via GA4 Measurement Protocol — spamdomäner injicerar falska sessioner direkt mot ditt mätnings-ID utan att någon verklig besökare träffar sajten. En enda domän som <code>leadsgo.io</code> kan stå för 90 % av all referraltrafik en given dag och ge kraftigt missvisande engagemangsdata. Lägg till dessa i samma lista som ClubRunner-domänerna i avsnitt 1a.</p>
-      <p>GA4 tillåter max <strong>50 domäner</strong> per dataström i "List unwanted referrals". Listan nedan innehåller ca 30 domäner — det finns utrymme att lägga till fler vid behov.</p>
+      <p>Det finns två sorters referral-spam med helt olika mekanismer, och de kräver olika åtgärder.</p>
+      <p><strong>Moderna MP-spammare</strong> (t.ex. <code>leadsgo.io</code>) injicerar falska sessioner direkt mot GA4:s insamlingsserver via Measurement Protocol — din gtag.js körs aldrig. Det innebär att "List unwanted referrals" inte har någon effekt: listan är en klientsidig kontroll som MP-spammen aldrig passerar. Sessionerna registreras ändå i GA4 med spamdomänen intakt som källa. Det enda effektiva skyddet mot MP-spam är <strong>Web hostname traffic-filtret</strong> (se nedan).</p>
+      <p><strong>Crawlande spam</strong> (äldre bots, knapp- och trafikspam) besöker faktiskt sajten. Gtag.js laddas, och listan gör att spammens domän inte skrivs som referral-källa — sessionen hamnar under <em>direct</em> i stället för referral. Sessionen försvinner inte, men förvanskar inte trafikkällsrapporten.</p>
+      <p>Listan nedan är ändå värd att ha som bevakningsskikt för crawlande spam och e-postproxies. GA4 tillåter max <strong>50 domäner</strong> per dataström — listan nedan innehåller ca 30.</p>
 
       <div class="nav-path">
         Admin <span class="sep">›</span> Data Streams <span class="sep">›</span> [din ström] <span class="sep">›</span> Configure tag settings <span class="sep">›</span> <span class="nav-end">List unwanted referrals</span>
       </div>
 
-      <h4>Aktiva Measurement Protocol-spammare (prioritet 1)</h4>
-      <p>Skickar falska sessioner direkt mot GA4 utan att besöka sajten. Lägg in omedelbart.</p>
+      <h4>Kända spamdomäner</h4>
       <table class="config-table">
         <tr>
           <th>Domän</th>
@@ -997,6 +998,12 @@
 
       <div class="callout callout-warning">
         <strong>Nya spamdomäner tillkommer kontinuerligt.</strong> Rekommenderad rutin: granska Source/Medium-rapporten filtrerad på <code>medium = referral</code> en gång i månaden. Domäner med orealistiskt hög engagemangsgrad (&gt;95&nbsp;%) och lång sessionstid men noll konverteringar är typiska spamkännetecken.
+      </div>
+
+      <h4>Web hostname traffic — det effektiva skyddet mot MP-spam</h4>
+      <p>GA4:s Web hostname traffic-filter filtrerar bort träffar där <code>hostname</code> inte matchar dina riktiga domäner. MP-spam saknar per definition ett giltigt hostname från din sajt, vilket gör filtret träffsäkert mot den typen av spamtrafik — till skillnad mot domänlistan ovan.</p>
+      <div class="callout callout-info">
+        Filtret konfigureras under <strong>Admin → Data settings → Data filters</strong>. Aktivera det i testläge först och verifiera att ingen legitim trafik faller bort innan det sätts till aktivt läge.
       </div>
     </div>
 
@@ -1183,16 +1190,16 @@
 
 <span class="cm">// Villkor — triggar när ALLA är uppfyllda:</span>
 <span class="cm">// Gate: bara verkliga http(s)-länkar – stoppar filter-/JS-länkar utan href</span>
-<span class="k">Click URL</span>  <span class="v">matches RegEx</span>       <span class="rx">^https?://</span>
+<span class="v">{{Click URL}}</span>  <span class="v">matches RegEx</span>       <span class="rx">^https?://</span>
 <span class="cm">// Byt ut rotary[distrikt].se mot din publika domän:</span>
-<span class="k">Click URL</span>  <span class="v">does not start with</span>  <span class="d">https://rotary[distrikt].se</span>
-<span class="k">Click URL</span>  <span class="v">does not start with</span>  <span class="d">https://portal.clubrunner.ca</span>
-<span class="k">Click URL</span>  <span class="v">does not start with</span>  <span class="d">https://content.clubrunner.ca</span>
-<span class="k">Click URL</span>  <span class="v">does not start with</span>  <span class="d">https://admin.clubrunner.ca</span>
-<span class="k">Click URL</span>  <span class="v">does not contain</span>     <span class="d">crsadmin.com</span>
-<span class="k">Click URL</span>  <span class="v">does not contain</span>     <span class="d">clubrunner.blob.core.windows.net</span>
-<span class="k">Click URL</span>  <span class="v">does not contain</span>     <span class="d">/bulletin/View/</span>
-<span class="k">Click URL</span>  <span class="v">does not contain</span>     <span class="d">view.officeapps.live.com</span>
+<span class="v">{{Click URL}}</span>  <span class="v">does not start with</span>  <span class="d">https://rotary[distrikt].se</span>
+<span class="v">{{Click URL}}</span>  <span class="v">does not start with</span>  <span class="d">https://portal.clubrunner.ca</span>
+<span class="v">{{Click URL}}</span>  <span class="v">does not start with</span>  <span class="d">https://content.clubrunner.ca</span>
+<span class="v">{{Click URL}}</span>  <span class="v">does not start with</span>  <span class="d">https://admin.clubrunner.ca</span>
+<span class="v">{{Click URL}}</span>  <span class="v">does not contain</span>     <span class="d">crsadmin.com</span>
+<span class="v">{{Click URL}}</span>  <span class="v">does not contain</span>     <span class="d">clubrunner.blob.core.windows.net</span>
+<span class="v">{{Click URL}}</span>  <span class="v">does not contain</span>     <span class="d">/bulletin/View/</span>
+<span class="v">{{Click URL}}</span>  <span class="v">does not contain</span>     <span class="d">view.officeapps.live.com</span>
 
 <span class="k">Trigger name:</span>  <span class="v">Outbound link click</span></div>
 
@@ -1240,7 +1247,7 @@
       <div class="config-block"><span class="k">Trigger type:</span>          <span class="v">Click – Just Links</span>
 <span class="k">This trigger fires on:</span> <span class="v">Some Link Clicks</span>
 
-<span class="k">Click URL</span>  <span class="v">contains</span>  <span class="d">/bulletin/View/</span>
+<span class="v">{{Click URL}}</span>  <span class="v">contains</span>  <span class="d">/bulletin/View/</span>
 
 <span class="k">Trigger name:</span>  <span class="v">Bulletin-view</span></div>
 
@@ -1249,8 +1256,8 @@
 <span class="k">Configuration:</span> <span class="v">[välj din Google tag]</span>
 <span class="k">Event name:</span>    <span class="ev">bulletin_viewed</span>
 
-<span class="k">Event Parameters</span>
-<span class="k">  Parameter name:</span>  <span class="d">link_url</span>   <span class="k">Value:</span>  <span class="v">{{Click URL}}</span>
+<span class="k">Event parameters:</span>
+<span class="k">  Parameter name:</span>  <span class="v">link_url</span>   <span class="k">Value:</span>  <span class="v">{{Click URL}}</span>
 
 <span class="k">Trigger:</span>       <span class="v">Bulletin-view</span>
 <span class="k">Tag name:</span>      <span class="v">GA4 – Bulletin view</span></div>
@@ -1268,7 +1275,7 @@
       <div class="config-block"><span class="k">Trigger type:</span>          <span class="v">Click – Just Links</span>
 <span class="k">This trigger fires on:</span> <span class="v">Some Link Clicks</span>
 
-<span class="k">Click URL</span>  <span class="v">contains</span>  <span class="d">/documents/sv-se/</span>
+<span class="v">{{Click URL}}</span>  <span class="v">contains</span>  <span class="d">/documents/sv-se/</span>
 
 <span class="cm">// Matchar ClubRunners dokumentsidor – enklare och mer specifik än RegEx</span>
 <span class="k">Trigger name:</span>  <span class="v">Document download</span></div>
@@ -1307,7 +1314,7 @@
       <div class="config-block"><span class="k">Trigger type:</span>          <span class="v">Click – Just Links</span>
 <span class="k">This trigger fires on:</span> <span class="v">Some Link Clicks</span>
 
-<span class="k">Click URL</span>  <span class="v">starts with</span>  <span class="d">https://clubrunner.blob.core.windows.net/00000060099/</span>
+<span class="v">{{Click URL}}</span>  <span class="v">starts with</span>  <span class="d">https://clubrunner.blob.core.windows.net/00000060099/</span>
 
 <span class="cm">// Org-ID:t är unikt för ditt distrikt/din klubb och räcker som matchning – inget mer behövs i sökvägen.</span>
 <span class="cm">// Byt ut 00000060099 mot ditt distrikt/klubb-ClubRunner-organisations-ID.</span>
@@ -1449,7 +1456,7 @@ function() {
       <div class="config-block"><span class="k">Trigger type:</span>          <span class="v">Page View</span>
 <span class="k">This trigger fires on:</span> <span class="v">Some Page Views</span>
 
-<span class="k">Page Path</span>  <span class="v">matches RegEx</span>  <span class="d">^/[Ss]earch/</span>
+<span class="v">{{Page Path}}</span>  <span class="v">matches RegEx</span>  <span class="d">^/[Ss]earch/</span>
 
 <span class="k">Trigger name:</span>  <span class="v">CR-sitesearch</span></div>
 
@@ -1459,8 +1466,8 @@ function() {
 <span class="k">Configuration:</span> <span class="v">[välj din Google tag]</span>
 <span class="k">Event name:</span>    <span class="ev">view_search_results</span>  <span class="cm">// GA4:s rekommenderade eventnamn för sökningar</span>
 
-<span class="k">Event Parameters</span>
-<span class="k">  Parameter name:</span>  <span class="d">search_term</span>   <span class="k">Value:</span>  <span class="v">{{JS-sitesearch CR}}</span>
+<span class="k">Event parameters:</span>
+<span class="k">  Parameter name:</span>  <span class="v">search_term</span>   <span class="k">Value:</span>  <span class="v">{{JS-sitesearch CR}}</span>
 
 <span class="k">Trigger:</span>       <span class="v">CR-sitesearch</span>
 <span class="k">Tag name:</span>      <span class="v">GA4 – sitesearch CR</span></div>
@@ -1507,7 +1514,7 @@ function() {
 
       <h4>Rekommenderad lösning: data-ga-label i Custom widget</h4>
       <p>Använd det här mönstret när länken/knappen ligger i en Custom widget (HTML-redigerbar) — enklast, och kräver ingen framtida GTM-ändring.</p>
-      <p>EXEMPEL på kod med blå knapp som växlar färg vid mouse-over (samma stil och färger som ClubRunners Läs mer-knappar) vars etikett (Intresseanmälan) syns tydligt i GA4-rapporten:</p>
+      <p>Exempel på kod med blå knapp som växlar färg vid mouse-over (samma stil och färger som ClubRunners Läs mer-knappar) vars etikett (Intresseanmälan) syns tydligt i GA4-rapporten:</p>
       <div class="config-block">&lt;a href=<span class="v">"https://exempel.se"</span>
    <span class="hl">data-ga-label</span>=<span class="v">"Intresseanmälan"</span>
    onmouseout="this.style.backgroundColor='#0083EF'"
@@ -1551,7 +1558,7 @@ function() {
       <div class="config-block"><span class="k">Trigger type:</span>          <span class="v">Click – All Elements</span>
 <span class="k">This trigger fires on:</span> <span class="v">Some Clicks</span>
 
-<span class="k">Click Element</span>  <span class="v">matches CSS selector</span>  <span class="d">[data-ga-label]</span>
+<span class="v">{{Click Element}}</span>  <span class="v">matches CSS selector</span>  <span class="d">[data-ga-label]</span>
 
 <span class="k">Trigger name:</span>  <span class="v">Special Event – Attribute</span></div>
 
@@ -1571,7 +1578,7 @@ function() {
       <div class="config-block"><span class="k">Trigger type:</span>          <span class="v">Click – Just Links</span>
 <span class="k">This trigger fires on:</span> <span class="v">Some Link Clicks</span>
 
-<span class="k">Click URL</span>  <span class="v">matches RegEx</span>  <span class="d">(din URL)</span>
+<span class="v">{{Click URL}}</span>  <span class="v">matches RegEx</span>  <span class="d">(din URL)</span>
 
 <span class="k">Trigger name:</span>  <span class="v">Special Event – Link List</span></div>
 
@@ -1672,7 +1679,7 @@ function() {
         <span class="subsection-label">3a</span>
         <h3>Sidor utan GTM-täckning</h3>
       </div>
-      <p>ClubRunner injicerar inte GTM-koden i alla sidmallar. ClubRunner lägger inte in GTM-kod i nedanstående sidtyper. De registreras därför <em>inte</em> som sidvisningar i GA4, men vi kompenserar med click events.</p>
+      <p>ClubRunner lägger inte in GTM-kod i nedanstående sidtyper. De registreras därför <em>inte</em> som sidvisningar i GA4, men vi kompenserar med click events.</p>
 
       <table class="config-table">
         <tr>
@@ -1882,12 +1889,12 @@ function() {
 
 <span class="cm">// Triggar på alla länkar som lämnar rotary.se:</span>
 <span class="cm">// Gate: bara verkliga http(s)-länkar – stoppar filter-/JS-länkar utan href</span>
-<span class="k">Click URL</span>  <span class="v">matches RegEx</span>       <span class="rx">^https?://</span>
-<span class="k">Click URL</span>  <span class="v">does not start with</span>  <span class="d">https://rotary.se</span>
-<span class="k">Click URL</span>  <span class="v">does not start with</span>  <span class="d">https://www.rotary.se</span>
-<span class="k">Click URL</span>  <span class="v">does not contain</span>     <span class="d">clubrunner.ca</span>
-<span class="k">Click URL</span>  <span class="v">does not contain</span>     <span class="d">clubrunner.blob.core.windows.net</span>
-<span class="k">Click URL</span>  <span class="v">does not contain</span>     <span class="d">crsadmin.com</span>
+<span class="v">{{Click URL}}</span>  <span class="v">matches RegEx</span>       <span class="rx">^https?://</span>
+<span class="v">{{Click URL}}</span>  <span class="v">does not start with</span>  <span class="d">https://rotary.se</span>
+<span class="v">{{Click URL}}</span>  <span class="v">does not start with</span>  <span class="d">https://www.rotary.se</span>
+<span class="v">{{Click URL}}</span>  <span class="v">does not contain</span>     <span class="d">clubrunner.ca</span>
+<span class="v">{{Click URL}}</span>  <span class="v">does not contain</span>     <span class="d">clubrunner.blob.core.windows.net</span>
+<span class="v">{{Click URL}}</span>  <span class="v">does not contain</span>     <span class="d">crsadmin.com</span>
 
 <span class="k">Trigger name:</span>  <span class="v">Portal outbound click</span></div>
 
@@ -1902,9 +1909,9 @@ function() {
 <span class="k">Event name:</span>      <span class="ev">outbound_click</span>
 
 <span class="k">Event parameters:</span>
-  <span class="k">Parameter name:</span>  <span class="d">link_url</span>     <span class="k">Value:</span> <span class="v">{{Click URL}}</span>
-  <span class="k">Parameter name:</span>  <span class="d">link_text</span>    <span class="k">Value:</span> <span class="v">{{Click Text}}</span>
-  <span class="k">Parameter name:</span>  <span class="d">link_domain</span>  <span class="k">Value:</span> <span class="v">{{Click URL Hostname}}</span>
+  <span class="k">Parameter name:</span>  <span class="v">link_url</span>     <span class="k">Value:</span> <span class="v">{{Click URL}}</span>
+  <span class="k">Parameter name:</span>  <span class="v">link_text</span>    <span class="k">Value:</span> <span class="v">{{Click Text}}</span>
+  <span class="k">Parameter name:</span>  <span class="v">link_domain</span>  <span class="k">Value:</span> <span class="v">{{Click URL Hostname}}</span>
 
 <span class="k">Trigger:</span>         <span class="v">Portal outbound click</span>
 <span class="k">Tag name:</span>        <span class="v">GA4 – Portal outbound click</span></div>
