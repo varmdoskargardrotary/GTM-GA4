@@ -501,7 +501,8 @@
   <!-- Changelog -->
   <div class="context-box" id="changelog">
     <h3>Changelog</h3>
-    <p style="font-size:0.85rem; margin-bottom:0;"><strong>18 August 2026</strong> — <a href="#s2h">Section 2h</a>: the normalisation in the <code>Canonical Page Location</code> variable was extended to also strip a trailing slash (<code>/clubsmap/</code> → <code>/clubsmap</code>), not just case. <strong>Already implemented 2h?</strong> Add one line to your existing variable — see the section for the code. No new variables, triggers, or tags are required, and no other step in the document is affected.</p>
+    <p style="font-size:0.85rem; margin-bottom:0.5rem;"><strong>18 August 2026</strong> — <a href="#s2h">Section 2h</a>: the normalisation in the <code>Canonical Page Location</code> variable was extended to also strip a trailing slash (<code>/clubsmap/</code> → <code>/clubsmap</code>), not just case. <strong>Already implemented 2h?</strong> Add one line to your existing variable — see the section for the code. No new variables, triggers, or tags are required, and no other step in the document is affected.</p>
+    <p style="font-size:0.85rem; margin-bottom:0;"><strong>18 August 2026</strong> — <a href="#s2h">Section 2h, Step 2</a>: clarified that the <code>page_location</code> parameter must be set under <strong>Configuration settings</strong> on the Google tag — <em>not</em> under Shared event settings, which was previously (incorrectly) mentioned as equivalent. Shared event settings only apply to GA4 Event tags and never reach the automatic <code>page_view</code>. <strong>Check your setup</strong> if you added the parameter before this date: if it's under Shared event settings, case/trailing-slash variants will keep appearing as separate rows in "Pages and screens", even though steps 1 and 2 looked complete.</p>
   </div>
 
   <!-- TOC -->
@@ -1417,11 +1418,20 @@ function() {
       </div>
 
       <h4>Step 2 — Override page_location in the Google tag</h4>
-      <p>Open the Google tag from section 2b. Under <strong>Configuration settings</strong> (Shared event settings), add a parameter:</p>
+      <p>Open the Google tag from section 2b. Under <strong>Configuration settings</strong>, click <strong>Add parameter</strong> and fill in:</p>
       <div class="config-block"><span class="k">Configuration parameter:</span>  <span class="v">page_location</span>
 <span class="k">Value:</span>                    <span class="v">{{Canonical Page Location}}</span></div>
+
+      <div class="callout callout-warning">
+        <strong>Case-sensitive field name.</strong> The parameter name must be typed exactly <code>page_location</code> — all lowercase. That's what GA4's built-in field is called; if you type <code>Page_location</code> (capital P, a common instinct since GTM's own UI field is labelled "Page location") GA4 won't recognise it as the reserved field. Instead an entirely separate, unused custom parameter gets created, and <code>page_location</code> stays untouched — the override looks configured but does nothing.
+      </div>
+
       <div class="callout callout-info">
         <strong>Effect:</strong> The automatic <code>page_view</code> and all GA4 events that inherit the Google tag are now reported on the clean path, regardless of which alias URL the visitor arrived on. Since campaign parameters are preserved, traffic sources are unaffected.
+      </div>
+
+      <div class="callout callout-tip">
+        <strong>Verify in the Network tab:</strong> visit a page with a known case variant in incognito (e.g. <code>/ClubsMap</code>), filter the Network tab for <code>collect</code>, and check the <code>dl</code> parameter in the GA4 request. If the path appears there in lowercase, the override is correctly wired up; if it's still in its original case, the parameter is still in the wrong place or the container version hasn't been published.
       </div>
 
     </div>

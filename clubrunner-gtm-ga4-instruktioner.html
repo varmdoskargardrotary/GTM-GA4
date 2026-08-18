@@ -501,7 +501,8 @@
   <!-- Changelog -->
   <div class="context-box" id="changelog">
     <h3>Ändringshistorik</h3>
-    <p style="font-size:0.85rem; margin-bottom:0;"><strong>2026-08-18</strong> — <a href="#s2h">Avsnitt 2h</a>: normaliseringen i variabeln <code>Canonical Page Location</code> utökades till att även strippa avslutande snedstreck (<code>/clubsmap/</code> → <code>/clubsmap</code>), inte bara skiftläge. <strong>Har du redan implementerat 2h?</strong> Lägg till en rad i din befintliga variabel — se avsnittet för koden. Inga nya variabler, triggers eller taggar krävs, och inget annat steg i dokumentet påverkas.</p>
+    <p style="font-size:0.85rem; margin-bottom:0.5rem;"><strong>2026-08-18</strong> — <a href="#s2h">Avsnitt 2h</a>: normaliseringen i variabeln <code>Canonical Page Location</code> utökades till att även strippa avslutande snedstreck (<code>/clubsmap/</code> → <code>/clubsmap</code>), inte bara skiftläge. <strong>Har du redan implementerat 2h?</strong> Lägg till en rad i din befintliga variabel — se avsnittet för koden. Inga nya variabler, triggers eller taggar krävs, och inget annat steg i dokumentet påverkas.</p>
+    <p style="font-size:0.85rem; margin-bottom:0;"><strong>2026-08-18</strong> — <a href="#s2h">Avsnitt 2h, Steg 2</a>: förtydligat att <code>page_location</code>-parametern ska sättas under <strong>Configuration settings</strong> på Google-taggen — <em>inte</em> under Shared event settings, som tidigare felaktigt nämndes som synonymt. Shared event settings gäller bara GA4 Event-taggar och når aldrig den automatiska <code>page_view</code>. <strong>Kontrollera din uppsättning</strong> om du satte parametern före detta datum: står den under Shared event settings fortsätter skiftläge/snedstreck att dyka upp som separata rader i "Sidor och skärmar", trots att steg 1 och 2 såg klara ut.</p>
   </div>
 
   <!-- TOC -->
@@ -1417,11 +1418,20 @@ function() {
       </div>
 
       <h4>Steg 2 — Skriv över page_location i Google-taggen</h4>
-      <p>Öppna Google-taggen från avsnitt 2b. Under <strong>Configuration settings</strong> (Shared event settings) lägg till en parameter:</p>
+      <p>Öppna Google-taggen från avsnitt 2b. Under <strong>Configuration settings</strong> klicka <strong>Add parameter</strong> och fyll i:</p>
       <div class="config-block"><span class="k">Configuration parameter:</span>  <span class="v">page_location</span>
 <span class="k">Value:</span>                    <span class="v">{{Canonical Page Location}}</span></div>
+
+      <div class="callout callout-warning">
+        <strong>Skiftlägeskänsligt fältnamn.</strong> Parameternamnet måste skrivas exakt <code>page_location</code> — helt gement. GA4:s inbyggda fält heter så; skriver du <code>Page_location</code> (stort P, en vanlig instinkt eftersom GTM:s eget UI-fält heter "Page location") känner GA4 inte igen det som det reserverade fältet. Det skapas i stället en helt egen, oanvänd anpassad parameter, och <code>page_location</code> förblir opåverkad — overriden ser konfigurerad ut men gör ingenting.
+      </div>
+
       <div class="callout callout-info">
         <strong>Effekt:</strong> Den automatiska <code>page_view</code> och alla GA4-event som ärver Google-taggen rapporteras nu på den rena sökvägen, oavsett vilken alias-URL besökaren kom in på. Eftersom kampanjparametrarna behålls påverkas inte trafikkällorna.
+      </div>
+
+      <div class="callout callout-tip">
+        <strong>Verifiera i Network-fliken:</strong> besök en sida med känt skiftläge i inkognito (t.ex. <code>/ClubsMap</code>), filtrera Network-fliken på <code>collect</code> och kontrollera <code>dl</code>-parametern i GA4-anropet. Står sökvägen där med gemener är overrideen korrekt kopplad; står den kvar i originalskiftläge sitter parametern fortfarande på fel ställe eller så är containerversionen inte publicerad.
       </div>
 
     </div>
