@@ -485,7 +485,7 @@
     <div class="badge">Rotarydistrikt/Rotaryklubbar · ClubRunner CMS</div>
     <h1>DEL 1<br/>GTM &amp; GA4 <em>konfiguration</em><br>för webbplatser med ClubRunner CMS</h1>
     <p>Steg-för-steg-instruktioner för korrekt webbanalys, anpassade för ClubRunners multi-domänarkitektur. Alla fältnamn i GTM och GA4 anges på engelska, exakt som de visas i respektive gränssnitt.</p>
-    <p style="font-size:0.75rem; color:rgba(255,255,255,0.45); margin-top:1.25rem; margin-bottom:0;">Anders Tihkan <a href="https://varmdoskargard.se" target="_blank">(Värmdö Skärgård RK)</a> &nbsp;·&nbsp; Uppdaterat 2026-07-21</p>
+    <p style="font-size:0.75rem; color:rgba(255,255,255,0.45); margin-top:1.25rem; margin-bottom:0;">Anders Tihkan <a href="https://varmdoskargard.se" target="_blank">(Värmdö Skärgård RK)</a> &nbsp;·&nbsp; Uppdaterat 2026-08-18</p>
     <p style="font-size:0.8rem; color:rgba(255,255,255,0.7); margin-top:0.75rem; margin-bottom:0;">Har du synpunkter på den här guiden? <a href="https://forms.gle/68b5WZYrkqso8PdV8" target="_blank" style="color:var(--gold-light); text-decoration:underline;">Lämna feedback</a> — det hjälper oss att förbättra materialet.</p>
   </div>
 </div>
@@ -498,10 +498,17 @@
     Supportsidan om <a href="https://rotary2405.se/page/support-trafikanalys/" target="_blank">Trafikanalys</a> beskriver varför mätningar och konfigurering behövs.</p>
   </div>
 
+  <!-- Changelog -->
+  <div class="context-box" id="changelog">
+    <h3>Ändringshistorik</h3>
+    <p style="font-size:0.85rem; margin-bottom:0;"><strong>2026-08-18</strong> — <a href="#s2h">Avsnitt 2h</a>: normaliseringen i variabeln <code>Canonical Page Location</code> utökades till att även strippa avslutande snedstreck (<code>/clubsmap/</code> → <code>/clubsmap</code>), inte bara skiftläge. <strong>Har du redan implementerat 2h?</strong> Lägg till en rad i din befintliga variabel — se avsnittet för koden. Inga nya variabler, triggers eller taggar krävs, och inget annat steg i dokumentet påverkas.</p>
+  </div>
+
   <!-- TOC -->
   <div class="toc">
     <div class="toc-title">Innehåll</div>
     <ol>
+      <li class="nonum"><a href="#changelog">Ändringshistorik</a></li>
       <li style="counter-reset: toc -1;"><a href="#cr-config">ClubRunner — registrera GTM-behållaren</a></li>
       <li><a href="#ga4">Google Analytics 4 — inställningar</a></li>
       <li><a href="#gtm">Google Tag Manager — taggar och triggers</a></li>
@@ -1340,12 +1347,12 @@
     </div>
 
     <!-- 2h -->
-    <div class="subsection">
+    <div class="subsection" id="s2h">
       <div class="subsection-header">
         <span class="subsection-label">2h</span>
-        <h3>Konsolidera sidvisningar: omdöpta sidor och skiftlägeskorrigering (canonical-sökväg)</h3>
+        <h3>Konsolidera sidvisningar: omdöpta sidor, skiftläge och avslutande snedstreck (canonical-sökväg)</h3>
       </div>
-      <p>GA4 grupperar sidvisningar på <code>page_location</code> (den faktiska URL:en). På ClubRunner gör det att samma sida ofta splittras på flera rader av två skäl: <strong>omdöpta sidor</strong> nås via en gammal alias-URL parallellt med den rena adressen, och <strong>skiftläge</strong> i sökvägen (<code>/Events</code> vs <code>/events</code>, <code>/ClubInfo/…</code> vs <code>/clubinfo/…</code>) skapar dubbletter. Variabeln nedan åtgärdar båda.</p>
+      <p>GA4 grupperar sidvisningar på <code>page_location</code> (den faktiska URL:en). På ClubRunner gör det att samma sida ofta splittras på flera rader av tre skäl: <strong>omdöpta sidor</strong> nås via en gammal alias-URL parallellt med den rena adressen, <strong>skiftläge</strong> i sökvägen (<code>/Events</code> vs <code>/events</code>, <code>/ClubInfo/…</code> vs <code>/clubinfo/…</code>) skapar dubbletter, och <strong>avslutande snedstreck</strong> gör detsamma (<code>/clubsmap/</code> vs <code>/clubsmap</code>). Variabeln nedan åtgärdar alla tre.</p>
       <p>När en sida byter namn låter ClubRunner den gamla adressen fortsätta fungera — men <em>utan</em> 301-omdirigering. Innehållet serveras på en lång alias-URL, t.ex. <code>/60099/Page/Show?ClassCode=Page&amp;Slug=…</code>, parallellt med den rena <code>/page/&lt;slug&gt;</code>. Resultatet blir två sidor i rapporten för samma innehåll.</p>
 
       <div class="callout callout-warning">
@@ -1388,6 +1395,7 @@ function() {
     path = location.pathname;
   }
   path = path.toLowerCase();                                 <span class="cm">// ClubRunner är skiftlägesokänsligt – slår ihop /Events, /ClubInfo/… osv</span>
+  if (path.length &gt; 1 &amp;&amp; path.charAt(path.length - 1) === '/') path = path.slice(0, -1);  <span class="cm">// avslutande snedstreck – /clubsmap/ och /clubsmap är samma sida</span>
   if (/^\/page\/showhomepage\/?$/.test(path)) path = '/';    <span class="cm">// hemsidans interna route → roten</span>
   var loc = location.origin + path;            <span class="cm">// publik domän + canonical-sökväg</span>
   var src = new URLSearchParams(location.search);
@@ -1397,10 +1405,11 @@ function() {
   return qs ? loc + '?' + qs : loc;
 }</div>
       <p><strong>Canonical-sökvägen (omdöpta sidor).</strong> Variabeln tar <em>sökvägen</em> ur canonical-taggen (samma rena <code>/page/&lt;slug&gt;</code> oavsett om besökaren kom in via alias-URL:en eller den rena adressen), sätter den på den publika domänen via <code>location.origin</code>, och behåller bara kampanjparametrar (<code>utm_*</code>, <code>gclid</code> m.fl.) så att attributionen överlever.</p>
-      <p><strong>Skiftlägeskorrigering.</strong> Raden <code>path = path.toLowerCase()</code> gör sökvägen gemen — ClubRunner är skiftlägesokänsligt, så <code>/Events</code>, <code>/ClubInfo/…</code> och <code>/ClubsMap</code> slås ihop med sina gemena varianter (i ett års data för rotary2405.se låg ~1 466 visningar fördelade på 184 sådana dubblettgrupper, varav <code>/clubinfo/*</code> ofta var splittrade i tre skiftlägesvarianter). Lowercasingen normaliserar samtidigt %-kodningens skiftläge (<code>%C3%A4</code> → <code>%c3%a4</code>). Eftersom bara sökvägen görs gemen påverkas inte kampanjparametrarnas värden.</p>
+      <p><strong>Skiftlägeskorrigering.</strong> Raden <code>path = path.toLowerCase()</code> gör sökvägen gemen — ClubRunner är skiftlägesokänsligt, så <code>/Events</code>, <code>/ClubInfo/…</code> och <code>/ClubsMap</code> slås ihop med sina gemena varianter. I ett års rådata för rotary2405.se, perioden precis innan GTM-uppstädningen (2025-03-01–2026-02-28), låg 12 681 av periodens 30 942 visningar (41 %) fördelade på 207 sådana dubblettgrupper — <code>/clubinfo/*</code> var ofta splittrat i tre–fyra skiftlägesvarianter. Lowercasingen normaliserar samtidigt %-kodningens skiftläge (<code>%C3%A4</code> → <code>%c3%a4</code>). Eftersom bara sökvägen görs gemen påverkas inte kampanjparametrarnas värden.</p>
+      <p><strong>Avslutande snedstreck.</strong> Raden som strippar ett eventuellt sista <code>/</code> (utom på roten, som lämnas orörd) slår på samma sätt ihop <code>/clubsmap/</code> med <code>/clubsmap</code> — ClubRunner svarar identiskt oavsett om sökvägen avslutas med snedstreck eller inte. I samma årsdata stod trailing slash-dubbletter för ytterligare 10 664 visningar fördelade på 106 grupper. Kombinerat slår skiftläges- och snedstreckskorrigeringen tillsammans ihop 259 dubblettgrupper — 16 837 av periodens 30 942 visningar (54 %). Ett konkret exempel: <code>/ClubsMap</code>, <code>/clubsmap</code> och <code>/clubsmap/</code> var tre separata rader i rapporten trots att alla pekar på samma sida — tillsammans 1 287 visningar.</p>
 
       <div class="callout callout-warning">
-        <strong>Förutsättning för lowercasing:</strong> detta är säkert just för att ClubRunner serverar samma sida oavsett skiftläge i URL:en. På en server där sökvägar är skiftlägeskänsliga skulle <code>toLowerCase()</code> kunna slå ihop två <em>olika</em> sidor — då skulle inte den raden kunna användas.
+        <strong>Förutsättning för normaliseringen:</strong> detta är säkert just för att ClubRunner serverar samma sida oavsett skiftläge <em>och</em> avslutande snedstreck i URL:en. På en server där sökvägar är känsliga för endera skulle motsvarande rad kunna slå ihop två <em>olika</em> sidor — då skulle den raden inte kunna användas.
       </div>
 
       <div class="callout callout-info">

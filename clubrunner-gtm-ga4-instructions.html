@@ -485,7 +485,7 @@
     <div class="badge">Rotary Districts/Rotary Clubs · ClubRunner CMS</div>
     <h1>PART 1<br/>GTM &amp; GA4 <em>Configuration</em><br>for Websites Using ClubRunner CMS</h1>
     <p>Step-by-step instructions for correct web analytics, tailored to ClubRunner's multi-domain architecture.</p>
-    <p style="font-size:0.75rem; color:rgba(255,255,255,0.45); margin-top:1.25rem; margin-bottom:0;">Anders Tihkan <a href="https://varmdoskargard.se" target="_blank">(Värmdö Skärgård RC)</a> &nbsp;·&nbsp; Updated 21 July 2026</p>
+    <p style="font-size:0.75rem; color:rgba(255,255,255,0.45); margin-top:1.25rem; margin-bottom:0;">Anders Tihkan <a href="https://varmdoskargard.se" target="_blank">(Värmdö Skärgård RC)</a> &nbsp;·&nbsp; Updated 18 August 2026</p>
     <p style="font-size:0.8rem; color:rgba(255,255,255,0.7); margin-top:0.75rem; margin-bottom:0;">Do you have feedback on this guide? <a href="https://forms.gle/68b5WZYrkqso8PdV8" target="_blank" style="color:var(--gold-light); text-decoration:underline;">Leave feedback</a> — it helps us improve the material.</p>
   </div>
 </div>
@@ -498,10 +498,17 @@
     The support page on <a href="https://rotary2405.se/page/support-trafikanalys/" target="_blank">Traffic Analysis</a> (use translation buttons at the top of the page) explains why measurement and configuration are needed.</p>
   </div>
 
+  <!-- Changelog -->
+  <div class="context-box" id="changelog">
+    <h3>Changelog</h3>
+    <p style="font-size:0.85rem; margin-bottom:0;"><strong>18 August 2026</strong> — <a href="#s2h">Section 2h</a>: the normalisation in the <code>Canonical Page Location</code> variable was extended to also strip a trailing slash (<code>/clubsmap/</code> → <code>/clubsmap</code>), not just case. <strong>Already implemented 2h?</strong> Add one line to your existing variable — see the section for the code. No new variables, triggers, or tags are required, and no other step in the document is affected.</p>
+  </div>
+
   <!-- TOC -->
   <div class="toc">
     <div class="toc-title">Contents</div>
     <ol>
+      <li class="nonum"><a href="#changelog">Changelog</a></li>
       <li style="counter-reset: toc -1;"><a href="#cr-config">ClubRunner — Register the GTM Container</a></li>
       <li><a href="#ga4">Google Analytics 4 — Settings</a></li>
       <li><a href="#gtm">Google Tag Manager — Tags and Triggers</a></li>
@@ -1340,12 +1347,12 @@
     </div>
 
     <!-- 2h -->
-    <div class="subsection">
+    <div class="subsection" id="s2h">
       <div class="subsection-header">
         <span class="subsection-label">2h</span>
-        <h3>Consolidating page views: renamed pages and case correction (canonical path)</h3>
+        <h3>Consolidating page views: renamed pages, case, and trailing slash (canonical path)</h3>
       </div>
-      <p>GA4 groups page views by <code>page_location</code> (the actual URL). On ClubRunner, this often causes the same page to be split across several rows for two reasons: <strong>renamed pages</strong> are reachable via an old alias URL alongside the clean address, and <strong>case</strong> in the path (<code>/Events</code> vs <code>/events</code>, <code>/ClubInfo/…</code> vs <code>/clubinfo/…</code>) creates duplicates. The variable below fixes both.</p>
+      <p>GA4 groups page views by <code>page_location</code> (the actual URL). On ClubRunner, this often causes the same page to be split across several rows for three reasons: <strong>renamed pages</strong> are reachable via an old alias URL alongside the clean address, <strong>case</strong> in the path (<code>/Events</code> vs <code>/events</code>, <code>/ClubInfo/…</code> vs <code>/clubinfo/…</code>) creates duplicates, and a <strong>trailing slash</strong> does the same (<code>/clubsmap/</code> vs <code>/clubsmap</code>). The variable below fixes all three.</p>
       <p>When a page is renamed, ClubRunner lets the old address keep working — but <em>without</em> a 301 redirect. The content is served on a long alias URL, e.g. <code>/60099/Page/Show?ClassCode=Page&amp;Slug=…</code>, alongside the clean <code>/page/&lt;slug&gt;</code>. The result is two pages in the report for the same content.</p>
 
       <div class="callout callout-warning">
@@ -1388,6 +1395,7 @@ function() {
     path = location.pathname;
   }
   path = path.toLowerCase();                                 <span class="cm">// ClubRunner is case-insensitive – merges /Events, /ClubInfo/… etc.</span>
+  if (path.length &gt; 1 &amp;&amp; path.charAt(path.length - 1) === '/') path = path.slice(0, -1);  <span class="cm">// trailing slash – /clubsmap/ and /clubsmap are the same page</span>
   if (/^\/page\/showhomepage\/?$/.test(path)) path = '/';    <span class="cm">// homepage's internal route → root</span>
   var loc = location.origin + path;            <span class="cm">// public domain + canonical path</span>
   var src = new URLSearchParams(location.search);
@@ -1397,10 +1405,11 @@ function() {
   return qs ? loc + '?' + qs : loc;
 }</div>
       <p><strong>Canonical path (renamed pages).</strong> The variable takes the <em>path</em> from the canonical tag (the same clean <code>/page/&lt;slug&gt;</code> regardless of whether the visitor arrived via the alias URL or the clean address), sets it on the public domain via <code>location.origin</code>, and keeps only campaign parameters (<code>utm_*</code>, <code>gclid</code>, etc.) so attribution survives.</p>
-      <p><strong>Case correction.</strong> The line <code>path = path.toLowerCase()</code> lowercases the path — ClubRunner is case-insensitive, so <code>/Events</code>, <code>/ClubInfo/…</code> and <code>/ClubsMap</code> are merged with their lowercase variants (in a year's worth of data for rotary2405.se, roughly 1,466 views were spread across 184 such duplicate groups, with <code>/clubinfo/*</code> often split into three case variants). Lowercasing also normalises the case of %-encoding (<code>%C3%A4</code> → <code>%c3%a4</code>). Since only the path is lowercased, campaign parameter values are unaffected.</p>
+      <p><strong>Case correction.</strong> The line <code>path = path.toLowerCase()</code> lowercases the path — ClubRunner is case-insensitive, so <code>/Events</code>, <code>/ClubInfo/…</code> and <code>/ClubsMap</code> are merged with their lowercase variants. In a year of raw data for rotary2405.se, the period immediately before the GTM clean-up (1 March 2025 – 28 February 2026), 12,681 of the period's 30,942 views (41%) were spread across 207 such duplicate groups — <code>/clubinfo/*</code> was often split into three or four case variants. Lowercasing also normalises the case of %-encoding (<code>%C3%A4</code> → <code>%c3%a4</code>). Since only the path is lowercased, campaign parameter values are unaffected.</p>
+      <p><strong>Trailing slash.</strong> The line that strips a trailing <code>/</code> (except on the root, which is left untouched) likewise merges <code>/clubsmap/</code> with <code>/clubsmap</code> — ClubRunner responds identically whether the path ends with a slash or not. In the same year of data, trailing-slash duplicates accounted for a further 10,664 views spread across 106 groups. Combined, the case and trailing-slash corrections together merge 259 duplicate groups — 16,837 of the period's 30,942 views (54%). One concrete example: <code>/ClubsMap</code>, <code>/clubsmap</code> and <code>/clubsmap/</code> were three separate rows in the report despite all pointing to the same page — 1,287 views between them.</p>
 
       <div class="callout callout-warning">
-        <strong>Precondition for lowercasing:</strong> this is safe specifically because ClubRunner serves the same page regardless of URL case. On a server where paths are case-sensitive, <code>toLowerCase()</code> could merge two <em>different</em> pages — in that case, this line could not be used.
+        <strong>Precondition for the normalisation:</strong> this is safe specifically because ClubRunner serves the same page regardless of URL case <em>and</em> trailing slash. On a server where paths are sensitive to either, the corresponding line could merge two <em>different</em> pages — in that case, that line could not be used.
       </div>
 
       <div class="callout callout-info">
