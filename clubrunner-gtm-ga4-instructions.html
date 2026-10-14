@@ -501,7 +501,7 @@
   <!-- Changelog -->
   <div class="context-box" id="changelog">
     <h3>Changelog</h3>
-    <p style="font-size:0.85rem; margin-bottom:0.5rem;"><strong>14 October 2026</strong> — <a href="#s2d">Section 2d</a>: two exceptions in the <em>Outbound link click</em> trigger were wrong, so internal clicks were counted as <code>outbound_click</code> while clicks to some club sites were dropped. (1) <code>does not start with https://rotary[district].se</code> missed links to the <code>www.</code> address. The row is replaced with <code>does not match RegEx ^https?://(www\.)?rotary2405\.se([/?#]|$)</code>. (2) <code>does not start with https://portal.clubrunner.ca</code> was too broad: it hid clicks to club sites at <code>https://portal.clubrunner.ca/[club ID]</code> but not the same clicks via <code>http://</code>, and missed the district's own portal pages over http. The row is replaced with <code>does not match RegEx ^https?://portal\.clubrunner\.ca/99999([/?#]|$)</code>. Replace 2405 and 99999 with your district number and ClubRunner ID. Club subdomains and portal sites now consistently count as outbound. <strong>Already implemented 2d?</strong> Replace those two rows in your trigger and publish. Historical data is not corrected – filter out <code>Link URL</code> matching the same RegEx in your explorations.</p>
+    <p style="font-size:0.85rem; margin-bottom:0.5rem;"><strong>14 October 2026</strong> — <a href="#s2d">Section 2d</a>: the exception for the site's own addresses in the <em>Outbound link click</em> trigger was wrong, so internal clicks were counted as <code>outbound_click</code> while clicks to some club sites were dropped. <code>does not start with https://rotary[district].se</code> missed links to the <code>www.</code> address, and <code>does not start with https://portal.clubrunner.ca</code> was too broad – it hid clicks to club sites at <code>https://portal.clubrunner.ca/[club ID]</code> but not the same clicks via <code>http://</code>, and missed the district's own portal pages over http. Both rows are replaced with one general row that works for district and club sites alike: <code>does not match RegEx ^https?://((www\.)?ADDRESS|portal\.clubrunner\.ca/99999)([/?#]|$)</code>, where you replace <code>ADDRESS</code> with the site's domain and <code>99999</code> with the site's ClubRunner ID. Other clubs' sites, club subdomains and (for a club) the district site now consistently count as outbound. <strong>Already implemented 2d?</strong> Replace the two rows in your trigger with the new one and publish. Historical data is not corrected – filter out <code>Link URL</code> matching the same RegEx in your explorations. In addition, the examples now use real addresses and IDs (sections 2d, 2g and 2h), while <code>99999</code> remains wherever you fill in your own ID.</p>
     <p style="font-size:0.85rem; margin-bottom:0.5rem;"><strong>18 August 2026</strong> — <a href="#s2h">Section 2h</a>: the normalisation in the <code>Canonical Page Location</code> variable was extended to also strip a trailing slash (<code>/clubsmap/</code> → <code>/clubsmap</code>), not just case. <strong>Already implemented 2h?</strong> Add one line to your existing variable — see the section for the code. No new variables, triggers, or tags are required, and no other step in the document is affected.</p>
     <p style="font-size:0.85rem; margin-bottom:0;"><strong>18 August 2026</strong> — <a href="#s2h">Section 2h, Step 2</a>: clarified that the <code>page_location</code> parameter must be set under <strong>Configuration settings</strong> on the Google tag — <em>not</em> under Shared event settings, which was previously (incorrectly) mentioned as equivalent. Shared event settings only apply to GA4 Event tags and never reach the automatic <code>page_view</code>. <strong>Check your setup</strong> if you added the parameter before this date: if it's under Shared event settings, case/trailing-slash variants will keep appearing as separate rows in "Pages and screens", even though steps 1 and 2 looked complete.</p>
   </div>
@@ -1189,7 +1189,7 @@
         <span class="subsection-label">2d</span>
         <h3>Outbound link clicks — trigger and tag</h3>
       </div>
-      <p>Registers clicks on external links. ClubRunner's own domains, bulletin links and page file downloads must be excluded so they aren't counted as external or double-counted against the download tags.</p>
+      <p>Registers clicks on external links. The site's own addresses, ClubRunner's own domains, bulletin links and page file downloads must be excluded so they aren't counted as external or double-counted against the download tags. The trigger is the same for district and club sites — only <code>ADDRESS</code> and the ClubRunner ID (<code>99999</code>) differ.</p>
 
       <h4>Step 1 — Create the trigger</h4>
       <div class="nav-path">Triggers <span class="sep">›</span> New</div>
@@ -1200,12 +1200,20 @@
 <span class="cm">// Conditions — fires when ALL are met:</span>
 <span class="cm">// Gate: real http(s) links only – blocks filter/JS links with no href</span>
 <span class="v">{{Click URL}}</span>  <span class="v">matches RegEx</span>       <span class="rx">^https?://</span>
-<span class="cm">// The district's own site, with and without www. Replace 2405 with your district number.</span>
-<span class="cm">// Club subdomains (e.g. hultsfred.rotary2405.se) must NOT match – they count as outbound.</span>
-<span class="v">{{Click URL}}</span>  <span class="v">does not match RegEx</span> <span class="rx">^https?://(www\.)?rotary2405\.se([/?#]|$)</span>
-<span class="cm">// The district's own pages on the portal address, http and https. Replace 99999 with your ClubRunner ID.</span>
-<span class="cm">// Other portal.clubrunner.ca/[number] addresses are club sites and should count as outbound.</span>
-<span class="v">{{Click URL}}</span>  <span class="v">does not match RegEx</span> <span class="rx">^https?://portal\.clubrunner\.ca/99999([/?#]|$)</span>
+<span class="cm">// The site's own addresses – NOT counted as outbound. Replace ADDRESS and 99999:</span>
+<span class="cm">//</span>
+<span class="cm">//   ADDRESS = the site's public address without https:// and without www.</span>
+<span class="cm">//             Write \. instead of each dot.</span>
+<span class="cm">//               District site:         rotary2405\.se</span>
+<span class="cm">//               Club, own domain:      varmdoskargard\.se</span>
+<span class="cm">//               Club, subdomain:       hultsfred\.rotary2405\.se</span>
+<span class="cm">//               Club, portal only:     portal\.clubrunner\.ca/15604</span>
+<span class="cm">//</span>
+<span class="cm">//   99999   = replace with the site's ClubRunner ID. You can see your ClubRunner ID</span>
+<span class="cm">//             while logged in, in the address bar: https://admin.clubrunner.ca/[ID]/</span>
+<span class="cm">//</span>
+<span class="cm">// Other clubs' sites and the district site (for a club) count as outbound.</span>
+<span class="v">{{Click URL}}</span>  <span class="v">does not match RegEx</span> <span class="rx">^https?://((www\.)?<span class="hl">ADDRESS</span>|portal\.clubrunner\.ca/<span class="hl">99999</span>)([/?#]|$)</span>
 <span class="v">{{Click URL}}</span>  <span class="v">does not start with</span>  <span class="d">https://content.clubrunner.ca</span>
 <span class="v">{{Click URL}}</span>  <span class="v">does not start with</span>  <span class="d">https://admin.clubrunner.ca</span>
 <span class="v">{{Click URL}}</span>  <span class="v">does not contain</span>     <span class="d">crsadmin.com</span>
@@ -1220,11 +1228,17 @@
       </div>
 
       <div class="callout callout-info">
-        <strong>Why RegEx for the district domain:</strong> ClubRunner links internally to <code>https://www.rotary2405.se/…</code>. A condition such as <code>does not start with https://rotary2405.se</code> therefore never matches, and every internal link is recorded as <code>outbound_click</code> (in D2405 this was just over a quarter of all outbound clicks). The RegEx row excludes both <code>rotary2405.se</code> and <code>www.rotary2405.se</code>, but not club subdomains such as <code>hultsfred.rotary2405.se</code> – clicks there are intentionally outbound, since club sites are separate websites.
+        <strong>Example — filled-in row:</strong><br>
+        District D2405 (ID 60089): <code>^https?://((www\.)?rotary2405\.se|portal\.clubrunner\.ca/60089)([/?#]|$)</code><br>
+        Värmdö Skärgård RC (ID 15591): <code>^https?://((www\.)?varmdoskargard\.se|portal\.clubrunner\.ca/15591)([/?#]|$)</code>
       </div>
 
       <div class="callout callout-info">
-        <strong>Why the portal row is limited to the district's ID:</strong> Club sites without their own domain live at <code>portal.clubrunner.ca/[club ID]</code>. A broad exception such as <code>does not start with https://portal.clubrunner.ca</code> means clicks to those club sites are <em>not</em> recorded when the link is https, yet <em>are</em> recorded when ClubRunner writes the link as <code>http://</code> – the same kind of click ends up differently depending on the protocol. The district's own pages are also reachable via the portal address (e.g. <code>portal.clubrunner.ca/99999/ClubInfo/…</code>) and were then wrongly counted as outbound. The RegEx row excludes only the district's own ID, regardless of http/https.
+        <strong>Why the row looks like this:</strong> ClubRunner links to the site's own pages in several ways — with and without <code>www.</code>, with <code>http://</code> or <code>https://</code>, and often via the portal address <code>portal.clubrunner.ca/[ID]</code> instead of the site's own domain (Värmdö Skärgård's home page, for example, has about ten such links). A simple <code>does not start with</code> condition misses one of the variants, and internal clicks are then counted as <code>outbound_click</code>. The RegEx row catches every variant but only the site's own ID — other clubs' portal sites, club subdomains and (for a club) the district site count as outbound. <code>([/?#]|$)</code> at the end ensures that e.g. ID 15604 doesn't accidentally match 156041.
+      </div>
+
+      <div class="callout callout-warning">
+        <strong>Don't forget to replace <code>ADDRESS</code> and <code>99999</code>.</strong> <code>ADDRESS</code> is written without square brackets on purpose: if it is left in place the row matches nothing, and internal clicks show up immediately as <code>outbound_click</code> in Preview. (A forgotten <code>[ADDRESS]</code> would be interpreted as valid RegEx and the error would go unnoticed.) If <code>99999</code> is left in place, clicks to the site's portal address show up as outbound.
       </div>
 
       <div class="callout callout-warning">
@@ -1323,7 +1337,7 @@
         <span class="subsection-label">2g</span>
         <h3>Page file downloads via ClubRunner blob storage — trigger and tag</h3>
       </div>
-      <p>Files uploaded in the Download Page Files widget are stored by ClubRunner on a separate domain: <code>clubrunner.blob.core.windows.net</code>. These files sit under a path prefix that starts with the district's/club's ClubRunner ID (e.g. <code>/00000099999/</code>). Since that ID is unique to the district/club, it's sufficient as a match — the trigger then becomes independent of language and folder structure. They require a separate trigger because the domain differs from your public site.</p>
+      <p>Files uploaded in the Download Page Files widget are stored by ClubRunner on a separate domain: <code>clubrunner.blob.core.windows.net</code>. These files sit under a path prefix that starts with the district's/club's ClubRunner ID (e.g. <code>/00000060089/</code>). Since that ID is unique to the district/club, it's sufficient as a match — the trigger then becomes independent of language and folder structure. They require a separate trigger because the domain differs from your public site.</p>
       <p>The blob domain must also be included in the exceptions in the "Outbound link click" trigger (section 2d) so these downloads aren't simultaneously counted as external clicks.</p>
 
       <div class="callout callout-info">
@@ -1366,7 +1380,7 @@
         <h3>Consolidating page views: renamed pages, case, and trailing slash (canonical path)</h3>
       </div>
       <p>GA4 groups page views by <code>page_location</code> (the actual URL). On ClubRunner, this often causes the same page to be split across several rows for three reasons: <strong>renamed pages</strong> are reachable via an old alias URL alongside the clean address, <strong>case</strong> in the path (<code>/Events</code> vs <code>/events</code>, <code>/ClubInfo/…</code> vs <code>/clubinfo/…</code>) creates duplicates, and a <strong>trailing slash</strong> does the same (<code>/clubsmap/</code> vs <code>/clubsmap</code>). The variable below fixes all three.</p>
-      <p>When a page is renamed, ClubRunner lets the old address keep working — but <em>without</em> a 301 redirect. The content is served on a long alias URL, e.g. <code>/99999/Page/Show?ClassCode=Page&amp;Slug=…</code>, alongside the clean <code>/page/&lt;slug&gt;</code>. The result is two pages in the report for the same content.</p>
+      <p>When a page is renamed, ClubRunner lets the old address keep working — but <em>without</em> a 301 redirect. The content is served on a long alias URL, e.g. <code>/60089/Page/Show?ClassCode=Page&amp;Slug=…</code>, alongside the clean <code>/page/&lt;slug&gt;</code>. The result is two pages in the report for the same content.</p>
 
       <div class="callout callout-warning">
         <strong>Two pitfalls:</strong>
@@ -1385,7 +1399,7 @@
           <td><code>https://rotary2405.se/page/support-logga-in-hjälp</code> ✅</td>
         </tr>
         <tr>
-          <td><code>rotary2405.se/99999/Page/Show?…&amp;Slug=support-logga-in-hjälp</code></td>
+          <td><code>rotary2405.se/60089/Page/Show?…&amp;Slug=support-logga-in-hjälp</code></td>
           <td><code>https://portal.clubrunner.ca/page/support-logga-in-hjälp</code> ❌ wrong host</td>
         </tr>
       </table>
@@ -1426,7 +1440,7 @@ function() {
       </div>
 
       <div class="callout callout-info">
-        <strong>Special case — the homepage:</strong> ClubRunner serves the homepage on <em>two</em> live addresses — the clean root <code>/</code> and the internal route <code>/page/showhomepage</code> (which logo/"Home" links often point to). Both have <em>self-referencing</em> canonicals, so canonical alone doesn't merge them; that's why the <code>if</code> line in the variable forces <code>/page/showhomepage</code> to the root. The bare route <code>/99999/Page/Show</code> <em>without</em> <code>?…&amp;Slug=</code>, however, is an error page ("Account not found", soft 404) — it should <strong>not</strong> be normalised away. If it turns up in reports, it's a useful signal of broken links (e.g. set an alert on <code>page_title</code> containing "General Error").
+        <strong>Special case — the homepage:</strong> ClubRunner serves the homepage on <em>two</em> live addresses — the clean root <code>/</code> and the internal route <code>/page/showhomepage</code> (which logo/"Home" links often point to). Both have <em>self-referencing</em> canonicals, so canonical alone doesn't merge them; that's why the <code>if</code> line in the variable forces <code>/page/showhomepage</code> to the root. The bare route <code>/60089/Page/Show</code> <em>without</em> <code>?…&amp;Slug=</code>, however, is an error page ("Account not found", soft 404) — it should <strong>not</strong> be normalised away. If it turns up in reports, it's a useful signal of broken links (e.g. set an alert on <code>page_title</code> containing "General Error").
       </div>
 
       <h4>Step 2 — Override page_location in the Google tag</h4>

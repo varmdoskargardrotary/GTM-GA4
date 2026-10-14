@@ -501,7 +501,7 @@
   <!-- Changelog -->
   <div class="context-box" id="changelog">
     <h3>Ändringshistorik</h3>
-    <p style="font-size:0.85rem; margin-bottom:0.5rem;"><strong>2026-10-14</strong> — <a href="#s2d">Avsnitt 2d</a>: två undantag i triggern <em>Outbound link click</em> var felaktiga, så interna klick räknades som <code>outbound_click</code> medan klick till vissa klubbsajter tappades. (1) <code>does not start with https://rotary[distrikt].se</code> missade länkar till <code>www.</code>-adressen. Raden ersätts med <code>does not match RegEx ^https?://(www\.)?rotary2405\.se([/?#]|$)</code>. (2) <code>does not start with https://portal.clubrunner.ca</code> var för brett: det dolde klick till klubbsajter på <code>https://portal.clubrunner.ca/[klubb-ID]</code> men inte samma klick via <code>http://</code>, och missade distriktets egna portal-sidor via http. Raden ersätts med <code>does not match RegEx ^https?://portal\.clubrunner\.ca/99999([/?#]|$)</code>. Byt ut 2405 och 99999 mot ditt distriktsnummer och ClubRunner-ID. Klubbarnas subdomäner och portal-sajter räknas nu konsekvent som utgående. <strong>Har du redan implementerat 2d?</strong> Byt ut de två raderna i din trigger och publicera. Historisk data rättas inte – filtrera bort <code>Link URL</code> som matchar samma RegEx i dina utforskningar.</p>
+    <p style="font-size:0.85rem; margin-bottom:0.5rem;"><strong>2026-10-14</strong> — <a href="#s2d">Avsnitt 2d</a>: undantaget för sajtens egna adresser i triggern <em>Outbound link click</em> var felaktigt, så interna klick räknades som <code>outbound_click</code> medan klick till vissa klubbsajter tappades. <code>does not start with https://rotary[distrikt].se</code> missade länkar till <code>www.</code>-adressen, och <code>does not start with https://portal.clubrunner.ca</code> var för brett – det dolde klick till klubbsajter på <code>https://portal.clubrunner.ca/[klubb-ID]</code> men inte samma klick via <code>http://</code>, och missade distriktets egna portal-sidor via http. Båda raderna ersätts med en generell rad som fungerar för både distrikts- och klubbsajter: <code>does not match RegEx ^https?://((www\.)?ADRESS|portal\.clubrunner\.ca/99999)([/?#]|$)</code>, där du byter ut <code>ADRESS</code> mot sajtens domän och <code>99999</code> mot sajtens ClubRunner-ID. Andra klubbars sajter, klubbarnas subdomäner och (för en klubb) distriktets sajt räknas nu konsekvent som utgående. <strong>Har du redan implementerat 2d?</strong> Byt ut de två raderna i din trigger mot den nya och publicera. Historisk data rättas inte – filtrera bort <code>Link URL</code> som matchar samma RegEx i dina utforskningar. Samtidigt används nu riktiga adresser och ID i exemplen (avsnitt 2d, 2g och 2h), medan <code>99999</code> står kvar där du ska fylla i ditt eget ID.</p>
     <p style="font-size:0.85rem; margin-bottom:0.5rem;"><strong>2026-08-18</strong> — <a href="#s2h">Avsnitt 2h</a>: normaliseringen i variabeln <code>Canonical Page Location</code> utökades till att även strippa avslutande snedstreck (<code>/clubsmap/</code> → <code>/clubsmap</code>), inte bara skiftläge. <strong>Har du redan implementerat 2h?</strong> Lägg till en rad i din befintliga variabel — se avsnittet för koden. Inga nya variabler, triggers eller taggar krävs, och inget annat steg i dokumentet påverkas.</p>
     <p style="font-size:0.85rem; margin-bottom:0;"><strong>2026-08-18</strong> — <a href="#s2h">Avsnitt 2h, Steg 2</a>: förtydligat att <code>page_location</code>-parametern ska sättas under <strong>Configuration settings</strong> på Google-taggen — <em>inte</em> under Shared event settings, som tidigare felaktigt nämndes som synonymt. Shared event settings gäller bara GA4 Event-taggar och når aldrig den automatiska <code>page_view</code>. <strong>Kontrollera din uppsättning</strong> om du satte parametern före detta datum: står den under Shared event settings fortsätter skiftläge/snedstreck att dyka upp som separata rader i "Sidor och skärmar", trots att steg 1 och 2 såg klara ut.</p>
   </div>
@@ -1189,7 +1189,7 @@
         <span class="subsection-label">2d</span>
         <h3>Utgående länkklick — trigger och tagg</h3>
       </div>
-      <p>Registrerar klick på externa länkar. ClubRunners egna domäner, bulletin-länkar och sid-filnedladdningar måste exkluderas så att de inte räknas som externa eller dubbelräknas mot nedladdningstaggarna.</p>
+      <p>Registrerar klick på externa länkar. Sajtens egna adresser, ClubRunners egna domäner, bulletin-länkar och sid-filnedladdningar måste exkluderas så att de inte räknas som externa eller dubbelräknas mot nedladdningstaggarna. Triggern är densamma för distrikts- och klubbsajter — bara <code>ADRESS</code> och ClubRunner-ID:t (<code>99999</code>) skiljer.</p>
 
       <h4>Steg 1 — Skapa trigger</h4>
       <div class="nav-path">Triggers <span class="sep">›</span> New</div>
@@ -1200,12 +1200,20 @@
 <span class="cm">// Villkor — triggar när ALLA är uppfyllda:</span>
 <span class="cm">// Gate: bara verkliga http(s)-länkar – stoppar filter-/JS-länkar utan href</span>
 <span class="v">{{Click URL}}</span>  <span class="v">matches RegEx</span>       <span class="rx">^https?://</span>
-<span class="cm">// Distriktets egen sajt, med och utan www. Byt ut 2405 mot ditt distriktsnummer.</span>
-<span class="cm">// Klubbarnas subdomäner (t.ex. hultsfred.rotary2405.se) ska INTE matcha – de räknas som utgående.</span>
-<span class="v">{{Click URL}}</span>  <span class="v">does not match RegEx</span> <span class="rx">^https?://(www\.)?rotary2405\.se([/?#]|$)</span>
-<span class="cm">// Distriktets egna sidor på portal-adressen, http och https. Byt ut 99999 mot ditt ClubRunner-ID.</span>
-<span class="cm">// Övriga portal.clubrunner.ca/[nummer] är klubbsajter och ska räknas som utgående.</span>
-<span class="v">{{Click URL}}</span>  <span class="v">does not match RegEx</span> <span class="rx">^https?://portal\.clubrunner\.ca/99999([/?#]|$)</span>
+<span class="cm">// Sajtens egna adresser – räknas INTE som utgående. Byt ut ADRESS och 99999:</span>
+<span class="cm">//</span>
+<span class="cm">//   ADRESS = sajtens publika adress utan https:// och utan www.</span>
+<span class="cm">//            Skriv \. i stället för varje punkt.</span>
+<span class="cm">//              Distriktets sajt:      rotary2405\.se</span>
+<span class="cm">//              Klubb, egen domän:     varmdoskargard\.se</span>
+<span class="cm">//              Klubb, subdomän:       hultsfred\.rotary2405\.se</span>
+<span class="cm">//              Klubb, bara portal:    portal\.clubrunner\.ca/15604</span>
+<span class="cm">//</span>
+<span class="cm">//   99999  = byt mot sajtens ClubRunner-ID. Ditt ClubRunner-ID ser du som</span>
+<span class="cm">//            inloggad, i adressfältet: https://admin.clubrunner.ca/[ID]/</span>
+<span class="cm">//</span>
+<span class="cm">// Andra klubbars och distriktets sajter (för en klubb) räknas som utgående.</span>
+<span class="v">{{Click URL}}</span>  <span class="v">does not match RegEx</span> <span class="rx">^https?://((www\.)?<span class="hl">ADRESS</span>|portal\.clubrunner\.ca/<span class="hl">99999</span>)([/?#]|$)</span>
 <span class="v">{{Click URL}}</span>  <span class="v">does not start with</span>  <span class="d">https://content.clubrunner.ca</span>
 <span class="v">{{Click URL}}</span>  <span class="v">does not start with</span>  <span class="d">https://admin.clubrunner.ca</span>
 <span class="v">{{Click URL}}</span>  <span class="v">does not contain</span>     <span class="d">crsadmin.com</span>
@@ -1220,11 +1228,17 @@
       </div>
 
       <div class="callout callout-info">
-        <strong>Varför RegEx för distriktsdomänen:</strong> ClubRunner länkar internt till <code>https://www.rotary2405.se/…</code>. Ett villkor som <code>does not start with https://rotary2405.se</code> träffar därför aldrig, och alla interna länkar registreras som <code>outbound_click</code> (i D2405 var det drygt en fjärdedel av alla utgående klick). RegEx-raden undantar både <code>rotary2405.se</code> och <code>www.rotary2405.se</code>, men inte klubbarnas subdomäner som <code>hultsfred.rotary2405.se</code> – klick dit är avsiktligt utgående, eftersom klubbsajterna är egna webbplatser.
+        <strong>Exempel — ifylld rad:</strong><br>
+        Distriktet D2405 (ID 60089): <code>^https?://((www\.)?rotary2405\.se|portal\.clubrunner\.ca/60089)([/?#]|$)</code><br>
+        Värmdö Skärgård RK (ID 15591): <code>^https?://((www\.)?varmdoskargard\.se|portal\.clubrunner\.ca/15591)([/?#]|$)</code>
       </div>
 
       <div class="callout callout-info">
-        <strong>Varför portal-raden begränsas till distriktets ID:</strong> Klubbsajter som saknar egen domän ligger på <code>portal.clubrunner.ca/[klubbens ID]</code>. Ett brett undantag som <code>does not start with https://portal.clubrunner.ca</code> gör att klick till dessa klubbsajter <em>inte</em> registreras när länken är https, men däremot registreras när ClubRunner skriver länken som <code>http://</code> – samma typ av klick hamnar alltså olika beroende på protokoll. Distriktets egna sidor nås också via portal-adressen (t.ex. <code>portal.clubrunner.ca/99999/ClubInfo/…</code>) och räknades då felaktigt som utgående. RegEx-raden undantar bara distriktets eget ID, oavsett http/https.
+        <strong>Varför raden ser ut så här:</strong> ClubRunner länkar till sajtens egna sidor på flera sätt — med och utan <code>www.</code>, med <code>http://</code> eller <code>https://</code>, och ofta via portal-adressen <code>portal.clubrunner.ca/[ID]</code> i stället för den egna domänen (Värmdö Skärgårds startsida har t.ex. ett tiotal sådana länkar). Ett enkelt <code>does not start with</code>-villkor missar någon av varianterna, och då räknas interna klick som <code>outbound_click</code>. RegEx-raden fångar alla varianter men bara sajtens eget ID — andra klubbars portal-sajter, klubbarnas subdomäner och (för en klubb) distriktets sajt räknas som utgående. <code>([/?#]|$)</code> i slutet gör att t.ex. ID 15604 inte råkar matcha 156041.
+      </div>
+
+      <div class="callout callout-warning">
+        <strong>Glöm inte att byta ut <code>ADRESS</code> och <code>99999</code>.</strong> <code>ADRESS</code> skrivs utan hakparenteser med avsikt: står den kvar matchar raden ingenting, och interna klick syns direkt som <code>outbound_click</code> i Preview. (En kvarglömd <code>[ADRESS]</code> hade tolkats som giltig RegEx och felet hade inte märkts.) Står <code>99999</code> kvar syns klick till sajtens portal-adress som utgående.
       </div>
 
       <div class="callout callout-warning">
@@ -1323,7 +1337,7 @@
         <span class="subsection-label">2g</span>
         <h3>Nedladdning av sidfiler via ClubRunner blob-lagring — trigger och tagg</h3>
       </div>
-      <p>Filer som är uppladdade i widgeten Download Page Files lagrar ClubRunner på en separat domän: <code>clubrunner.blob.core.windows.net</code>. Dessa filer ligger under ett sökvägsprefix som inleds med distriktets/klubbens ClubRunner-ID (t.ex. <code>/00000099999/</code>). Eftersom det ID:t är unikt för distrikt/klubb räcker det som matchning — triggern blir då oberoende av språk- och mappstruktur. De kräver en separat trigger eftersom domänen skiljer sig från din publika sajt.</p>
+      <p>Filer som är uppladdade i widgeten Download Page Files lagrar ClubRunner på en separat domän: <code>clubrunner.blob.core.windows.net</code>. Dessa filer ligger under ett sökvägsprefix som inleds med distriktets/klubbens ClubRunner-ID (t.ex. <code>/00000060089/</code>). Eftersom det ID:t är unikt för distrikt/klubb räcker det som matchning — triggern blir då oberoende av språk- och mappstruktur. De kräver en separat trigger eftersom domänen skiljer sig från din publika sajt.</p>
       <p>Blob-domänen måste också vara med i undantagen i "Outbound link click"-triggern (avsnitt 2d) så att dessa nedladdningar inte samtidigt räknas som externa klick.</p>
 
       <div class="callout callout-info">
@@ -1366,7 +1380,7 @@
         <h3>Konsolidera sidvisningar: omdöpta sidor, skiftläge och avslutande snedstreck (canonical-sökväg)</h3>
       </div>
       <p>GA4 grupperar sidvisningar på <code>page_location</code> (den faktiska URL:en). På ClubRunner gör det att samma sida ofta splittras på flera rader av tre skäl: <strong>omdöpta sidor</strong> nås via en gammal alias-URL parallellt med den rena adressen, <strong>skiftläge</strong> i sökvägen (<code>/Events</code> vs <code>/events</code>, <code>/ClubInfo/…</code> vs <code>/clubinfo/…</code>) skapar dubbletter, och <strong>avslutande snedstreck</strong> gör detsamma (<code>/clubsmap/</code> vs <code>/clubsmap</code>). Variabeln nedan åtgärdar alla tre.</p>
-      <p>När en sida byter namn låter ClubRunner den gamla adressen fortsätta fungera — men <em>utan</em> 301-omdirigering. Innehållet serveras på en lång alias-URL, t.ex. <code>/99999/Page/Show?ClassCode=Page&amp;Slug=…</code>, parallellt med den rena <code>/page/&lt;slug&gt;</code>. Resultatet blir två sidor i rapporten för samma innehåll.</p>
+      <p>När en sida byter namn låter ClubRunner den gamla adressen fortsätta fungera — men <em>utan</em> 301-omdirigering. Innehållet serveras på en lång alias-URL, t.ex. <code>/60089/Page/Show?ClassCode=Page&amp;Slug=…</code>, parallellt med den rena <code>/page/&lt;slug&gt;</code>. Resultatet blir två sidor i rapporten för samma innehåll.</p>
 
       <div class="callout callout-warning">
         <strong>Två fällor:</strong>
@@ -1385,7 +1399,7 @@
           <td><code>https://rotary2405.se/page/support-logga-in-hjälp</code> ✅</td>
         </tr>
         <tr>
-          <td><code>rotary2405.se/99999/Page/Show?…&amp;Slug=support-logga-in-hjälp</code></td>
+          <td><code>rotary2405.se/60089/Page/Show?…&amp;Slug=support-logga-in-hjälp</code></td>
           <td><code>https://portal.clubrunner.ca/page/support-logga-in-hjälp</code> ❌ fel värd</td>
         </tr>
       </table>
@@ -1426,7 +1440,7 @@ function() {
       </div>
 
       <div class="callout callout-info">
-        <strong>Specialfall hemsidan:</strong> ClubRunner serverar hemsidan på <em>två</em> live-adresser — den rena roten <code>/</code> och den interna routen <code>/page/showhomepage</code> (dit logotyp-/"Hem"-länkar ofta går). Båda har <em>självrefererande</em> canonical, så canonical ensam slår inte ihop dem; därför tvingar <code>if</code>-raden i variabeln <code>/page/showhomepage</code> till roten. Den bara routen <code>/99999/Page/Show</code> <em>utan</em> <code>?…&amp;Slug=</code> är däremot en felsida ("Kontot hittas inte", soft 404) — den ska <strong>inte</strong> normaliseras bort. Dyker den upp i rapporterna är det en nyttig signal om trasiga länkar (larma t.ex. på <code>page_title</code> som innehåller "General Error").
+        <strong>Specialfall hemsidan:</strong> ClubRunner serverar hemsidan på <em>två</em> live-adresser — den rena roten <code>/</code> och den interna routen <code>/page/showhomepage</code> (dit logotyp-/"Hem"-länkar ofta går). Båda har <em>självrefererande</em> canonical, så canonical ensam slår inte ihop dem; därför tvingar <code>if</code>-raden i variabeln <code>/page/showhomepage</code> till roten. Den bara routen <code>/60089/Page/Show</code> <em>utan</em> <code>?…&amp;Slug=</code> är däremot en felsida ("Kontot hittas inte", soft 404) — den ska <strong>inte</strong> normaliseras bort. Dyker den upp i rapporterna är det en nyttig signal om trasiga länkar (larma t.ex. på <code>page_title</code> som innehåller "General Error").
       </div>
 
       <h4>Steg 2 — Skriv över page_location i Google-taggen</h4>
